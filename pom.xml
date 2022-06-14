@@ -1,0 +1,141 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.apicatalog</groupId>
+    <artifactId>vc-http-api</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+
+    <name>Verifiable Credentials HTTP API v0.3</name>
+
+    <description>
+    A HTTP API for Verifiable Credentials lifecycle management
+  </description>
+
+    <url>https://github.com/filip26/vc-http-api</url>
+
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>http://apache.org/licenses/LICENSE-2.0</url>
+        </license>
+    </licenses>
+
+    <issueManagement>
+        <system>github</system>
+        <url>https://github.com/filip26/vc-http-api/issues</url>
+    </issueManagement>
+
+    <scm>
+        <connection>scm:git:git://github.com/filip26/vc-http-api.git</connection>
+        <developerConnection>scm:git:git://github.com/filip26/vc-http-api.git</developerConnection>
+        <url>https://github.com/filip26/vc-http-api/tree/main</url>
+    </scm>
+
+    <developers>
+        <developer>
+            <id>filip26</id>
+            <name>Filip Kolarik</name>
+            <email>filip26@gmail.com</email>
+            <roles>
+                <role>author</role>
+            </roles>
+        </developer>
+    </developers>
+
+    <inceptionYear>2022</inceptionYear>
+
+    <properties>
+        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
+
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <argLine>-Dfile.encoding=UTF-8</argLine>
+        
+        <vertx.version>4.1.1</vertx.version>
+        <main.verticle>com.apicatalog.vc.http.api.VerifierVerticle</main.verticle>
+        <launcher.class>io.vertx.core.Launcher</launcher.class>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>io.vertx</groupId>
+                <artifactId>vertx-stack-depchain</artifactId>
+                <version>${vertx.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-web</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-web-validation</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-junit5</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.0.0-M7</version>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                    <archive>
+                        <manifest>
+                            <mainClass>${launcher.class}</mainClass>
+                        </manifest>
+                        <manifestEntries>
+                            <Main-Verticle>${main.verticle}</Main-Verticle>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.0.0</version>
+                <configuration>
+                    <mainClass>${launcher.class}</mainClass>
+                    <arguments>
+                        <argument>run</argument>
+                        <argument>${main.verticle}</argument>
+                    </arguments>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

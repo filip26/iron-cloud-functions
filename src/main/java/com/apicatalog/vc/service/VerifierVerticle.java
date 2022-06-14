@@ -1,4 +1,4 @@
-package com.apicatalog.vc.http.api;
+package com.apicatalog.vc.service;
 
 
 import java.nio.charset.Charset;

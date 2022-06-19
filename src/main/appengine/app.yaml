@@ -1,6 +1,6 @@
 runtime: java17
 env: standard
-service: vc-http-api
+service: vc-api
 
 handlers:
 - url: /.*
@@ -12,4 +12,3 @@ env_variables:
   JAVA_USER_OPTS: "-Dfile.encoding=UTF-8"
   DEFAULT_ENCODING: "UTF-8"
   LANG: "en_US.UTF-8"
-

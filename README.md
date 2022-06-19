@@ -24,8 +24,16 @@ All PR's welcome!
 Fork and clone the project repository.
 
 ```bash
-> cd iron-verfiable-credentials
+> cd vc-http-api
 > mvn clean package
+```
+
+## Developing
+
+```bash
+> cd vc-http-api
+> chmod +x ./bin/start.sh
+> ./bin/start.sh dev
 ```
 
 # Resources

@@ -1,5 +1,7 @@
 package com.apicatalog.vc.service;
 
+import static io.vertx.ext.web.validation.builder.Parameters.optionalParam;
+import static io.vertx.json.schema.common.dsl.Schemas.stringSchema;
 
 import java.io.StringReader;
 import java.nio.charset.Charset;
@@ -18,7 +20,9 @@ import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.BodyHandler;
 import io.vertx.ext.web.handler.StaticHandler;
+import io.vertx.ext.web.validation.RequestParameters;
 import io.vertx.ext.web.validation.RequestPredicate;
+import io.vertx.ext.web.validation.ValidationHandler;
 import io.vertx.ext.web.validation.builder.ValidationHandlerBuilder;
 import io.vertx.json.schema.SchemaParser;
 import io.vertx.json.schema.SchemaRouter;
@@ -27,6 +31,9 @@ import io.vertx.json.schema.SchemaRouterOptions;
 
 public class VerifierVerticle extends AbstractVerticle {
 
+    private static final String OPTION_DOMAIN = "domain";
+    private static final String OPTION_CHALLENGE = "challenge";
+    
     private static final String CTX_RESULT = "verificationResult";
     
     Instant startTime;
@@ -44,11 +51,13 @@ public class VerifierVerticle extends AbstractVerticle {
         router
             .post("/credentials/verify")
             .putMetadata("input-type", "crendetial")
+            .putMetadata("strict", true)
             .handler(ctx -> ctx.reroute("/verify"));
 
         router
             .post("/presentations/verify")
             .putMetadata("input-type", "presentation")
+            .putMetadata("strict", true)
             .handler(ctx -> ctx.reroute("/verify"));
 
         router
@@ -56,14 +65,33 @@ public class VerifierVerticle extends AbstractVerticle {
             .consumes("application/json")
             .consumes("application/ld+json")
             .produces("application/json")
-            
+
             // validation
             .handler(ValidationHandlerBuilder
                         .create(schemaParser)
+                        .queryParameter(optionalParam(OPTION_DOMAIN, stringSchema()))
+                        .queryParameter(optionalParam(OPTION_CHALLENGE, stringSchema()))
                         .predicate(RequestPredicate.BODY_REQUIRED)      // request body is required
                         .build()
                     )
 
+            // options
+            .handler(ctx -> {
+                final RequestParameters parameters = ctx.get(ValidationHandler.REQUEST_CONTEXT_KEY);
+                
+                var domain = parameters.queryParameter(OPTION_DOMAIN);
+                
+                if (domain != null) {
+                    ctx.put(OPTION_DOMAIN, domain.getString());
+                }
+                
+                var challenge = parameters.queryParameter(OPTION_CHALLENGE);
+                
+                if (challenge != null) {
+                    ctx.put(OPTION_CHALLENGE, challenge.getString());
+                }
+            })
+            
             // set verification result
             .handler(ctx -> {
                 ctx.put(CTX_RESULT, new VerificationResult());
@@ -83,11 +111,18 @@ public class VerifierVerticle extends AbstractVerticle {
                 
                 try {
                     
-                    var jsdoc = JsonDocument.of(new StringReader(document.toString()));
-                        
                     verificationResult.addCheck("proof");
 
-                    Vc.verify(jsdoc.getJsonContent().orElse(null).asJsonObject()).isValid();
+                    Vc.verify(JsonDocument
+                                .of(new StringReader(document.toString()))
+                                .getJsonContent()
+                                .orElseThrow(IllegalStateException::new)
+                                .asJsonObject())
+                    
+                        .domain(ctx.get(OPTION_DOMAIN, null))
+                        
+                        // assert document validity
+                        .isValid();
                                                         
                     ctx.json(verificationResult);
                 
@@ -95,6 +130,7 @@ public class VerifierVerticle extends AbstractVerticle {
                     ctx.fail(e);
                 }
             })
+            
             // handle errors
             .failureHandler(new ErrorHandler());
             

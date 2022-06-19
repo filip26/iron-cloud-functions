@@ -5,4 +5,4 @@ An implementation of [Verifiable Credentials HTTP API](https://w3c-ccg.github.io
 # Extra Endpoints
 
 ## /verify?[domain=]
-Verifies verifiable credentials and presentations sent in raw JSON format, expanded or compacted.
+Verifies verifiable credentials and presentations sent in raw JSON[-LD] format, expanded or compacted.

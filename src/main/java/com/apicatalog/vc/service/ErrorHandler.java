@@ -6,6 +6,7 @@ import com.apicatalog.ld.signature.DataError;
 import com.apicatalog.ld.signature.VerificationError;
 
 import io.vertx.core.Handler;
+import io.vertx.core.json.DecodeException;
 import io.vertx.ext.web.RoutingContext;
 
 class ErrorHandler implements Handler<RoutingContext> {
@@ -13,13 +14,19 @@ class ErrorHandler implements Handler<RoutingContext> {
     @Override
     public void handle(RoutingContext ctx) {
 
-        final VerificationResult verificationResult = ctx.get(Constants.CTX_RESULT);
+        VerificationResult verificationResult = ctx.get(Constants.CTX_RESULT);
+        
+        if (verificationResult == null) {
+            verificationResult = new VerificationResult();
+        }
         
         final Throwable e = ctx.failure();
 
         if (e instanceof VerificationError ve) {
             
             verificationResult.addError(toString(ve.getCode()));
+            
+            ctx.response().setStatusCode(400);
 
         } else if (e instanceof DataError de) {
 
@@ -27,6 +34,14 @@ class ErrorHandler implements Handler<RoutingContext> {
             verificationResult.addError(toString(de));
             
             ctx.response().setStatusCode(400);
+            
+        } else if (e instanceof DecodeException de) {
+
+            verificationResult.addError("MALFORMED");
+            verificationResult.addError("INVALID_DOCUMENT");
+            
+            ctx.response().setStatusCode(400);
+
             
         } else {
             ctx.response().setStatusCode(500);

@@ -1,5 +1,7 @@
 package com.apicatalog.vc.service;
 
+import java.util.Arrays;
+
 import com.apicatalog.ld.signature.DataError;
 import com.apicatalog.ld.signature.VerificationError;
 
@@ -16,7 +18,8 @@ class ErrorHandler implements Handler<RoutingContext> {
         final Throwable e = ctx.failure();
 
         if (e instanceof VerificationError ve) {
-            verificationResult.addError(ve.getCode().name());
+            
+            verificationResult.addError(toString(ve.getCode()));
 
         } else if (e instanceof DataError de) {
 
@@ -40,6 +43,10 @@ class ErrorHandler implements Handler<RoutingContext> {
     
     static String toString(DataError de) {
         return de.getType().name().toUpperCase() + "_" + de.getSubject().toUpperCase();
+    }
+    
+    static String toString(VerificationError.Code code) {
+        return String.join("_", Arrays.stream(code.name().split("(?=\\p{Upper})")).map(String::toUpperCase).toList());
     }
     
 }

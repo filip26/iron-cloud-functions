@@ -8,7 +8,7 @@ An implementation of the [Verifiable Credentials HTTP API](https://w3c-ccg.githu
 
 # Demo
 
-[vc.apicatalog.com/*](vc.apicatalog.com)
+[https://vc.apicatalog.com/*](https://vc.apicatalog.com)
 
 # Extra Endpoints
 

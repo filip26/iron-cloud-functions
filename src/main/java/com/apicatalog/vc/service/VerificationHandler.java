@@ -23,13 +23,13 @@ class VerificationHandler implements Handler<RoutingContext> {
         ctx.put(Constants.CTX_RESULT, verificationResult);
 
         var route = ctx.currentRoute();
-        
+
         var document = ctx.body().asJsonObject();
-        
+
         final String documentKey = route.getMetadata(Constants.CTX_DOCUMENT_KEY);
-        
+
         if (StringUtils.isNotBlank(documentKey)) {
-            document = document.getJsonObject(documentKey);            
+            document = document.getJsonObject(documentKey);
         }
 
         if (document == null) {
@@ -40,23 +40,23 @@ class VerificationHandler implements Handler<RoutingContext> {
         try {
 
             verificationResult.addCheck("PROOF");
-            
+
             Vc.verify(JsonDocument
                         .of(new StringReader(document.toString()))
                         .getJsonContent()
                         .orElseThrow(IllegalStateException::new)
                         .asJsonObject())
-            
+
                 .domain(ctx.get(Constants.OPTION_DOMAIN, null))
-                
+
                 // assert document validity
                 .isValid();
-                                        
+
             ctx.json(verificationResult);
-        
+
         } catch (JsonLdError | VerificationError | DataError e) {
             ctx.fail(e);
-        }        
+        }
     }
 
 }

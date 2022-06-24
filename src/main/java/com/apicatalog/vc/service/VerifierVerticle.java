@@ -36,33 +36,43 @@ public class VerifierVerticle extends AbstractVerticle {
 
         router
             .post("/credentials/verify")
+            .consumes("application/json")
+            .consumes("application/ld+json")
+            .produces("application/json")
             .putMetadata(Constants.CTX_DOCUMENT_KEY, Constants.CREDENTIAL_KEY)
             .putMetadata(Constants.CTX_STRICT, true)
 
             //TODO validation
+            .handler(ctx -> {
+                System.out.println(ctx.body().asString());
+                ctx.next();
+            })
 
             // options
             .handler(new EmbeddedOptionsHandler())
-            
+
             // verify
             .handler(new VerificationHandler())
-            
+
             // handle errors
             .failureHandler(new ErrorHandler());
 
         router
             .post("/presentations/verify")
+            .consumes("application/json")
+            .consumes("application/ld+json")
+            .produces("application/json")
             .putMetadata(Constants.CTX_DOCUMENT_KEY, Constants.PRESENTATION_KEY)
             .putMetadata(Constants.CTX_STRICT, true)
 
             //TODO validation
-            
+
             // options
             .handler(new EmbeddedOptionsHandler())
-            
+
             // verify
             .handler(new VerificationHandler())
-            
+
             // handle errors
             .failureHandler(new ErrorHandler());
 
@@ -73,7 +83,7 @@ public class VerifierVerticle extends AbstractVerticle {
             .consumes("application/ld+json")
             .produces("application/json")
             .putMetadata(Constants.CTX_STRICT, false)
-            
+
             // validation
             .handler(ValidationHandlerBuilder
                         .create(schemaParser)                           //TODO body validation
@@ -87,28 +97,28 @@ public class VerifierVerticle extends AbstractVerticle {
             // options
             .handler(ctx -> {
                 final RequestParameters parameters = ctx.get(ValidationHandler.REQUEST_CONTEXT_KEY);
-                
+
                 var domain = parameters.queryParameter(Constants.OPTION_DOMAIN);
-                
+
                 if (domain != null) {
                     ctx.put(Constants.OPTION_DOMAIN, domain.getString());
                 }
-                
+
                 var challenge = parameters.queryParameter(Constants.OPTION_CHALLENGE);
-                
+
                 if (challenge != null) {
                     ctx.put(Constants.OPTION_CHALLENGE, challenge.getString());
                 }
 
                 ctx.next();
             })
-                        
+
             // verify
             .handler(new VerificationHandler())
-            
+
             // handle errors
             .failureHandler(new ErrorHandler());
-            
+
         // static resources
         router
             .get("/static/*")
@@ -154,5 +164,5 @@ public class VerifierVerticle extends AbstractVerticle {
             return Integer.valueOf(envPort);
         }
         return 8080;
-    }    
+    }
 }

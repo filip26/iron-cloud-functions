@@ -1,9 +1,11 @@
-package com.apicatalog.vc.service;
+package com.apicatalog.vc.service.issuer;
+
+import com.apicatalog.vc.service.Constants;
 
 import io.vertx.core.Handler;
 import io.vertx.ext.web.RoutingContext;
 
-class VerifyEmbeddedOptionsHandler implements Handler<RoutingContext> {
+class IssueEmbeddedOptionsHandler implements Handler<RoutingContext> {
 
     @Override
     public void handle(RoutingContext ctx) {

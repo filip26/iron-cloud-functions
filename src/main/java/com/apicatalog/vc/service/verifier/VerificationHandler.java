@@ -1,4 +1,4 @@
-package com.apicatalog.vc.service;
+package com.apicatalog.vc.service.verifier;
 
 import java.io.StringReader;
 
@@ -9,6 +9,7 @@ import com.apicatalog.ld.signature.DataError;
 import com.apicatalog.ld.signature.DataError.ErrorType;
 import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.vc.api.Vc;
+import com.apicatalog.vc.service.Constants;
 
 import io.vertx.core.Handler;
 import io.vertx.ext.web.RoutingContext;

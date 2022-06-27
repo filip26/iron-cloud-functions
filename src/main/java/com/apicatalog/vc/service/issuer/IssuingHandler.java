@@ -1,4 +1,4 @@
-package com.apicatalog.vc.service;
+package com.apicatalog.vc.service.issuer;
 
 import java.io.StringReader;
 
@@ -13,6 +13,7 @@ import com.apicatalog.ld.signature.ed25519.Ed25519ProofOptions2020;
 import com.apicatalog.ld.signature.key.KeyPair;
 import com.apicatalog.ld.signature.proof.ProofOptions;
 import com.apicatalog.vc.api.Vc;
+import com.apicatalog.vc.service.Constants;
 
 import io.vertx.core.Handler;
 import io.vertx.ext.web.RoutingContext;

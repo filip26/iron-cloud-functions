@@ -1,15 +1,16 @@
-package com.apicatalog.vc.service;
+package com.apicatalog.vc.service.verifier;
 
 import java.util.Arrays;
 
 import com.apicatalog.ld.signature.DataError;
 import com.apicatalog.ld.signature.VerificationError;
+import com.apicatalog.vc.service.Constants;
 
 import io.vertx.core.Handler;
 import io.vertx.core.json.DecodeException;
 import io.vertx.ext.web.RoutingContext;
 
-class ErrorHandler implements Handler<RoutingContext> {
+class VerifierErrorHandler implements Handler<RoutingContext> {
 
     @Override
     public void handle(RoutingContext ctx) {

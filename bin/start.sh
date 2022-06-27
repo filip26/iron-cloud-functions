@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 export LAUNCHER="io.vertx.core.Launcher"
-export VERTICLE="com.apicatalog.vc.service.VerifierVerticle"
+export VERTICLE="com.apicatalog.vc.service.VcApiVerticle"
 export CMD="mvn compile"
 export VERTX_CMD="run"
 export PORT=8080

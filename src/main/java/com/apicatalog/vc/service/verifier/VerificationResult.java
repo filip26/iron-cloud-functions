@@ -1,4 +1,4 @@
-package com.apicatalog.vc.service;
+package com.apicatalog.vc.service.verifier;
 
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;

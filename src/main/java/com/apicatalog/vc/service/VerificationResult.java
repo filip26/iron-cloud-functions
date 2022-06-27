@@ -3,7 +3,7 @@ package com.apicatalog.vc.service;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
-public class VerificationResult extends JsonObject {
+class VerificationResult extends JsonObject {
 
     private static final String PROPERTY_CHECKS = "checks";
     private static final String PROPERTY_WARNINGS = "warnings";

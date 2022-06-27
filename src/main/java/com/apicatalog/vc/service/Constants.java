@@ -1,6 +1,6 @@
 package com.apicatalog.vc.service;
 
-public class Constants {
+class Constants {
 
     static final String OPTIONS = "options";
     static final String OPTION_DOMAIN = "domain";

@@ -54,7 +54,7 @@
 
         <vertx.version>4.3.1</vertx.version>
 
-        <main.verticle>com.apicatalog.vc.service.VerifierVerticle</main.verticle>
+        <main.verticle>com.apicatalog.vc.service.VcApiVerticle</main.verticle>
         <launcher.class>io.vertx.core.Launcher</launcher.class>
     </properties>
 

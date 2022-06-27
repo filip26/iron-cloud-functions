@@ -8,6 +8,7 @@ import java.time.Duration;
 import java.time.Instant;
 
 import io.vertx.core.AbstractVerticle;
+import io.vertx.core.http.HttpServerOptions;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.BodyHandler;
 import io.vertx.ext.web.handler.StaticHandler;
@@ -20,7 +21,7 @@ import io.vertx.json.schema.SchemaRouter;
 import io.vertx.json.schema.SchemaRouterOptions;
 
 
-public class VerifierVerticle extends AbstractVerticle {
+public class VcApiVerticle extends AbstractVerticle {
 
     Instant startTime;
 
@@ -36,10 +37,10 @@ public class VerifierVerticle extends AbstractVerticle {
 
         router
             .post("/credentials/verify")
-            .consumes("application/json")
             .consumes("application/ld+json")
+            .consumes("application/json")
             .produces("application/json")
-            .putMetadata(Constants.CTX_DOCUMENT_KEY, Constants.CREDENTIAL_KEY)
+            .putMetadata(Constants.CTX_DOCUMENT_KEY, Constants.VERIFIABLE_CREDENTIAL_KEY)
             .putMetadata(Constants.CTX_STRICT, true)
 
             //TODO validation
@@ -49,7 +50,7 @@ public class VerifierVerticle extends AbstractVerticle {
             })
 
             // options
-            .handler(new EmbeddedOptionsHandler())
+            .handler(new VerifyEmbeddedOptionsHandler())
 
             // verify
             .handler(new VerificationHandler())
@@ -59,8 +60,8 @@ public class VerifierVerticle extends AbstractVerticle {
 
         router
             .post("/presentations/verify")
-            .consumes("application/json")
             .consumes("application/ld+json")
+            .consumes("application/json")
             .produces("application/json")
             .putMetadata(Constants.CTX_DOCUMENT_KEY, Constants.PRESENTATION_KEY)
             .putMetadata(Constants.CTX_STRICT, true)
@@ -68,7 +69,7 @@ public class VerifierVerticle extends AbstractVerticle {
             //TODO validation
 
             // options
-            .handler(new EmbeddedOptionsHandler())
+            .handler(new VerifyEmbeddedOptionsHandler())
 
             // verify
             .handler(new VerificationHandler())
@@ -79,8 +80,8 @@ public class VerifierVerticle extends AbstractVerticle {
 
         router
             .post("/verify")
-            .consumes("application/json")
             .consumes("application/ld+json")
+            .consumes("application/json")
             .produces("application/json")
             .putMetadata(Constants.CTX_STRICT, false)
 
@@ -119,6 +120,31 @@ public class VerifierVerticle extends AbstractVerticle {
             // handle errors
             .failureHandler(new ErrorHandler());
 
+        // issues a credential and returns the signed credentials in the response body
+        router
+            .post("/credentials/issue")
+            .consumes("application/ld+json")
+            .consumes("application/json")
+            .produces("application/ld+json")
+            .produces("application/json")
+            .putMetadata(Constants.CTX_DOCUMENT_KEY, Constants.CREDENTIAL_KEY)
+            
+            // validation TODO
+            .handler(ctx -> {
+                ctx.next();
+            })
+            
+            // options
+            .handler(new IssueEmbeddedOptionsHandler())
+
+            // issue
+            .handler(new IssuingHandler())
+
+            // handle errors
+            .failureHandler(new ErrorHandler());
+            ;
+            
+        
         // static resources
         router
             .get("/static/*")
@@ -136,24 +162,29 @@ public class VerifierVerticle extends AbstractVerticle {
                                     .setMaxAgeSeconds(4*3600l)     // maxAge = 4 hours
                             );
 
-        // server
+        // server options
+        var serverOptions = new HttpServerOptions()
+                                    .setMaxWebSocketFrameSize(1000000)
+                                    .setUseAlpn(true);
+        
+        // service 
         vertx
-            .createHttpServer()
+            .createHttpServer(serverOptions)
             .requestHandler(router)
             .listen(getDefaultPort())
                 .onSuccess(ctx -> {
-                    System.out.println(VerifierVerticle.class.getName() +  " started on port " + ctx.actualPort() + " with " + Charset.defaultCharset()  + " charset.");
+                    System.out.println(VcApiVerticle.class.getName() +  " started on port " + ctx.actualPort() + " with " + Charset.defaultCharset()  + " charset.");
                     startTime = Instant.now();
                 })
                 .onFailure(ctx ->
-                    System.err.println(VerifierVerticle.class.getName() +  " start failed [" + ctx.getMessage() + "].")
+                    System.err.println(VcApiVerticle.class.getName() +  " start failed [" + ctx.getMessage() + "].")
                 );
     }
 
     @Override
     public void stop() throws Exception {
         if (startTime != null) {
-            System.out.println(VerifierVerticle.class.getName() +  " stopped after running for " +  Duration.between(startTime, Instant.now()) + ".");
+            System.out.println(VcApiVerticle.class.getName() +  " stopped after running for " +  Duration.between(startTime, Instant.now()) + ".");
         }
     }
 

@@ -3,7 +3,7 @@ package com.apicatalog.vc.service;
 import io.vertx.core.Handler;
 import io.vertx.ext.web.RoutingContext;
 
-public class EmbeddedOptionsHandler implements Handler<RoutingContext> {
+public class VerifyEmbeddedOptionsHandler implements Handler<RoutingContext> {
 
     @Override
     public void handle(RoutingContext ctx) {

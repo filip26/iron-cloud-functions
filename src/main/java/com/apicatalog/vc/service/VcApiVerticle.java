@@ -39,12 +39,12 @@ public class VcApiVerticle extends AbstractVerticle {
         
         // static resources
         router
-            .get("/static/*")
+            .get("/key/*")
             .handler(StaticHandler
-                        .create("webroot/static/")
+                        .create("webroot/key/")
                         .setIncludeHidden(false)
                         .setDefaultContentEncoding("UTF-8")
-                        .setMaxAgeSeconds(100*24*3600l)
+                        .setMaxAgeSeconds(365*24*3600l)      
                     );
 
         router.get().handler(StaticHandler

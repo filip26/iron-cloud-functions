@@ -25,6 +25,8 @@ public class VerifierApi  {
             .putMetadata(Constants.CTX_STRICT, true)
 
             //TODO validation
+            
+            //FIXME remove
             .handler(ctx -> {
                 System.out.println(ctx.body().asString());
                 ctx.next();

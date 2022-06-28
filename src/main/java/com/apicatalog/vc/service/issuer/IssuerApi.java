@@ -25,6 +25,13 @@ public class IssuerApi extends AbstractVerticle {
                 ctx.next();
             })
             
+            //FIXME remove
+            .handler(ctx -> {
+                System.out.println(ctx.body().asString());
+                ctx.next();
+            })
+
+            
             // options
             .handler(new IssueEmbeddedOptionsHandler())
 

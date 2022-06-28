@@ -18,7 +18,7 @@ class IssuerErrorHandler implements Handler<RoutingContext> {
         var errorResponse = new JsonObject();
 
         final Throwable e = ctx.failure();
-e.printStackTrace();
+
         if (e instanceof SigningError se) {
 
             errorResponse.put("id",  toString(se.getCode()));

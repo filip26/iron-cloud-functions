@@ -6,6 +6,7 @@ import java.net.URI;
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.StringUtils;
 import com.apicatalog.jsonld.document.JsonDocument;
+import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.ld.signature.DataError;
 import com.apicatalog.ld.signature.DataError.ErrorType;
 import com.apicatalog.ld.signature.SigningError;
@@ -58,8 +59,28 @@ class IssuingHandler implements Handler<RoutingContext> {
                                         .add("https://w3id.org/security/suites/ed25519-2020/v1")
                                         .build()
                                         );
+            
+            //FIXME, remove hack to pass the testing suite
+            //see https://github.com/w3c-ccg/vc-api-issuer-test-suite/issues/18
+            var proof = signed.getJsonObject("sec:proof");
+            
+            //FIXME, flatten proofValue, see above
+            if (JsonUtils.isObject(proof.get("verificationMethod"))) {
+                proof = Json.createObjectBuilder(proof)
+                            .add("verificationMethod", 
+                                        proof.getJsonObject("verificationMethod")
+                                            .getString("id")
+                                            ).build();
+            }
+
+            //FIXME, remove
+            if (proof != null) {
+                signed = Json.createObjectBuilder(signed).remove("sec:proof").add("proof", proof).build();
+            }
+
             var response = ctx.response();
 
+            response.setStatusCode(201);        // created
             response.putHeader("content-type", "application/ld+json");
             response.end(signed.toString());
 

@@ -22,6 +22,8 @@ class IssueEmbeddedOptionsHandler implements Handler<RoutingContext> {
         Ed25519ProofOptions2020 proofOptions = new Ed25519ProofOptions2020();
         proofOptions.setVerificationMethod(new Ed25519VerificationKey2020(URI.create("https://vc.apicatalog.com/key/test.json")));
         
+        Instant created = Instant.now();
+        
         if (options != null) {
 
             var domain = options.getString(Constants.OPTION_DOMAIN);
@@ -30,12 +32,11 @@ class IssueEmbeddedOptionsHandler implements Handler<RoutingContext> {
                 proofOptions.setDomain(domain);
             }
 
-            Instant created = options.getInstant(Constants.OPTION_CREATED);
+            created = options.getInstant(Constants.OPTION_CREATED, created);
 
-            if (created != null) {
-                proofOptions.setCreated(created);
-            }
         }
+
+        proofOptions.setCreated(created);
 
         ctx.put(Constants.OPTIONS, proofOptions);
         ctx.next();

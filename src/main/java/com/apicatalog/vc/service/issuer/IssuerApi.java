@@ -1,15 +1,9 @@
 package com.apicatalog.vc.service.issuer;
 
-import java.nio.charset.Charset;
-import java.time.Duration;
-import java.time.Instant;
-
 import com.apicatalog.vc.service.Constants;
 
 import io.vertx.core.AbstractVerticle;
-import io.vertx.core.http.HttpServerOptions;
 import io.vertx.ext.web.Router;
-import io.vertx.ext.web.handler.StaticHandler;
 import io.vertx.json.schema.SchemaParser;
 
 

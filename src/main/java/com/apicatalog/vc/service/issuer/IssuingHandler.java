@@ -10,8 +10,7 @@ import com.apicatalog.ld.signature.DataError;
 import com.apicatalog.ld.signature.DataError.ErrorType;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.ed25519.Ed25519KeyPair2020;
-import com.apicatalog.ld.signature.ed25519.Ed25519ProofOptions2020;
-import com.apicatalog.ld.signature.ed25519.Ed25519VerificationKey2020;
+import com.apicatalog.ld.signature.proof.ProofOptions;
 import com.apicatalog.vc.api.Vc;
 import com.apicatalog.vc.service.Constants;
 
@@ -43,8 +42,7 @@ class IssuingHandler implements Handler<RoutingContext> {
             var keyPair = new Ed25519KeyPair2020(URI.create("did:key:z6Mkska8oQD7QQQWxqa7L5ai4mH98HfAdSwomPFYKuqNyE2y"));
             keyPair.setPrivateKey(Ed25519KeyPair2020.decodeKey("zRuuyWBEr6MivrDHUX4Yd7jiGzMbGJH38EHFqQxztA4r1QY"));
             
-            var proofOptions = new Ed25519ProofOptions2020();
-            proofOptions.setVerificationMethod(new Ed25519VerificationKey2020(URI.create("https://vc.apicatalog.com/key/test.json")));
+            final ProofOptions proofOptions = ctx.get(Constants.OPTIONS);
 
             var signed = Vc.sign(JsonDocument
                             .of(new StringReader(document.toString()))

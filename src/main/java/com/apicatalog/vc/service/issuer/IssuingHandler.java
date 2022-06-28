@@ -73,11 +73,28 @@ class IssuingHandler implements Handler<RoutingContext> {
                                             ).build();
             }
 
+            if (JsonUtils.isString(signed.get("credentialSubject"))) {
+                signed = Json.createObjectBuilder(signed).add("credentialSubject", 
+                        Json.createObjectBuilder()
+                        .add("id", signed.getString("credentialSubject"))
+                        
+                        ).build();
+            }
+            
+            if (JsonUtils.isNotNull(signed.get("cred:issuanceDate"))) {
+                signed = Json.createObjectBuilder(signed)
+                            .add("issuanceDate", signed.get("cred:issuanceDate"))
+                            .remove("cred:issuanceDate")
+                            .build();
+            }
+
             //FIXME, remove
             if (proof != null) {
                 signed = Json.createObjectBuilder(signed).remove("sec:proof").add("proof", proof).build();
             }
-
+            
+            //FIXME - hacks end here
+            
             var response = ctx.response();
 
             response.setStatusCode(201);        // created

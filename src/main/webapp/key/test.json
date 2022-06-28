@@ -1,0 +1,6 @@
+{
+	"id": "https://vc.apicatalog.com/key/test.json",
+    "type": "Ed25519VerificationKey2020",
+    "controller": "https://vc.apicatalog.com/issuer/test",
+	"publicKeyMultibase": "z6Mkska8oQD7QQQWxqa7L5ai4mH98HfAdSwomPFYKuqNyE2y"
+}

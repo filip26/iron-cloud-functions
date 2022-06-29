@@ -46,23 +46,19 @@ class IssuingHandler implements Handler<RoutingContext> {
             
             final ProofOptions proofOptions = ctx.get(Constants.OPTIONS);
 
-            var signed = Vc.sign(JsonDocument
-                            .of(new StringReader(document.toString()))
-                            .getJsonContent()
-                            .orElseThrow(IllegalStateException::new)
-                            .asJsonObject()
-                            ,
-                            keyPair,
-                            proofOptions)
-                                .getCompacted(
-                                    Json.createArrayBuilder()
-                                        .add("https://www.w3.org/2018/credentials/v1")
-                                        .add("https://w3id.org/security/suites/ed25519-2020/v1")
-                                        .build()
-                                        );
-            
+            var signed = Vc.sign(
+                                JsonDocument
+                                    .of(new StringReader(document.toString()))
+                                    .getJsonContent()
+                                    .orElseThrow(IllegalStateException::new)
+                                    .asJsonObject(),
+                                keyPair, 
+                                proofOptions
+                                )
+                            .getCompacted();
+
             //FIXME, remove, hack to pass the testing suite
-            signed = hack(signed);
+            signed = applyHacks(signed);
             
             var response = ctx.response();
 
@@ -76,11 +72,16 @@ class IssuingHandler implements Handler<RoutingContext> {
     }
 
     //FIXME, remove, see https://github.com/w3c-ccg/vc-api-issuer-test-suite/issues/18
-    static final JsonObject hack(JsonObject signed) {
+    static final JsonObject applyHacks(final JsonObject signed) {
 
+        var document = Json.createObjectBuilder(signed);
+        
         var proof = signed.getJsonObject("sec:proof");
         
-        //FIXME, flatten proofValue, see above
+        if (proof == null) {
+            proof = signed.getJsonObject("proof");
+        }
+
         if (JsonUtils.isObject(proof.get("verificationMethod"))) {
             proof = Json.createObjectBuilder(proof)
                         .add("verificationMethod", 
@@ -90,25 +91,24 @@ class IssuingHandler implements Handler<RoutingContext> {
         }
 
         if (JsonUtils.isString(signed.get("credentialSubject"))) {
-            signed = Json.createObjectBuilder(signed).add("credentialSubject", 
-                    Json.createObjectBuilder()
-                    .add("id", signed.getString("credentialSubject"))
-                    
-                    ).build();
+            document = document
+                            .add("credentialSubject", 
+                                    Json.createObjectBuilder()
+                                        .add("id", signed.getString("credentialSubject"))
+                                    );
         }
         
         if (JsonUtils.isNotNull(signed.get("cred:issuanceDate"))) {
-            signed = Json.createObjectBuilder(signed)
-                        .add("issuanceDate", signed.get("cred:issuanceDate"))
-                        .remove("cred:issuanceDate")
-                        .build();
+            document = document
+                            .add("issuanceDate", signed.get("cred:issuanceDate"))
+                            .remove("cred:issuanceDate");
         }
 
-        if (proof != null) {
-            signed = Json.createObjectBuilder(signed).remove("sec:proof").add("proof", proof).build();
+        if (signed.containsKey("sec:proof")) {
+            document = document
+                            .remove("sec:proof")
+                            .add("proof", proof);
         }
-        
-        return signed;
+        return document.build();
     }
-
 }

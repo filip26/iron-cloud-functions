@@ -30,13 +30,12 @@ public class IssuerApi extends AbstractVerticle {
                 System.out.println(ctx.body().asString());
                 ctx.next();
             })
-
             
             // options
             .handler(new IssueEmbeddedOptionsHandler())
 
             // issue
-            .handler(new IssuingHandler())
+            .blockingHandler(new IssuingHandler())
 
             // handle errors
             .failureHandler(new IssuerErrorHandler());

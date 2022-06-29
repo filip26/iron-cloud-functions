@@ -36,8 +36,8 @@ public class VerifierApi  {
             .handler(new VerifyEmbeddedOptionsHandler())
 
             // verify
-            .handler(new VerificationHandler())
-
+            .blockingHandler(new VerificationHandler())
+            
             // handle errors
             .failureHandler(new VerifierErrorHandler());
 

@@ -18,6 +18,7 @@ import com.apicatalog.vc.service.Constants;
 import io.vertx.core.Handler;
 import io.vertx.ext.web.RoutingContext;
 import jakarta.json.Json;
+import jakarta.json.JsonObject;
 
 class IssuingHandler implements Handler<RoutingContext> {
 
@@ -60,40 +61,8 @@ class IssuingHandler implements Handler<RoutingContext> {
                                         .build()
                                         );
             
-            //FIXME, remove hack to pass the testing suite
-            //see https://github.com/w3c-ccg/vc-api-issuer-test-suite/issues/18
-            var proof = signed.getJsonObject("sec:proof");
-            
-            //FIXME, flatten proofValue, see above
-            if (JsonUtils.isObject(proof.get("verificationMethod"))) {
-                proof = Json.createObjectBuilder(proof)
-                            .add("verificationMethod", 
-                                        proof.getJsonObject("verificationMethod")
-                                            .getString("id")
-                                            ).build();
-            }
-
-            if (JsonUtils.isString(signed.get("credentialSubject"))) {
-                signed = Json.createObjectBuilder(signed).add("credentialSubject", 
-                        Json.createObjectBuilder()
-                        .add("id", signed.getString("credentialSubject"))
-                        
-                        ).build();
-            }
-            
-            if (JsonUtils.isNotNull(signed.get("cred:issuanceDate"))) {
-                signed = Json.createObjectBuilder(signed)
-                            .add("issuanceDate", signed.get("cred:issuanceDate"))
-                            .remove("cred:issuanceDate")
-                            .build();
-            }
-
-            //FIXME, remove
-            if (proof != null) {
-                signed = Json.createObjectBuilder(signed).remove("sec:proof").add("proof", proof).build();
-            }
-            
-            //FIXME - hacks end here
+            //FIXME, remove, hack to pass the testing suite
+            signed = hack(signed);
             
             var response = ctx.response();
 
@@ -104,6 +73,42 @@ class IssuingHandler implements Handler<RoutingContext> {
         } catch (JsonLdError | DataError | IllegalStateException | SigningError e) {
             ctx.fail(e);
         }
+    }
+
+    //FIXME, remove, see https://github.com/w3c-ccg/vc-api-issuer-test-suite/issues/18
+    static final JsonObject hack(JsonObject signed) {
+
+        var proof = signed.getJsonObject("sec:proof");
+        
+        //FIXME, flatten proofValue, see above
+        if (JsonUtils.isObject(proof.get("verificationMethod"))) {
+            proof = Json.createObjectBuilder(proof)
+                        .add("verificationMethod", 
+                                    proof.getJsonObject("verificationMethod")
+                                        .getString("id")
+                                        ).build();
+        }
+
+        if (JsonUtils.isString(signed.get("credentialSubject"))) {
+            signed = Json.createObjectBuilder(signed).add("credentialSubject", 
+                    Json.createObjectBuilder()
+                    .add("id", signed.getString("credentialSubject"))
+                    
+                    ).build();
+        }
+        
+        if (JsonUtils.isNotNull(signed.get("cred:issuanceDate"))) {
+            signed = Json.createObjectBuilder(signed)
+                        .add("issuanceDate", signed.get("cred:issuanceDate"))
+                        .remove("cred:issuanceDate")
+                        .build();
+        }
+
+        if (proof != null) {
+            signed = Json.createObjectBuilder(signed).remove("sec:proof").add("proof", proof).build();
+        }
+        
+        return signed;
     }
 
 }

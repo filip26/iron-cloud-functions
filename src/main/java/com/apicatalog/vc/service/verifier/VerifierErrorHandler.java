@@ -22,7 +22,7 @@ class VerifierErrorHandler implements Handler<RoutingContext> {
         }
 
         final Throwable e = ctx.failure();
-e.printStackTrace();
+
         if (e instanceof VerificationError ve) {
 
             verificationResult.addError(toString(ve.getCode()));

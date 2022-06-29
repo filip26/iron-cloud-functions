@@ -23,8 +23,7 @@ class IssueEmbeddedOptionsHandler implements Handler<RoutingContext> {
         Ed25519ProofOptions2020 proofOptions = new Ed25519ProofOptions2020();
         
         // default values
-//        proofOptions.setVerificationMethod(new VerificationMethodReference(URI.create("https://vc.apicatalog.com/key/test.json")));      
-        proofOptions.setVerificationMethod(new VerificationMethodReference(URI.create("did:key:z6Mkska8oQD7QQQWxqa7L5ai4mH98HfAdSwomPFYKuqNyE2y")));
+        proofOptions.setVerificationMethod(new VerificationMethodReference(URI.create("did:key:z6Mkska8oQD7QQQWxqa7L5ai4mH98HfAdSwomPFYKuqNyE2y#z6Mkska8oQD7QQQWxqa7L5ai4mH98HfAdSwomPFYKuqNyE2y")));
         proofOptions.setPurpose(URI.create("https://w3id.org/security#assertionMethod"));
         proofOptions.setCreated(Instant.now().truncatedTo(ChronoUnit.SECONDS));
         

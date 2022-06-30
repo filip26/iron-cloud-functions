@@ -24,14 +24,14 @@ All PR's welcome!
 Fork and clone the project repository.
 
 ```bash
-> cd vc-http-api
+> cd iron-vc-api
 > mvn clean package
 ```
 
 ### Developing
 
 ```bash
-> cd vc-http-api
+> cd iron-vc-api
 > chmod +x ./bin/start.sh
 > ./bin/start.sh dev
 ```

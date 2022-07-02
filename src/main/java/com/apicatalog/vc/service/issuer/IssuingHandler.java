@@ -45,7 +45,7 @@ class IssuingHandler implements Handler<RoutingContext> {
         
         try {
             var keyPair = new KeyPair(URI.create("did:key:z6Mkska8oQD7QQQWxqa7L5ai4mH98HfAdSwomPFYKuqNyE2y"));
-            keyPair.setPrivateKey(Multicodec.decode(Type.Key, Multibase.decode("zRuuyWBEr6MivrDHUX4Yd7jiGzMbGJH38EHFqQxztA4r1QY")));
+            keyPair.setPrivateKey(Multicodec.decode(Multicodec.Type.Key, Multibase.decode("zRuuyWBEr6MivrDHUX4Yd7jiGzMbGJH38EHFqQxztA4r1QY")));
             
             final ProofOptions proofOptions = ctx.get(Constants.OPTIONS);
 

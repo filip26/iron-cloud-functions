@@ -5,10 +5,10 @@ import java.io.StringReader;
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.StringUtils;
 import com.apicatalog.jsonld.document.JsonDocument;
-import com.apicatalog.ld.signature.DataError;
-import com.apicatalog.ld.signature.DataError.ErrorType;
+import com.apicatalog.ld.DocumentError;
+import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.signature.VerificationError;
-import com.apicatalog.vc.api.Vc;
+import com.apicatalog.vc.Vc;
 import com.apicatalog.vc.service.Constants;
 
 import io.vertx.core.Handler;
@@ -34,12 +34,11 @@ class VerificationHandler implements Handler<RoutingContext> {
         }
 
         if (document == null) {
-            ctx.fail(new DataError(ErrorType.Invalid, "document"));
+            ctx.fail(new DocumentError(ErrorType.Invalid, "document"));
             return;
         }
 
         try {
-
             verificationResult.addCheck("PROOF");
 
             Vc.verify(JsonDocument
@@ -55,7 +54,7 @@ class VerificationHandler implements Handler<RoutingContext> {
 
             ctx.json(verificationResult);
 
-        } catch (JsonLdError | VerificationError | DataError e) {
+        } catch (JsonLdError | VerificationError | DocumentError e) {
             ctx.fail(e);
         }
     }

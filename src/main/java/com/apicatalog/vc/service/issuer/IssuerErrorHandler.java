@@ -2,7 +2,7 @@ package com.apicatalog.vc.service.issuer;
 
 import java.util.Arrays;
 
-import com.apicatalog.ld.signature.DataError;
+import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.SigningError;
 
 import io.vertx.core.Handler;
@@ -25,7 +25,7 @@ class IssuerErrorHandler implements Handler<RoutingContext> {
 
             ctx.response().setStatusCode(400);
 
-        } else if (e instanceof DataError de) {
+        } else if (e instanceof DocumentError de) {
 
             errorResponse.put("id", "MALFORMED");
 
@@ -58,7 +58,7 @@ class IssuerErrorHandler implements Handler<RoutingContext> {
             .end(content);
     }
 
-    static String toString(DataError de) {
+    static String toString(DocumentError de) {
         return de.getType().name().toUpperCase() + "_" + de.getSubject().toUpperCase();
     }
 

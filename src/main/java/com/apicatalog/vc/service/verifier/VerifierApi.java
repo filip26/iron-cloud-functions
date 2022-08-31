@@ -4,8 +4,12 @@ import static io.vertx.ext.web.validation.builder.Parameters.optionalParam;
 import static io.vertx.json.schema.common.dsl.Schemas.stringSchema;
 
 import com.apicatalog.vc.service.Constants;
+import com.apicatalog.vc.service.MockOAuth2Provider;
 
+import io.vertx.core.Vertx;
+import io.vertx.ext.auth.oauth2.OAuth2Auth;
 import io.vertx.ext.web.Router;
+import io.vertx.ext.web.handler.OAuth2AuthHandler;
 import io.vertx.ext.web.validation.RequestParameters;
 import io.vertx.ext.web.validation.RequestPredicate;
 import io.vertx.ext.web.validation.ValidationHandler;
@@ -14,16 +18,31 @@ import io.vertx.json.schema.SchemaParser;
 
 public class VerifierApi  {
 
-    public static void setup(Router router, SchemaParser schemaParser) throws Exception {
+    public static void setup(Vertx vertx, Router router, SchemaParser schemaParser) throws Exception {
 
+        OAuth2Auth oauth2 = new MockOAuth2Provider();
+        //OAuth2Auth.create(vertx, credentials);
+        
+OAuth2AuthHandler oauth2Handler = (OAuth2AuthHandler) OAuth2AuthHandler.create(vertx, oauth2);
+
+        
         router
             .post("/credentials/verify")
             .consumes("application/ld+json")
             .consumes("application/json")
             .produces("application/json")
+            
+            .handler(ctx -> {
+                System.out.println(">>> HIT");
+                ctx.next();
+            })
+            
+//            .handler(oauth2Handler)
+            
             .putMetadata(Constants.CTX_DOCUMENT_KEY, Constants.VERIFIABLE_CREDENTIAL_KEY)
             .putMetadata(Constants.CTX_STRICT, true)
 
+            
             //TODO validation
             
             //FIXME remove

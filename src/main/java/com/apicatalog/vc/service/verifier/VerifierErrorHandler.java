@@ -9,6 +9,7 @@ import com.apicatalog.vc.service.Constants;
 import io.vertx.core.Handler;
 import io.vertx.core.json.DecodeException;
 import io.vertx.ext.web.RoutingContext;
+import io.vertx.ext.web.handler.HttpException;
 
 class VerifierErrorHandler implements Handler<RoutingContext> {
 
@@ -23,6 +24,8 @@ class VerifierErrorHandler implements Handler<RoutingContext> {
 
         final Throwable e = ctx.failure();
 
+        e.printStackTrace();
+        
         if (e instanceof VerificationError ve) {
 
             verificationResult.addError(toString(ve.getCode()));
@@ -43,7 +46,9 @@ class VerifierErrorHandler implements Handler<RoutingContext> {
 
             ctx.response().setStatusCode(400);
 
-
+        } else if (e instanceof HttpException he) {
+            throw he;
+            
         } else {
             ctx.response().setStatusCode(500);
 

@@ -9,6 +9,7 @@ import io.vertx.core.Handler;
 import io.vertx.core.json.DecodeException;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
+import io.vertx.ext.web.handler.HttpException;
 
 class IssuerErrorHandler implements Handler<RoutingContext> {
 
@@ -43,6 +44,8 @@ class IssuerErrorHandler implements Handler<RoutingContext> {
 
             ctx.response().setStatusCode(400);
 
+        } else if (e instanceof HttpException he) {
+            throw he;
 
         } else {
             ctx.response().setStatusCode(500);

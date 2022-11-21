@@ -28,6 +28,7 @@ class IssuerErrorHandler implements Handler<RoutingContext> {
         } else if (e instanceof DocumentError de) {
 
             errorResponse.put("id", "MALFORMED");
+            errorResponse.put("code", de.getType());
 
 //            verificationResult.addError("MALFORMED");
 //            verificationResult.addError(toString(de));

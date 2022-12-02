@@ -31,9 +31,6 @@ public class IssuerApi extends AbstractVerticle {
                 ctx.next();
             })
             
-            // options
-            .handler(new IssueEmbeddedOptionsHandler())
-
             // issue
             .blockingHandler(new IssuingHandler())
 

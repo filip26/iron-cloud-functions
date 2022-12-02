@@ -25,14 +25,14 @@ class VerifierErrorHandler implements Handler<RoutingContext> {
 
         if (e instanceof VerificationError ve) {
 
-            verificationResult.addError(toString(ve.getCode()));
+            verificationResult.addError(toString(ve.getCode().name()));
 
             ctx.response().setStatusCode(400);
 
         } else if (e instanceof DocumentError de) {
 
             verificationResult.addError("MALFORMED");
-            verificationResult.addError(toString(de));
+            verificationResult.addError(toString(de.getCode()));
 
             ctx.response().setStatusCode(400);
 
@@ -57,12 +57,7 @@ class VerifierErrorHandler implements Handler<RoutingContext> {
             .end(content);
     }
 
-    static String toString(DocumentError de) {
-        return de.getType().name().toUpperCase() + "_" + de.getSubject().toUpperCase();
+    static String toString(String code) {
+        return String.join("_", Arrays.stream(code.split("(?=\\p{Upper})")).map(String::toUpperCase).toList());
     }
-
-    static String toString(VerificationError.Code code) {
-        return String.join("_", Arrays.stream(code.name().split("(?=\\p{Upper})")).map(String::toUpperCase).toList());
-    }
-
 }

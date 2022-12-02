@@ -75,6 +75,12 @@
     <dependencies>
         <dependency>
             <groupId>com.apicatalog</groupId>
+            <artifactId>iron-ed25519-signature-suite</artifactId>
+            <version>${iron-vc.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.apicatalog</groupId>
             <artifactId>iron-verifiable-credentials</artifactId>
             <version>${iron-vc.version}</version>
         </dependency>

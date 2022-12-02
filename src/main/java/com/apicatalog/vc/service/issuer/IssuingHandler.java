@@ -2,6 +2,8 @@ package com.apicatalog.vc.service.issuer;
 
 import java.io.StringReader;
 import java.net.URI;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.StringUtils;
@@ -11,10 +13,13 @@ import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.ed25519.Ed25519KeyPair2020;
+import com.apicatalog.ld.signature.ed25519.Ed25519Signature2020;
+import com.apicatalog.ld.signature.ed25519.Ed25519VerificationKey2020;
 import com.apicatalog.ld.signature.proof.ProofOptions;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.multicodec.Multicodec;
 import com.apicatalog.vc.Vc;
+import com.apicatalog.vc.integrity.DataIntegrityProofOptions;
 import com.apicatalog.vc.service.Constants;
 
 import io.vertx.core.Handler;
@@ -38,7 +43,7 @@ class IssuingHandler implements Handler<RoutingContext> {
         }
 
         if (document == null) {
-            ctx.fail(new DocumentError(ErrorType.Invalid, "document"));
+            ctx.fail(new DocumentError(ErrorType.Invalid));
             return;
         }
         
@@ -51,7 +56,7 @@ class IssuingHandler implements Handler<RoutingContext> {
             		Multicodec.decode(Multicodec.Type.Key, Multibase.decode("zRuuyWBEr6MivrDHUX4Yd7jiGzMbGJH38EHFqQxztA4r1QY"))
             		);
             
-            final ProofOptions proofOptions = ctx.get(Constants.OPTIONS);
+            final ProofOptions proofOptions = getOptions(ctx);
 
             var signed = Vc.sign(
                                 JsonDocument
@@ -78,6 +83,44 @@ class IssuingHandler implements Handler<RoutingContext> {
         }
     }
 
+    static final ProofOptions getOptions(RoutingContext ctx) {
+
+        var body = ctx.body().asJsonObject();
+
+        var options = body.getJsonObject(Constants.OPTIONS);
+
+        // verification key
+        Ed25519VerificationKey2020 verificationKey = new Ed25519VerificationKey2020(
+                URI.create("did:key:z6Mkska8oQD7QQQWxqa7L5ai4mH98HfAdSwomPFYKuqNyE2y#z6Mkska8oQD7QQQWxqa7L5ai4mH98HfAdSwomPFYKuqNyE2y"), 
+                null,  
+                null, 
+                Multicodec.decode(Multicodec.Type.Key, Multibase.decode("z6Mkska8oQD7QQQWxqa7L5ai4mH98HfAdSwomPFYKuqNyE2y"))
+                );
+
+        // default values
+        final Instant created = Instant.now().truncatedTo(ChronoUnit.SECONDS);
+        
+        DataIntegrityProofOptions proofOptions = (new Ed25519Signature2020())
+                        .createOptions()
+                        .verificationMethod(verificationKey)
+                        .purpose(URI.create("https://w3id.org/security#assertionMethod"))
+                        .created(created);                
+
+        // recieved options
+        if (options != null) {
+
+            var domain = options.getString(Constants.OPTION_DOMAIN);
+
+            if (domain != null) {
+                proofOptions.domain(domain);
+            }
+
+            proofOptions.created(options.getInstant(Constants.OPTION_CREATED, created));
+        }
+        
+        return proofOptions;
+    }
+    
     //FIXME, remove, see https://github.com/w3c-ccg/vc-api-issuer-test-suite/issues/18
     static final JsonObject applyHacks(final JsonObject signed) {
 

@@ -21,26 +21,20 @@ class IssuerErrorHandler implements Handler<RoutingContext> {
 
         if (e instanceof SigningError se) {
 
-            errorResponse.put("id",  toString(se.getCode()));
+            errorResponse.put("id",  toString(se.getCode().name()));
 
             ctx.response().setStatusCode(400);
 
         } else if (e instanceof DocumentError de) {
 
             errorResponse.put("id", "MALFORMED");
-            errorResponse.put("code", de.getType());
-
-//            verificationResult.addError("MALFORMED");
-//            verificationResult.addError(toString(de));
+            errorResponse.put("code",  toString(de.getCode()));
 
             ctx.response().setStatusCode(400);
 
         } else if (e instanceof DecodeException de) {
 
             errorResponse.put("id", "MALFORMED");
-
-//            verificationResult.addError("MALFORMED");
-//            verificationResult.addError("INVALID_DOCUMENT");
 
             ctx.response().setStatusCode(400);
 
@@ -59,12 +53,7 @@ class IssuerErrorHandler implements Handler<RoutingContext> {
             .end(content);
     }
 
-    static String toString(DocumentError de) {
-        return de.getType().name().toUpperCase() + "_" + de.getSubject().toUpperCase();
+    static String toString(String code) {
+        return String.join("_", Arrays.stream(code.split("(?=\\p{Upper})")).map(String::toUpperCase).toList());
     }
-
-    static String toString(SigningError.Code code) {
-        return String.join("_", Arrays.stream(code.name().split("(?=\\p{Upper})")).map(String::toUpperCase).toList());
-    }
-
 }

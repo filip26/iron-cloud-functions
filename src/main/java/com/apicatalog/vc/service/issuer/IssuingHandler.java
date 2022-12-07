@@ -94,7 +94,7 @@ class IssuingHandler implements Handler<RoutingContext> {
                 URI.create("did:key:z6Mkska8oQD7QQQWxqa7L5ai4mH98HfAdSwomPFYKuqNyE2y#z6Mkska8oQD7QQQWxqa7L5ai4mH98HfAdSwomPFYKuqNyE2y"), 
                 null,  
                 null, 
-                Multicodec.decode(Multicodec.Type.Key, Multibase.decode("z6Mkska8oQD7QQQWxqa7L5ai4mH98HfAdSwomPFYKuqNyE2y"))
+                null
                 );
 
         // default values

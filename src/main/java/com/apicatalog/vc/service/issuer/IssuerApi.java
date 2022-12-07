@@ -18,7 +18,7 @@ public class IssuerApi extends AbstractVerticle {
             .consumes("application/json")
             .produces("application/ld+json")
             .produces("application/json")
-            .putMetadata(Constants.CTX_DOCUMENT_KEY, Constants.VERIFIABLE_CREDENTIAL_KEY)
+            .putMetadata(Constants.CTX_DOCUMENT_KEY, Constants.CREDENTIAL_KEY)
             
             // validation TODO
 //            .handler(ctx -> {

@@ -42,8 +42,6 @@ class VerificationHandler implements Handler<RoutingContext> {
         try {
             verificationResult.addCheck("PROOF");
 
-            
-            
             Vc.verify(JsonDocument
                         .of(new StringReader(document.toString()))
                         .getJsonContent()

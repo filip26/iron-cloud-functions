@@ -46,7 +46,7 @@ public class VerifierApi  {
             .consumes("application/ld+json")
             .consumes("application/json")
             .produces("application/json")
-            .putMetadata(Constants.CTX_DOCUMENT_KEY, Constants.PRESENTATION_KEY)
+            .putMetadata(Constants.CTX_DOCUMENT_KEY, Constants.VERIFIABLE_PRESENTATION_KEY)
             .putMetadata(Constants.CTX_STRICT, true)
 
             //TODO validation

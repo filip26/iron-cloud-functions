@@ -28,7 +28,8 @@ class VcApiTest {
 
     static Stream<Arguments> testData() {
         return Stream.of(
-                Arguments.of("isser - proof options", "it0001-in.jsonld")
+                Arguments.of("issue - proof options", "0001-in.jsonld", "/credentials/issue", 201),
+                Arguments.of("verify - proof options", "0002-in.jsonld", "/credentials/verify", 200)
                 );
     }
 
@@ -43,7 +44,7 @@ class VcApiTest {
     @MethodSource("testData")
     @Timeout(value = 10, timeUnit = TimeUnit.SECONDS)
     @DisplayName("Execute a test")
-    void executeTest(String name, String path, Vertx vertx, VertxTestContext testContext) throws Throwable {
+    void executeTest(String name, String path, String endpoint, int code, Vertx vertx, VertxTestContext testContext) throws Throwable {
 
         try (final InputStream is = this.getClass().getResourceAsStream(path)) {
 
@@ -51,12 +52,12 @@ class VcApiTest {
 
             WebClient client = WebClient.create(vertx);
 
-            client.post(8080, "localhost", "/credentials/issue")
+            client.post(8080, "localhost", endpoint)
                     .putHeader("content-type", "application/json")
                     .as(BodyCodec.string())
                     .sendBuffer(Buffer.buffer(input),
                             testContext.succeeding(response -> testContext.verify(() -> {
-                                assertEquals(201, response.statusCode());
+                                assertEquals(code, response.statusCode());
                                 testContext.completeNow();
                             })));
         }

@@ -45,8 +45,8 @@ class VerifierErrorHandler implements Handler<RoutingContext> {
 
 
         } else {
+            e.printStackTrace();
             ctx.response().setStatusCode(500);
-
         }
 
         var content = verificationResult.toString();

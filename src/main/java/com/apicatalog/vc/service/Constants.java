@@ -11,8 +11,10 @@ public class Constants {
     public static final String CTX_DOCUMENT_KEY = "documentKey";
     public static final String CTX_STRICT = "strictMode";
 
+    public static final String CREDENTIAL_KEY = "credential";
+    
     public static final String VERIFIABLE_CREDENTIAL_KEY = "verifiableCredential";
-    public static final String PRESENTATION_KEY = "verifiablePresentation";
+    public static final String VERIFIABLE_PRESENTATION_KEY = "verifiablePresentation";
 
     protected Constants() {}
 }

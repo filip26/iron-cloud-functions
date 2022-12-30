@@ -29,11 +29,11 @@ import jakarta.json.JsonObject;
 
 class IssuingHandler implements Handler<RoutingContext> {
 
-    static final URI KEYPAIR_ID = URI.create("did:key:" + System.getenv("VC_PUBLIC_KEY")); 
-    static final String PUBLIC_KEY = System.getenv("VC_PUBLIC_KEY");
-    static final String PRIVATE_KEY = System.getenv("VC_PRIVATE_KEY");
+    static final URI KEYPAIR_ID = URI.create("did:key:" + System.getProperty("VC_PUBLIC_KEY", System.getenv("VC_PUCLIC_KEY"))); 
+    static final String PUBLIC_KEY = System.getProperty("VC_PUBLIC_KEY", System.getenv("VC_PUBLIC_KEY"));
+    static final String PRIVATE_KEY = System.getProperty("VC_PRIVATE_KEY", System.getenv("VC_PRIVATE_KEY"));
     
-    static final URI VERIFICATION_KEY = URI.create(System.getenv("VC_VERIFICATION_KEY"));
+    static final URI VERIFICATION_KEY = URI.create(System.getProperty("VC_VERIFICATION_KEY", System.getenv("VC_VERIFICATION_KEY")));
     
     @Override
     public void handle(RoutingContext ctx) {

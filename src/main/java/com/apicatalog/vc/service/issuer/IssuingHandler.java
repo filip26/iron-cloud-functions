@@ -29,6 +29,12 @@ import jakarta.json.JsonObject;
 
 class IssuingHandler implements Handler<RoutingContext> {
 
+    static final URI KEYPAIR_ID = URI.create("did:key:" + System.getenv("VC_PUBLIC_KEY")); 
+    static final String PUBLIC_KEY = System.getenv("VC_PUBLIC_KEY");
+    static final String PRIVATE_KEY = System.getenv("VC_PRIVATE_KEY");
+    
+    static final URI VERIFICATION_KEY = URI.create(System.getenv("VC_VERIFICATION_KEY"));
+    
     @Override
     public void handle(RoutingContext ctx) {
 
@@ -49,11 +55,11 @@ class IssuingHandler implements Handler<RoutingContext> {
         
         try {
             var keyPair = new Ed25519KeyPair2020(
-            		URI.create("did:key:z6Mkska8oQD7QQQWxqa7L5ai4mH98HfAdSwomPFYKuqNyE2y"), 
+            		KEYPAIR_ID, 
             		null,  
             		null, 
-            		Multicodec.decode(Multicodec.Type.Key, Multibase.decode("z6Mkska8oQD7QQQWxqa7L5ai4mH98HfAdSwomPFYKuqNyE2y")),
-            		Multicodec.decode(Multicodec.Type.Key, Multibase.decode("zRuuyWBEr6MivrDHUX4Yd7jiGzMbGJH38EHFqQxztA4r1QY"))
+            		Multicodec.decode(Multicodec.Type.Key, Multibase.decode(PUBLIC_KEY)),
+            		Multicodec.decode(Multicodec.Type.Key, Multibase.decode(PRIVATE_KEY))
             		);
             
             final ProofOptions proofOptions = getOptions(ctx);
@@ -91,7 +97,7 @@ class IssuingHandler implements Handler<RoutingContext> {
 
         // verification key
         Ed25519VerificationKey2020 verificationKey = new Ed25519VerificationKey2020(
-                URI.create("did:key:z6Mkska8oQD7QQQWxqa7L5ai4mH98HfAdSwomPFYKuqNyE2y#z6Mkska8oQD7QQQWxqa7L5ai4mH98HfAdSwomPFYKuqNyE2y"), 
+                VERIFICATION_KEY, 
                 null,  
                 null, 
                 null

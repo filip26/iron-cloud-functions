@@ -36,6 +36,13 @@ class VcApiTest {
     @BeforeEach
     @DisplayName("Deploy a verticle")
     void deployVerticle(Vertx vertx, VertxTestContext testContext) {
+        
+        //set environmental variables
+        System.setProperty("VC_PUBLIC_KEY", "z6Mkska8oQD7QQQWxqa7L5ai4mH98HfAdSwomPFYKuqNyE2y");
+        System.setProperty("VC_PRIVATE_KEY", "zRuuyWBEr6MivrDHUX4Yd7jiGzMbGJH38EHFqQxztA4r1QY");
+        System.setProperty("VC_VERIFICATION_KEY", "did:key:z6Mkska8oQD7QQQWxqa7L5ai4mH98HfAdSwomPFYKuqNyE2y#z6Mkska8oQD7QQQWxqa7L5ai4mH98HfAdSwomPFYKuqNyE2y");
+
+        // start
         vertx.deployVerticle(new VcApiVerticle(), testContext.succeedingThenComplete());
     }
 

@@ -21,9 +21,9 @@ public class IssuerApi extends AbstractVerticle {
             .putMetadata(Constants.CTX_DOCUMENT_KEY, Constants.CREDENTIAL_KEY)
             
             // validation TODO
-            .handler(ctx -> {
-                ctx.next();
-            })
+//            .handler(ctx -> {
+//                ctx.next();
+//            })
             
             //FIXME remove
             .handler(ctx -> {
@@ -31,9 +31,6 @@ public class IssuerApi extends AbstractVerticle {
                 ctx.next();
             })
             
-            // options
-            .handler(new IssueEmbeddedOptionsHandler())
-
             // issue
             .blockingHandler(new IssuingHandler())
 

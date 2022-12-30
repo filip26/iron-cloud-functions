@@ -2,6 +2,8 @@ package com.apicatalog.vc.service.issuer;
 
 import java.io.StringReader;
 import java.net.URI;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.StringUtils;
@@ -10,12 +12,14 @@ import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.signature.SigningError;
-import com.apicatalog.ld.signature.key.KeyPair;
+import com.apicatalog.ld.signature.ed25519.Ed25519KeyPair2020;
+import com.apicatalog.ld.signature.ed25519.Ed25519Signature2020;
+import com.apicatalog.ld.signature.ed25519.Ed25519VerificationKey2020;
 import com.apicatalog.ld.signature.proof.ProofOptions;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.multicodec.Multicodec;
-import com.apicatalog.multicodec.Multicodec.Type;
 import com.apicatalog.vc.Vc;
+import com.apicatalog.vc.integrity.DataIntegrityProofOptions;
 import com.apicatalog.vc.service.Constants;
 
 import io.vertx.core.Handler;
@@ -25,6 +29,12 @@ import jakarta.json.JsonObject;
 
 class IssuingHandler implements Handler<RoutingContext> {
 
+    static final URI KEYPAIR_ID = URI.create("did:key:" + System.getProperty("VC_PUBLIC_KEY", System.getenv("VC_PUCLIC_KEY"))); 
+    static final String PUBLIC_KEY = System.getProperty("VC_PUBLIC_KEY", System.getenv("VC_PUBLIC_KEY"));
+    static final String PRIVATE_KEY = System.getProperty("VC_PRIVATE_KEY", System.getenv("VC_PRIVATE_KEY"));
+    
+    static final URI VERIFICATION_KEY = URI.create(System.getProperty("VC_VERIFICATION_KEY", System.getenv("VC_VERIFICATION_KEY")));
+    
     @Override
     public void handle(RoutingContext ctx) {
 
@@ -39,15 +49,20 @@ class IssuingHandler implements Handler<RoutingContext> {
         }
 
         if (document == null) {
-            ctx.fail(new DocumentError(ErrorType.Invalid, "document"));
+            ctx.fail(new DocumentError(ErrorType.Invalid));
             return;
         }
         
         try {
-            var keyPair = new KeyPair(URI.create("did:key:z6Mkska8oQD7QQQWxqa7L5ai4mH98HfAdSwomPFYKuqNyE2y"));
-            keyPair.setPrivateKey(Multicodec.decode(Multicodec.Type.Key, Multibase.decode("zRuuyWBEr6MivrDHUX4Yd7jiGzMbGJH38EHFqQxztA4r1QY")));
+            var keyPair = new Ed25519KeyPair2020(
+            		KEYPAIR_ID, 
+            		null,  
+            		null, 
+            		Multicodec.decode(Multicodec.Type.Key, Multibase.decode(PUBLIC_KEY)),
+            		Multicodec.decode(Multicodec.Type.Key, Multibase.decode(PRIVATE_KEY))
+            		);
             
-            final ProofOptions proofOptions = ctx.get(Constants.OPTIONS);
+            final ProofOptions proofOptions = getOptions(ctx);
 
             var signed = Vc.sign(
                                 JsonDocument
@@ -74,6 +89,44 @@ class IssuingHandler implements Handler<RoutingContext> {
         }
     }
 
+    static final ProofOptions getOptions(RoutingContext ctx) {
+
+        var body = ctx.body().asJsonObject();
+
+        var options = body.getJsonObject(Constants.OPTIONS);
+
+        // verification key
+        Ed25519VerificationKey2020 verificationKey = new Ed25519VerificationKey2020(
+                VERIFICATION_KEY, 
+                null,  
+                null, 
+                null
+                );
+
+        // default values
+        final Instant created = Instant.now().truncatedTo(ChronoUnit.SECONDS);
+        
+        DataIntegrityProofOptions proofOptions = (new Ed25519Signature2020())
+                        .createOptions()
+                        .verificationMethod(verificationKey)
+                        .purpose(URI.create("https://w3id.org/security#assertionMethod"))
+                        .created(created);                
+
+        // recieved options
+        if (options != null) {
+
+            var domain = options.getString(Constants.OPTION_DOMAIN);
+
+            if (domain != null) {
+                proofOptions.domain(domain);
+            }
+
+            proofOptions.created(options.getInstant(Constants.OPTION_CREATED, created));
+        }
+        
+        return proofOptions;
+    }
+    
     //FIXME, remove, see https://github.com/w3c-ccg/vc-api-issuer-test-suite/issues/18
     static final JsonObject applyHacks(final JsonObject signed) {
 

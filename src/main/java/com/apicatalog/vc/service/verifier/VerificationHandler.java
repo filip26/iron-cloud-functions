@@ -8,6 +8,7 @@ import com.apicatalog.jsonld.document.JsonDocument;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.signature.VerificationError;
+import com.apicatalog.ld.signature.ed25519.Ed25519Signature2020;
 import com.apicatalog.vc.Vc;
 import com.apicatalog.vc.service.Constants;
 
@@ -34,7 +35,7 @@ class VerificationHandler implements Handler<RoutingContext> {
         }
 
         if (document == null) {
-            ctx.fail(new DocumentError(ErrorType.Invalid, "document"));
+            ctx.fail(new DocumentError(ErrorType.Invalid));
             return;
         }
 
@@ -45,9 +46,9 @@ class VerificationHandler implements Handler<RoutingContext> {
                         .of(new StringReader(document.toString()))
                         .getJsonContent()
                         .orElseThrow(IllegalStateException::new)
-                        .asJsonObject())
+                        .asJsonObject(), new Ed25519Signature2020())
 
-                .domain(ctx.get(Constants.OPTION_DOMAIN, null))
+                .param(Constants.OPTION_DOMAIN, ctx.get(Constants.OPTION_DOMAIN, null))
 
                 // assert document validity
                 .isValid();

@@ -52,7 +52,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <argLine>-Dfile.encoding=UTF-8</argLine>
 
-        <iron-vc.version>0.8.1-SNAPSHOT</iron-vc.version>
+        <iron-vc.version>0.8.1</iron-vc.version>
 
         <vertx.version>4.3.5</vertx.version>
 
@@ -75,7 +75,7 @@
     <dependencies>
         <dependency>
             <groupId>com.apicatalog</groupId>
-            <artifactId>iron-ed25519-signature-suite</artifactId>
+            <artifactId>iron-ed25519-cryptosuite-2020</artifactId>
             <version>${iron-vc.version}</version>
         </dependency>
 

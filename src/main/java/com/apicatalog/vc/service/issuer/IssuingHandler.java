@@ -111,7 +111,7 @@ class IssuingHandler implements Handler<RoutingContext> {
         if (options != null) {
             created = options.getInstant(Constants.OPTION_CREATED, created);
             domain = options.getString(Constants.OPTION_DOMAIN, null);
-            domain = options.getString(Constants.OPTION_CHALLENGE, null);
+            challenge = options.getString(Constants.OPTION_CHALLENGE, null);
         }
         
         var suite = new EdDSASignature2022();
@@ -121,7 +121,9 @@ class IssuingHandler implements Handler<RoutingContext> {
                                 verificationKey, 
                                 URI.create("https://w3id.org/security#assertionMethod"), 
                                 created, 
-                                domain);
+                                domain,
+                                challenge
+                                );
         
         return proofOptions;
     }

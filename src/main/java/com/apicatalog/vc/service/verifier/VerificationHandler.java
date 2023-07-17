@@ -44,18 +44,18 @@ class VerificationHandler implements Handler<RoutingContext> {
             verificationResult.addCheck("PROOF");
 
             Vc.verify(JsonDocument
-                        .of(new StringReader(document.toString()))
-                        .getJsonContent()
-                        .orElseThrow(IllegalStateException::new)
-                        .asJsonObject(), 
-                        new Ed25519Signature2020(),
-                        new EdDSASignature2022()
-                        )
+                    .of(new StringReader(document.toString()))
+                    .getJsonContent()
+                    .orElseThrow(IllegalStateException::new)
+                    .asJsonObject(),
+                    new EdDSASignature2022(),
+                    new Ed25519Signature2020())
 
-                .param(Constants.OPTION_DOMAIN, ctx.get(Constants.OPTION_DOMAIN, null))
+                    .param(Constants.OPTION_DOMAIN, ctx.get(Constants.OPTION_DOMAIN, null))
+                    .param(Constants.OPTION_CHALLENGE, ctx.get(Constants.OPTION_CHALLENGE, null))
 
-                // assert document validity
-                .isValid();
+                    // assert document validity
+                    .isValid();
 
             ctx.json(verificationResult);
 

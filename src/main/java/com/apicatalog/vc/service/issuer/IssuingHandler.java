@@ -13,6 +13,7 @@ import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.ed25519.Ed25519KeyPair2020;
+import com.apicatalog.ld.signature.ed25519.Ed25519Signature2020;
 import com.apicatalog.ld.signature.ed25519.Ed25519VerificationKey2020;
 import com.apicatalog.ld.signature.eddsa.EdDSASignature2022;
 import com.apicatalog.multibase.Multibase;
@@ -106,25 +107,41 @@ class IssuingHandler implements Handler<RoutingContext> {
         Instant created = Instant.now().truncatedTo(ChronoUnit.SECONDS);
         String domain = null;
         String challenge = null;
+
+        // suite name
+        String suiteName = "eddsa-2022";
         
         // request options
         if (options != null) {
+            suiteName = options.getString(Constants.OPTION_TYPE, suiteName);
             created = options.getInstant(Constants.OPTION_CREATED, created);
             domain = options.getString(Constants.OPTION_DOMAIN, null);
             challenge = options.getString(Constants.OPTION_CHALLENGE, null);
         }
         
-        var suite = new EdDSASignature2022();
-        
-        Proof proofOptions = suite
-                        .createDraft(
-                                verificationKey, 
-                                URI.create("https://w3id.org/security#assertionMethod"), 
-                                created, 
-                                domain,
-                                challenge
-                                );
-        
+        Proof proofOptions = null;
+
+        if (suiteName == null || "eddsa-2022".equals(suiteName)) {
+            proofOptions = new EdDSASignature2022()
+                    .createDraft(
+                            verificationKey, 
+                            URI.create("https://w3id.org/security#assertionMethod"), 
+                            created, 
+                            domain,
+                            challenge
+                            );
+
+        } else if ("Ed25519Signature2020".equals(suiteName)) {
+            proofOptions = Ed25519Signature2020
+                    .createDraft(
+                            verificationKey, 
+                            URI.create("https://w3id.org/security#assertionMethod"), 
+                            created, 
+                            domain,
+                            challenge
+                            );
+        }
+                
         return proofOptions;
     }
     

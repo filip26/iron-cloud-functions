@@ -9,6 +9,7 @@ import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.ed25519.Ed25519Signature2020;
+import com.apicatalog.ld.signature.eddsa.EdDsaSignature2022;
 import com.apicatalog.vc.Vc;
 import com.apicatalog.vc.service.Constants;
 
@@ -46,7 +47,10 @@ class VerificationHandler implements Handler<RoutingContext> {
                         .of(new StringReader(document.toString()))
                         .getJsonContent()
                         .orElseThrow(IllegalStateException::new)
-                        .asJsonObject(), new Ed25519Signature2020())
+                        .asJsonObject(), 
+                        new Ed25519Signature2020(),
+                        new EdDsaSignature2022()
+                        )
 
                 .param(Constants.OPTION_DOMAIN, ctx.get(Constants.OPTION_DOMAIN, null))
 

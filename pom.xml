@@ -52,7 +52,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <argLine>-Dfile.encoding=UTF-8</argLine>
 
-        <iron-vc.version>0.8.1</iron-vc.version>
+        <iron-vc.version>0.9.0-SNAPSHOT</iron-vc.version>
 
         <vertx.version>4.3.5</vertx.version>
 
@@ -76,9 +76,13 @@
         <dependency>
             <groupId>com.apicatalog</groupId>
             <artifactId>iron-ed25519-cryptosuite-2020</artifactId>
-            <version>${iron-vc.version}</version>
+            <version>0.9.0-SNAPSHOT</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.apicatalog</groupId>
+            <artifactId>iron-eddsa-cryptosuite-2022</artifactId>
+            <version>0.9.0</version>
+        </dependency>
         <dependency>
             <groupId>com.apicatalog</groupId>
             <artifactId>iron-verifiable-credentials</artifactId>

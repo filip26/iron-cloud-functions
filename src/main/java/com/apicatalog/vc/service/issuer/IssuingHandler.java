@@ -14,12 +14,12 @@ import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.ed25519.Ed25519KeyPair2020;
 import com.apicatalog.ld.signature.ed25519.Ed25519Signature2020;
+import com.apicatalog.ld.signature.ed25519.Ed25519Signature2020Proof;
 import com.apicatalog.ld.signature.ed25519.Ed25519VerificationKey2020;
-import com.apicatalog.ld.signature.proof.ProofOptions;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.multicodec.Multicodec;
 import com.apicatalog.vc.Vc;
-import com.apicatalog.vc.integrity.DataIntegrityProofOptions;
+import com.apicatalog.vc.model.Proof;
 import com.apicatalog.vc.service.Constants;
 
 import io.vertx.core.Handler;
@@ -62,7 +62,7 @@ class IssuingHandler implements Handler<RoutingContext> {
             		Multicodec.decode(Multicodec.Type.Key, Multibase.decode(PRIVATE_KEY))
             		);
             
-            final ProofOptions proofOptions = getOptions(ctx);
+            final Proof proofOptions = getOptions(ctx);
 
             var signed = Vc.sign(
                                 JsonDocument
@@ -89,7 +89,7 @@ class IssuingHandler implements Handler<RoutingContext> {
         }
     }
 
-    static final ProofOptions getOptions(RoutingContext ctx) {
+    static final Proof getOptions(RoutingContext ctx) throws DocumentError {
 
         var body = ctx.body().asJsonObject();
 
@@ -104,25 +104,21 @@ class IssuingHandler implements Handler<RoutingContext> {
                 );
 
         // default values
-        final Instant created = Instant.now().truncatedTo(ChronoUnit.SECONDS);
+        Instant created = Instant.now().truncatedTo(ChronoUnit.SECONDS);
+        String domain = null;
         
-        DataIntegrityProofOptions proofOptions = (new Ed25519Signature2020())
-                        .createOptions()
-                        .verificationMethod(verificationKey)
-                        .purpose(URI.create("https://w3id.org/security#assertionMethod"))
-                        .created(created);                
-
         // recieved options
         if (options != null) {
-
-            var domain = options.getString(Constants.OPTION_DOMAIN);
-
-            if (domain != null) {
-                proofOptions.domain(domain);
-            }
-
-            proofOptions.created(options.getInstant(Constants.OPTION_CREATED, created));
+            created = options.getInstant(Constants.OPTION_CREATED, created);
+            domain = options.getString(Constants.OPTION_DOMAIN);
         }
+        
+        Ed25519Signature2020Proof proofOptions = Ed25519Signature2020
+                        .createDraft(
+                                verificationKey, 
+                                URI.create("https://w3id.org/security#assertionMethod"), 
+                                created, 
+                                domain);
         
         return proofOptions;
     }

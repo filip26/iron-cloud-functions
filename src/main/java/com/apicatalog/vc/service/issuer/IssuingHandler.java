@@ -14,7 +14,7 @@ import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.ed25519.Ed25519KeyPair2020;
 import com.apicatalog.ld.signature.ed25519.Ed25519VerificationKey2020;
-import com.apicatalog.ld.signature.eddsa.EdDsaSignature2022;
+import com.apicatalog.ld.signature.eddsa.EdDSASignature2022;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.multicodec.Multicodec;
 import com.apicatalog.vc.Vc;
@@ -105,14 +105,16 @@ class IssuingHandler implements Handler<RoutingContext> {
         // default values
         Instant created = Instant.now().truncatedTo(ChronoUnit.SECONDS);
         String domain = null;
+        String challenge = null;
         
-        // recieved options
+        // request options
         if (options != null) {
             created = options.getInstant(Constants.OPTION_CREATED, created);
-            domain = options.getString(Constants.OPTION_DOMAIN);
+            domain = options.getString(Constants.OPTION_DOMAIN, null);
+            domain = options.getString(Constants.OPTION_CHALLENGE, null);
         }
         
-        var suite = new EdDsaSignature2022();
+        var suite = new EdDSASignature2022();
         
         Proof proofOptions = suite
                         .createDraft(

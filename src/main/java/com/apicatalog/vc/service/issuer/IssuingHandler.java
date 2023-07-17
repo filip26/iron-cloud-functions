@@ -13,9 +13,8 @@ import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.ed25519.Ed25519KeyPair2020;
-import com.apicatalog.ld.signature.ed25519.Ed25519Signature2020;
-import com.apicatalog.ld.signature.ed25519.Ed25519Signature2020Proof;
 import com.apicatalog.ld.signature.ed25519.Ed25519VerificationKey2020;
+import com.apicatalog.ld.signature.eddsa.EdDsaSignature2022;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.multicodec.Multicodec;
 import com.apicatalog.vc.Vc;
@@ -113,7 +112,9 @@ class IssuingHandler implements Handler<RoutingContext> {
             domain = options.getString(Constants.OPTION_DOMAIN);
         }
         
-        Ed25519Signature2020Proof proofOptions = Ed25519Signature2020
+        var suite = new EdDsaSignature2022();
+        
+        Proof proofOptions = suite
                         .createDraft(
                                 verificationKey, 
                                 URI.create("https://w3id.org/security#assertionMethod"), 

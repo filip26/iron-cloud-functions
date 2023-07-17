@@ -121,8 +121,11 @@ class IssuingHandler implements Handler<RoutingContext> {
         
         Proof proofOptions = null;
 
-        if (suiteName == null || "eddsa-2022".equals(suiteName)) {
-            proofOptions = new EdDSASignature2022()
+        if ("ecdsa-2019".equals(suiteName)) {
+            //TODO
+            
+        } else if ("Ed25519Signature2020".equals(suiteName)) {
+            proofOptions = Ed25519Signature2020
                     .createDraft(
                             verificationKey, 
                             URI.create("https://w3id.org/security#assertionMethod"), 
@@ -130,9 +133,10 @@ class IssuingHandler implements Handler<RoutingContext> {
                             domain,
                             challenge
                             );
-
-        } else if ("Ed25519Signature2020".equals(suiteName)) {
-            proofOptions = Ed25519Signature2020
+        }
+        
+        if (proofOptions == null) {
+            proofOptions = new EdDSASignature2022()
                     .createDraft(
                             verificationKey, 
                             URI.create("https://w3id.org/security#assertionMethod"), 

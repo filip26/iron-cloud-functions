@@ -109,7 +109,7 @@ class IssuingHandler implements Handler<RoutingContext> {
         String challenge = null;
 
         // suite name
-        String suiteName = "eddsa-2022";
+        String suiteName = "Ed25519Signature2020";
         
         // request options
         if (options != null) {
@@ -124,8 +124,8 @@ class IssuingHandler implements Handler<RoutingContext> {
         if ("ecdsa-2019".equals(suiteName)) {
             //TODO
             
-        } else if ("Ed25519Signature2020".equals(suiteName)) {
-            proofOptions = Ed25519Signature2020
+        } else if ("eddsa-2022".equals(suiteName)) {
+            proofOptions = new EdDSASignature2022()
                     .createDraft(
                             verificationKey, 
                             URI.create("https://w3id.org/security#assertionMethod"), 
@@ -136,7 +136,7 @@ class IssuingHandler implements Handler<RoutingContext> {
         }
         
         if (proofOptions == null) {
-            proofOptions = new EdDSASignature2022()
+            proofOptions = Ed25519Signature2020
                     .createDraft(
                             verificationKey, 
                             URI.create("https://w3id.org/security#assertionMethod"), 
@@ -182,11 +182,6 @@ class IssuingHandler implements Handler<RoutingContext> {
                             .remove("cred:issuanceDate");
         }
 
-        if (signed.containsKey("sec:proof")) {
-            document = document
-                            .remove("sec:proof")
-                            .add("proof", proof);
-        }
         return document.build();
     }
 }

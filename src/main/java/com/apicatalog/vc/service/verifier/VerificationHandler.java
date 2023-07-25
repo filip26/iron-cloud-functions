@@ -11,6 +11,7 @@ import com.apicatalog.ld.signature.VerificationError;
 import com.apicatalog.ld.signature.ed25519.Ed25519Signature2020;
 import com.apicatalog.ld.signature.eddsa.EdDSASignature2022;
 import com.apicatalog.vc.Vc;
+import com.apicatalog.vc.integrity.DataIntegritySchema;
 import com.apicatalog.vc.service.Constants;
 
 import io.vertx.core.Handler;
@@ -51,8 +52,9 @@ class VerificationHandler implements Handler<RoutingContext> {
                     new EdDSASignature2022(),
                     new Ed25519Signature2020())
 
-                    .param(Constants.OPTION_DOMAIN, ctx.get(Constants.OPTION_DOMAIN, null))
-                    .param(Constants.OPTION_CHALLENGE, ctx.get(Constants.OPTION_CHALLENGE, null))
+                    .param(DataIntegritySchema.DOMAIN.name(), ctx.get(Constants.OPTION_DOMAIN, null))
+                    .param(DataIntegritySchema.CHALLENGE.name(), ctx.get(Constants.OPTION_CHALLENGE, null))
+                    .param(DataIntegritySchema.PURPOSE.name(), ctx.get(Constants.OPTION_PURPOSE, null))
 
                     // assert document validity
                     .isValid();

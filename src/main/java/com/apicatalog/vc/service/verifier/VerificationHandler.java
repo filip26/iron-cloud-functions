@@ -8,6 +8,7 @@ import com.apicatalog.jsonld.document.JsonDocument;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.signature.VerificationError;
+import com.apicatalog.ld.signature.ecdsa.ECDSASignature2019;
 import com.apicatalog.ld.signature.ed25519.Ed25519Signature2020;
 import com.apicatalog.ld.signature.eddsa.EdDSASignature2022;
 import com.apicatalog.vc.Vc;
@@ -50,6 +51,7 @@ class VerificationHandler implements Handler<RoutingContext> {
                     .orElseThrow(IllegalStateException::new)
                     .asJsonObject(),
                     new EdDSASignature2022(),
+                    new ECDSASignature2019(),
                     new Ed25519Signature2020())
 
                     .param(DataIntegritySchema.DOMAIN.name(), ctx.get(Constants.OPTION_DOMAIN, null))

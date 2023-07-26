@@ -13,12 +13,8 @@ import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.ecdsa.ECDSASignature2019;
-import com.apicatalog.ld.signature.ed25519.Ed25519KeyPair2020;
 import com.apicatalog.ld.signature.ed25519.Ed25519Signature2020;
-import com.apicatalog.ld.signature.ed25519.Ed25519VerificationKey2020;
 import com.apicatalog.ld.signature.eddsa.EdDSASignature2022;
-import com.apicatalog.multibase.Multibase;
-import com.apicatalog.multicodec.Multicodec;
 import com.apicatalog.vc.Vc;
 import com.apicatalog.vc.model.Proof;
 import com.apicatalog.vc.service.Constants;
@@ -29,12 +25,6 @@ import jakarta.json.Json;
 import jakarta.json.JsonObject;
 
 class IssuingHandler implements Handler<RoutingContext> {
-
-    static final URI KEYPAIR_ID = URI.create("did:key:" + System.getProperty("VC_PUBLIC_KEY", System.getenv("VC_PUCLIC_KEY")));
-    static final String PUBLIC_KEY = System.getProperty("VC_PUBLIC_KEY", System.getenv("VC_PUBLIC_KEY"));
-    static final String PRIVATE_KEY = System.getProperty("VC_PRIVATE_KEY", System.getenv("VC_PRIVATE_KEY"));
-
-    static final URI VERIFICATION_KEY = URI.create(System.getProperty("VC_VERIFICATION_KEY", System.getenv("VC_VERIFICATION_KEY")));
 
     @Override
     public void handle(RoutingContext ctx) {
@@ -55,13 +45,6 @@ class IssuingHandler implements Handler<RoutingContext> {
         }
 
         try {
-            var keyPair = new Ed25519KeyPair2020(
-                    KEYPAIR_ID,
-                    null,
-                    null,
-                    Multicodec.decode(Multicodec.Type.Key, Multibase.decode(PUBLIC_KEY)),
-                    Multicodec.decode(Multicodec.Type.Key, Multibase.decode(PRIVATE_KEY)));
-
             final Proof proofOptions = getOptions(ctx);
 
             var signed = Vc.sign(
@@ -70,12 +53,12 @@ class IssuingHandler implements Handler<RoutingContext> {
                             .getJsonContent()
                             .orElseThrow(IllegalStateException::new)
                             .asJsonObject(),
-                    keyPair,
+                    KeyProvider.getKeyPair(proofOptions.getCryptoSuite().getId()),
                     proofOptions)
                     .getCompacted();
 
             // FIXME, remove, hack to pass the testing suite
-            //signed = applyHacks(signed);
+            signed = applyHacks(signed);
 
             var response = ctx.response();
 
@@ -93,13 +76,6 @@ class IssuingHandler implements Handler<RoutingContext> {
         var body = ctx.body().asJsonObject();
 
         var options = body.getJsonObject(Constants.OPTIONS);
-
-        // verification key
-        Ed25519VerificationKey2020 verificationKey = new Ed25519VerificationKey2020(
-                VERIFICATION_KEY,
-                null,
-                null,
-                null);
 
         // default values
         Instant created = Instant.now().truncatedTo(ChronoUnit.SECONDS);
@@ -120,7 +96,7 @@ class IssuingHandler implements Handler<RoutingContext> {
         if ("ecdsa-2019".equals(suiteName)) {
             return new ECDSASignature2019()
                     .createDraft(
-                            verificationKey,
+                            KeyProvider.getEcDsaMethod(),
                             URI.create("https://w3id.org/security#assertionMethod"),
                             created,
                             domain,
@@ -129,7 +105,7 @@ class IssuingHandler implements Handler<RoutingContext> {
         } else if ("eddsa-2022".equals(suiteName)) {
             return new EdDSASignature2022()
                     .createDraft(
-                            verificationKey,
+                            KeyProvider.getEcDsaMethod(),
                             URI.create("https://w3id.org/security#assertionMethod"),
                             created,
                             domain,
@@ -138,24 +114,19 @@ class IssuingHandler implements Handler<RoutingContext> {
 
         return Ed25519Signature2020
                 .createDraft(
-                        verificationKey,
+                        KeyProvider.getEd25519Method(),
                         URI.create("https://w3id.org/security#assertionMethod"),
                         created,
                         domain,
                         challenge);
     }
 
-    // FIXME, remove, see
-    // https://github.com/w3c-ccg/vc-api-issuer-test-suite/issues/18
+    // FIXME, remove
     static final JsonObject applyHacks(final JsonObject signed) {
 
         var document = Json.createObjectBuilder(signed);
 
-        var proof = signed.getJsonObject("sec:proof");
-
-        if (proof == null) {
-            proof = signed.getJsonObject("proof");
-        }
+        var proof = signed.getJsonObject("proof");
 
         if (JsonUtils.isObject(proof.get("verificationMethod"))) {
             proof = Json.createObjectBuilder(proof)

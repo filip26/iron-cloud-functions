@@ -53,7 +53,9 @@
         <argLine>-Dfile.encoding=UTF-8</argLine>
 
         <iron-vc.version>0.9.0-SNAPSHOT</iron-vc.version>
-
+        <carbon.version>0.0.4-SNAPSHOT</carbon.version>
+        <copper.version>0.0.2-SNAPSHOT</copper.version>
+        
         <vertx.version>4.3.5</vertx.version>
 
         <main.verticle>com.apicatalog.vc.service.VcApiVerticle</main.verticle>
@@ -93,6 +95,12 @@
             <artifactId>iron-verifiable-credentials</artifactId>
             <version>${iron-vc.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.apicatalog</groupId>
+            <artifactId>copper-multicodec</artifactId>
+            <version>${copper.version}</version>
+        </dependency>    
 
         <dependency>
             <groupId>io.vertx</groupId>

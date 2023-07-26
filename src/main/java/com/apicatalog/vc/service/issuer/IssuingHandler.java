@@ -17,6 +17,7 @@ import com.apicatalog.ld.signature.ed25519.Ed25519Signature2020;
 import com.apicatalog.ld.signature.eddsa.EdDSASignature2022;
 import com.apicatalog.vc.Vc;
 import com.apicatalog.vc.model.Proof;
+import com.apicatalog.vc.model.ProofValueProcessor;
 import com.apicatalog.vc.service.Constants;
 
 import io.vertx.core.Handler;
@@ -43,10 +44,10 @@ class IssuingHandler implements Handler<RoutingContext> {
             ctx.fail(new DocumentError(ErrorType.Invalid));
             return;
         }
-
+        
         try {
             final Proof proofOptions = getOptions(ctx);
-
+        
             var signed = Vc.sign(
                     JsonDocument
                             .of(new StringReader(document.toString()))
@@ -58,7 +59,7 @@ class IssuingHandler implements Handler<RoutingContext> {
                     .getCompacted();
 
             // FIXME, remove, hack to pass the testing suite
-            signed = applyHacks(signed);
+     //       signed = applyHacks(signed);
 
             var response = ctx.response();
 
@@ -67,6 +68,7 @@ class IssuingHandler implements Handler<RoutingContext> {
             response.end(signed.toString());
 
         } catch (JsonLdError | DocumentError | IllegalStateException | SigningError e) {
+            e.printStackTrace();
             ctx.fail(e);
         }
     }
@@ -105,7 +107,7 @@ class IssuingHandler implements Handler<RoutingContext> {
         } else if ("eddsa-2022".equals(suiteName)) {
             return new EdDSASignature2022()
                     .createDraft(
-                            KeyProvider.getEcDsaMethod(),
+                            KeyProvider.getEdDsaMethod(),
                             URI.create("https://w3id.org/security#assertionMethod"),
                             created,
                             domain,

@@ -2,8 +2,6 @@ package com.apicatalog.vc.service.issuer;
 
 import java.io.StringReader;
 import java.net.URI;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.StringUtils;
@@ -17,7 +15,6 @@ import com.apicatalog.ld.signature.ed25519.Ed25519Signature2020;
 import com.apicatalog.ld.signature.eddsa.EdDSASignature2022;
 import com.apicatalog.vc.Vc;
 import com.apicatalog.vc.model.Proof;
-import com.apicatalog.vc.model.ProofValueProcessor;
 import com.apicatalog.vc.service.Constants;
 
 import io.vertx.core.Handler;
@@ -46,7 +43,9 @@ class IssuingHandler implements Handler<RoutingContext> {
         }
         
         try {
-            final Proof proofOptions = getOptions(ctx);
+            var options = IssuerOptions.getOptions(ctx);
+            
+            final Proof proofOptions = getDraft(options);
         
             var signed = Vc.sign(
                     JsonDocument
@@ -54,12 +53,12 @@ class IssuingHandler implements Handler<RoutingContext> {
                             .getJsonContent()
                             .orElseThrow(IllegalStateException::new)
                             .asJsonObject(),
-                    KeyProvider.getKeyPair(proofOptions.getCryptoSuite().getId()),
+                    KeyProvider.getKeyPair(options.cryptosuite()),
                     proofOptions)
                     .getCompacted();
 
             // FIXME, remove, hack to pass the testing suite
-     //       signed = applyHacks(signed);
+           signed = applyHacks(signed);
 
             var response = ctx.response();
 
@@ -73,54 +72,34 @@ class IssuingHandler implements Handler<RoutingContext> {
         }
     }
 
-    static final Proof getOptions(RoutingContext ctx) throws DocumentError {
+    static final Proof getDraft(IssuerOptions options) throws DocumentError {
 
-        var body = ctx.body().asJsonObject();
-
-        var options = body.getJsonObject(Constants.OPTIONS);
-
-        // default values
-        Instant created = Instant.now().truncatedTo(ChronoUnit.SECONDS);
-        String domain = null;
-        String challenge = null;
-
-        // suite name
-        String suiteName = "Ed25519Signature2020";
-
-        // request options
-        if (options != null) {
-            suiteName = options.getString(Constants.OPTION_TYPE, suiteName);
-            created = options.getInstant(Constants.OPTION_CREATED, created);
-            domain = options.getString(Constants.OPTION_DOMAIN, null);
-            challenge = options.getString(Constants.OPTION_CHALLENGE, null);
-        }
-
-        if ("ecdsa-2019".equals(suiteName)) {
+        if ("ecdsa-2019".equals(options.cryptosuite())) {
             return new ECDSASignature2019()
-                    .createDraft(
+                    .createDraft256(
                             KeyProvider.getEcDsaMethod(),
                             URI.create("https://w3id.org/security#assertionMethod"),
-                            created,
-                            domain,
-                            challenge);
+                            options.created(),
+                            options.domain(),
+                            options.challenge());
 
-        } else if ("eddsa-2022".equals(suiteName)) {
+        } else if ("eddsa-2022".equals(options.cryptosuite())) {
             return new EdDSASignature2022()
                     .createDraft(
                             KeyProvider.getEdDsaMethod(),
                             URI.create("https://w3id.org/security#assertionMethod"),
-                            created,
-                            domain,
-                            challenge);
+                            options.created(),
+                            options.challenge(),
+                            options.challenge());
         }
 
         return Ed25519Signature2020
                 .createDraft(
                         KeyProvider.getEd25519Method(),
                         URI.create("https://w3id.org/security#assertionMethod"),
-                        created,
-                        domain,
-                        challenge);
+                        options.created(),
+                        options.domain(),
+                        options.challenge());
     }
 
     // FIXME, remove
@@ -128,15 +107,15 @@ class IssuingHandler implements Handler<RoutingContext> {
 
         var document = Json.createObjectBuilder(signed);
 
-        var proof = signed.getJsonObject("proof");
-
-        if (JsonUtils.isObject(proof.get("verificationMethod"))) {
-            proof = Json.createObjectBuilder(proof)
-                    .add("verificationMethod",
-                            proof.getJsonObject("verificationMethod")
-                                    .getString("id"))
-                    .build();
-        }
+//        var proof = signed.getJsonObject("proof");
+//
+//        if (JsonUtils.isObject(proof.get("verificationMethod"))) {
+//            proof = Json.createObjectBuilder(proof)
+//                    .add("verificationMethod",
+//                            proof.getJsonObject("verificationMethod")
+//                                    .getString("id"))
+//                    .build();
+//        }
 
         if (JsonUtils.isString(signed.get("credentialSubject"))) {
             document = document

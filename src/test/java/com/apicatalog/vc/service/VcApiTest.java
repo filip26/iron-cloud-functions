@@ -30,7 +30,8 @@ class VcApiTest {
         return Stream.of(
                 Arguments.of("issue - proof options", "0001-in.jsonld", "/credentials/issue", 201),
                 Arguments.of("verify - proof options", "0002-in.jsonld", "/credentials/verify", 200),
-                Arguments.of("issue - proof options", "0003-in.jsonld", "/credentials/issue", 201)
+                Arguments.of("issue - proof options", "0003-in.jsonld", "/credentials/issue", 201),
+                Arguments.of("verify - proof options", "0004-in.jsonld", "/credentials/verify", 400)
                 );
     }
 
@@ -69,6 +70,7 @@ class VcApiTest {
                     .as(BodyCodec.string())
                     .sendBuffer(Buffer.buffer(input),
                             testContext.succeeding(response -> testContext.verify(() -> {
+                                System.out.println(">>>> " + code + ", " + response.statusCode());
                                 assertEquals(code, response.statusCode());
                                 testContext.completeNow();
                             })));

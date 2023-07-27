@@ -23,7 +23,7 @@ class VerifierErrorHandler implements Handler<RoutingContext> {
         }
 
         final Throwable e = ctx.failure();
-
+        
         if (e instanceof VerificationError ve) {
 
             verificationResult.addCheck(toVcErrorCode(ve.getCode()));
@@ -31,7 +31,6 @@ class VerifierErrorHandler implements Handler<RoutingContext> {
             ctx.response().setStatusCode(400);
 
         } else if (e instanceof DocumentError de) {
-
             verificationResult.addError(toVcErrorCode(de.getCode()));
             verificationResult.addError(toString(de.getCode()));
 

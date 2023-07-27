@@ -31,7 +31,7 @@ public class VerifyEmbeddedOptionsHandler implements Handler<RoutingContext> {
             var purpose = options.getString(Constants.OPTION_PURPOSE);
 
             if (purpose != null) {
-                ctx.put(Constants.OPTION_CHALLENGE, purpose);
+                ctx.put(Constants.OPTION_PURPOSE, purpose);
             }
 
         }

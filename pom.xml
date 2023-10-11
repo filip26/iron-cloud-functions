@@ -54,7 +54,7 @@
 
         <iron-vc.version>0.8.1</iron-vc.version>
 
-        <vertx.version>4.4.1</vertx.version>
+        <vertx.version>4.4.6</vertx.version>
 
         <main.verticle>com.apicatalog.vc.service.VcApiVerticle</main.verticle>
         <launcher.class>io.vertx.core.Launcher</launcher.class>

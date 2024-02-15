@@ -19,6 +19,16 @@ Verifies verifiable credentials and presentations sent in raw JSON[-LD] format, 
 
 All PR's welcome!
 
+### Setup
+
+#### Variables
+```bash
+> export VC_PUBLIC_KEY=[MULTIBASE]
+> export VC_PRIVATE_KEY=[MULTIBASE]
+> export VC_VERIFICATION_KEY=[DID URL]
+```
+See [IssuingHandler](https://github.com/filip26/iron-vc-api/blob/33004560eafb913ea812e7883d742acaea6da59f/src/main/java/com/apicatalog/vc/service/issuer/IssuingHandler.java#L32) and [VCApiTest](https://github.com/filip26/iron-vc-api/blob/33004560eafb913ea812e7883d742acaea6da59f/src/test/java/com/apicatalog/vc/service/VcApiTest.java#L40) for an example.
+
 ### Building
 
 Fork and clone the project repository.
@@ -34,6 +44,23 @@ Fork and clone the project repository.
 > cd iron-vc-api
 > chmod +x ./bin/start.sh
 > ./bin/start.sh dev
+```
+
+### Deployment
+
+1. Setup GAE project and install `gcloud` utility. 
+2. Create `.env.yaml` in the project root directory
+
+```yaml
+env_variables:
+  VC_PUBLIC_KEY: [MULTIBASE]
+  VC_PRIVATE_KEY: [MULTIBASE]
+  VC_VERIFICATION_KEY: [DID URL]
+```
+3. Edit [src/main/appengine/app.yaml](https://github.com/filip26/iron-vc-api/blob/33004560eafb913ea812e7883d742acaea6da59f/src/main/appengine/app.yaml)
+4. Compile and deploy
+```bash
+> ./bin/deploy.sh
 ```
 
 ## Resources

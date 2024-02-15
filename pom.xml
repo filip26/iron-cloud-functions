@@ -59,7 +59,7 @@
         <copper.codec.version>0.1.1</copper.codec.version>
         <copper.base.version>0.5.0</copper.base.version>
 
-        <vertx.version>4.3.5</vertx.version>
+        <vertx.version>4.5.3</vertx.version>
         <jakarta.json.version>2.0.1</jakarta.json.version>
 
         <main.verticle>com.apicatalog.vc.service.VcApiVerticle</main.verticle>
@@ -150,12 +150,12 @@
         <plugins>
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.0.0-M7</version>
+                <version>3.2.5</version>
             </plugin>
 
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
-                <version>3.3.0</version>
+                <version>3.3.1</version>
                 <executions>
                     <execution>
                         <id>position-react-build</id>
@@ -206,7 +206,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
-                <version>3.1.0</version>
+                <version>3.1.1</version>
                 <configuration>
                     <mainClass>${launcher.class}</mainClass>
                     <arguments>

@@ -1,4 +1,6 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.apicatalog</groupId>
@@ -52,11 +54,13 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <argLine>-Dfile.encoding=UTF-8</argLine>
 
-        <iron-vc.version>0.9.0-SNAPSHOT</iron-vc.version>
-        <carbon.version>0.0.4-SNAPSHOT</carbon.version>
-        <copper.version>0.0.2-SNAPSHOT</copper.version>
-        
+        <iron.vc.version>0.11.0</iron.vc.version>
+        <carbon.version>0.3.0</carbon.version>
+        <copper.codec.version>0.1.1</copper.codec.version>
+        <copper.base.version>0.5.0</copper.base.version>
+
         <vertx.version>4.3.5</vertx.version>
+        <jakarta.json.version>2.0.1</jakarta.json.version>
 
         <main.verticle>com.apicatalog.vc.service.VcApiVerticle</main.verticle>
         <launcher.class>io.vertx.core.Launcher</launcher.class>
@@ -78,29 +82,34 @@
         <dependency>
             <groupId>com.apicatalog</groupId>
             <artifactId>iron-ed25519-cryptosuite-2020</artifactId>
-            <version>${iron-vc.version}</version>
+            <version>${iron.vc.version}</version>
         </dependency>
         <dependency>
             <groupId>com.apicatalog</groupId>
-            <artifactId>iron-eddsa-cryptosuite-2022</artifactId>
-            <version>${iron-vc.version}</version>
+            <artifactId>iron-eddsa-rdfc-2022</artifactId>
+            <version>${iron.vc.version}</version>
         </dependency>
         <dependency>
             <groupId>com.apicatalog</groupId>
-            <artifactId>iron-ecdsa-cryptosuite-2019</artifactId>
-            <version>${iron-vc.version}</version>
-        </dependency>        
+            <artifactId>iron-ecdsa-rdfc-2019</artifactId>
+            <version>${iron.vc.version}</version>
+        </dependency>
         <dependency>
             <groupId>com.apicatalog</groupId>
             <artifactId>iron-verifiable-credentials</artifactId>
-            <version>${iron-vc.version}</version>
+            <version>${iron.vc.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.apicatalog</groupId>
             <artifactId>copper-multicodec</artifactId>
-            <version>${copper.version}</version>
-        </dependency>    
+            <version>${copper.codec.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.apicatalog</groupId>
+            <artifactId>copper-multibase</artifactId>
+            <version>${copper.base.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>io.vertx</groupId>
@@ -118,17 +127,23 @@
         </dependency>
 
         <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>jakarta.json</artifactId>
+            <version>${jakarta.json.version}</version>
+        </dependency>
+        
+        <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-junit5</artifactId>
             <scope>test</scope>
         </dependency>
-        
+
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-web-client</artifactId>
             <scope>test</scope>
         </dependency>
-                
+
     </dependencies>
 
     <build>
@@ -149,10 +164,12 @@
                         </goals>
                         <phase>prepare-package</phase>
                         <configuration>
-                            <outputDirectory>${project.build.outputDirectory}/webroot</outputDirectory>
+                            <outputDirectory>
+                                ${project.build.outputDirectory}/webroot</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>${project.basedir}/src/main/webapp</directory>
+                                    <directory>
+                                        ${project.basedir}/src/main/webapp</directory>
                                     <filtering>false</filtering>
                                 </resource>
                             </resources>

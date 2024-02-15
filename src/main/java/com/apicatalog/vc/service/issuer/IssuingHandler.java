@@ -76,7 +76,7 @@ class IssuingHandler implements Handler<RoutingContext> {
 
         if ("ecdsa-2019".equals(options.cryptosuite())) {
             return new ECDSASignature2019()
-                    .createDraft256(
+                    .createP256Draft(
                             KeyProvider.getEcDsaMethod(),
                             URI.create("https://w3id.org/security#assertionMethod"),
                             options.created(),

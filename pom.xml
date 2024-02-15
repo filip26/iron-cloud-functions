@@ -102,14 +102,27 @@
 
         <dependency>
             <groupId>com.apicatalog</groupId>
+            <artifactId>carbon-did</artifactId>
+            <version>${carbon.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.apicatalog</groupId>
             <artifactId>copper-multicodec</artifactId>
             <version>${copper.codec.version}</version>
         </dependency>
+
         <dependency>
             <groupId>com.apicatalog</groupId>
             <artifactId>copper-multibase</artifactId>
             <version>${copper.base.version}</version>
         </dependency>
+
+       <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk18on</artifactId>
+            <version>1.77</version>
+        </dependency>     
 
         <dependency>
             <groupId>io.vertx</groupId>

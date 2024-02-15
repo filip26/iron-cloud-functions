@@ -65,7 +65,7 @@ env_variables:
 
 ## Resources
 * [Verifiable Credentials HTTP API](https://w3c-ccg.github.io/vc-api/)
-* [Ed25519Signature 2020 Interoperability Report](https://w3c-ccg.github.io/di-ed25519-test-suite/)
+* [Interoperability Report](https://w3c-ccg.github.io/di-ed25519signature2020-test-suite/)
 * [https://github.com/w3c-ccg/vc-api/](https://github.com/w3c-ccg/vc-api/)
 * [Verifiable Credentials Use Cases](https://www.w3.org/TR/vc-use-cases/)
 * [Verifiable Credentials Data Model v1.1](https://www.w3.org/TR/vc-data-model/)

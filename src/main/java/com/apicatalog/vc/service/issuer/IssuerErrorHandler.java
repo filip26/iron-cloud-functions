@@ -40,8 +40,8 @@ class IssuerErrorHandler implements Handler<RoutingContext> {
 
 
         } else {
+            e.printStackTrace();
             ctx.response().setStatusCode(500);
-
         }
         errorResponse.put("message",  e.getMessage());
 

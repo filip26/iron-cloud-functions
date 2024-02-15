@@ -29,7 +29,10 @@ class VcApiTest {
     static Stream<Arguments> testData() {
         return Stream.of(
                 Arguments.of("issue - proof options", "0001-in.jsonld", "/credentials/issue", 201),
-                Arguments.of("verify - proof options", "0002-in.jsonld", "/credentials/verify", 200)
+                Arguments.of("verify - proof options", "0002-in.jsonld", "/credentials/verify", 200),
+                Arguments.of("issue - proof options", "0003-in.jsonld", "/credentials/issue", 201),
+                Arguments.of("verify - proof options", "0004-in.jsonld", "/credentials/verify", 400),
+                Arguments.of("verify - proof options", "0005-in.jsonld", "/credentials/verify", 400)
                 );
     }
 
@@ -39,8 +42,12 @@ class VcApiTest {
         
         //set environmental variables
         System.setProperty("VC_PUBLIC_KEY", "z6Mkska8oQD7QQQWxqa7L5ai4mH98HfAdSwomPFYKuqNyE2y");
-        System.setProperty("VC_PRIVATE_KEY", "zRuuyWBEr6MivrDHUX4Yd7jiGzMbGJH38EHFqQxztA4r1QY");
+        System.setProperty("VC_PRIVATE_KEY", "z3u2RRiEW8idMgvP3kthwjWqPo9W8X4pvEp52toGwp8EjJvg");
         System.setProperty("VC_VERIFICATION_KEY", "did:key:z6Mkska8oQD7QQQWxqa7L5ai4mH98HfAdSwomPFYKuqNyE2y#z6Mkska8oQD7QQQWxqa7L5ai4mH98HfAdSwomPFYKuqNyE2y");
+
+        System.setProperty("EC_PUBLIC_KEY", "zDnaepBuvsQ8cpsWrVKw8fbpGpvPeNSjVPTWoq6cRqaYzBKVP");
+        System.setProperty("EC_PRIVATE_KEY", "z42twTcNeSYcnqg1FLuSFs2bsGH3ZqbRHFmvS9XMsYhjxvHN");
+        System.setProperty("EC_VERIFICATION_KEY", "did:key:zDnaepBuvsQ8cpsWrVKw8fbpGpvPeNSjVPTWoq6cRqaYzBKVP#zDnaepBuvsQ8cpsWrVKw8fbpGpvPeNSjVPTWoq6cRqaYzBKVP");
 
         // start
         vertx.deployVerticle(new VcApiVerticle(), testContext.succeedingThenComplete());

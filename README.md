@@ -22,10 +22,18 @@ All PR's welcome!
 ### Setup
 
 #### Variables
+
+##### EDDSA Keys
 ```bash
 > export VC_PUBLIC_KEY=[MULTIBASE]
 > export VC_PRIVATE_KEY=[MULTIBASE]
 > export VC_VERIFICATION_KEY=[DID URL]
+```
+##### ECDSA P-256 Keys
+```bash
+> export EC_PUBLIC_KEY=[MULTIBASE]
+> export EC_PRIVATE_KEY=[MULTIBASE]
+> export EC_VERIFICATION_KEY=[DID URL]
 ```
 See [IssuingHandler](https://github.com/filip26/iron-vc-api/blob/33004560eafb913ea812e7883d742acaea6da59f/src/main/java/com/apicatalog/vc/service/issuer/IssuingHandler.java#L32) and [VCApiTest](https://github.com/filip26/iron-vc-api/blob/33004560eafb913ea812e7883d742acaea6da59f/src/test/java/com/apicatalog/vc/service/VcApiTest.java#L40) for an example.
 
@@ -56,6 +64,9 @@ env_variables:
   VC_PUBLIC_KEY: [MULTIBASE]
   VC_PRIVATE_KEY: [MULTIBASE]
   VC_VERIFICATION_KEY: [DID URL]
+  EC_PUBLIC_KEY: [MULTIBASE]
+  EC_PRIVATE_KEY: [MULTIBASE]
+  EC_VERIFICATION_KEY: [DID URL]
 ```
 3. Edit [src/main/appengine/app.yaml](https://github.com/filip26/iron-vc-api/blob/33004560eafb913ea812e7883d742acaea6da59f/src/main/appengine/app.yaml)
 4. Compile and deploy
@@ -64,11 +75,9 @@ env_variables:
 ```
 
 ## Resources
+* [Iron Verifiable Credentials](https://github.com/filip26/iron-verifiable-credentials)
 * [Verifiable Credentials HTTP API](https://w3c-ccg.github.io/vc-api/)
-* [Interoperability Report](https://w3c-ccg.github.io/di-ed25519signature2020-test-suite/)
 * [https://github.com/w3c-ccg/vc-api/](https://github.com/w3c-ccg/vc-api/)
-* [Verifiable Credentials Use Cases](https://www.w3.org/TR/vc-use-cases/)
-* [Verifiable Credentials Data Model v1.1](https://www.w3.org/TR/vc-data-model/)
 
 ## Sponsors
 

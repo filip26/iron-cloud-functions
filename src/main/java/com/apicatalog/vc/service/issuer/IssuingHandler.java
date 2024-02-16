@@ -41,12 +41,12 @@ class IssuingHandler implements Handler<RoutingContext> {
             ctx.fail(new DocumentError(ErrorType.Invalid));
             return;
         }
-        
+
         try {
             var options = IssuerOptions.getOptions(ctx);
-            
+
             final Proof proofOptions = getDraft(options);
-        
+
             var signed = Vc.sign(
                     JsonDocument
                             .of(new StringReader(document.toString()))
@@ -58,7 +58,7 @@ class IssuingHandler implements Handler<RoutingContext> {
                     .getCompacted();
 
             // FIXME, remove, hack to pass the testing suite
-           signed = applyHacks(signed);
+            signed = applyHacks(signed);
 
             var response = ctx.response();
 
@@ -107,27 +107,11 @@ class IssuingHandler implements Handler<RoutingContext> {
 
         var document = Json.createObjectBuilder(signed);
 
-//        var proof = signed.getJsonObject("proof");
-//
-//        if (JsonUtils.isObject(proof.get("verificationMethod"))) {
-//            proof = Json.createObjectBuilder(proof)
-//                    .add("verificationMethod",
-//                            proof.getJsonObject("verificationMethod")
-//                                    .getString("id"))
-//                    .build();
-//        }
-
         if (JsonUtils.isString(signed.get("credentialSubject"))) {
             document = document
                     .add("credentialSubject",
                             Json.createObjectBuilder()
                                     .add("id", signed.getString("credentialSubject")));
-        }
-
-        if (JsonUtils.isNotNull(signed.get("cred:issuanceDate"))) {
-            document = document
-                    .add("issuanceDate", signed.get("cred:issuanceDate"))
-                    .remove("cred:issuanceDate");
         }
 
         return document.build();

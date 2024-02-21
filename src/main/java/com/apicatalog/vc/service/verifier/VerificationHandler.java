@@ -16,6 +16,8 @@ import com.apicatalog.vc.integrity.DataIntegrityVocab;
 import com.apicatalog.vc.service.Constants;
 
 import io.vertx.core.Handler;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 
 class VerificationHandler implements Handler<RoutingContext> {
@@ -34,7 +36,15 @@ class VerificationHandler implements Handler<RoutingContext> {
         final String documentKey = route.getMetadata(Constants.CTX_DOCUMENT_KEY);
 
         if (StringUtils.isNotBlank(documentKey)) {
-            document = document.getJsonObject(documentKey);
+            var value  = document.getValue(documentKey);
+            if (value instanceof JsonArray array) {
+                // ignore key length type for verification 
+                // keyType = array.getString(0);
+                document = array.getJsonObject(1);
+                
+            } else if (value instanceof JsonObject object) {
+                document = object;
+            }
         }
 
         if (document == null) {

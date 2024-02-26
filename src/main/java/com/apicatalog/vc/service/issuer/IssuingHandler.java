@@ -10,12 +10,11 @@ import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.signature.SigningError;
-import com.apicatalog.ld.signature.ecdsa.ECDSASignature2019;
 import com.apicatalog.ld.signature.ed25519.Ed25519Signature2020;
-import com.apicatalog.ld.signature.eddsa.EdDSASignature2022;
-import com.apicatalog.vc.Vc;
-import com.apicatalog.vc.model.Proof;
+import com.apicatalog.vc.issuer.Issuer;
+import com.apicatalog.vc.issuer.ProofDraft;
 import com.apicatalog.vc.service.Constants;
+import com.apicatalog.vc.service.Suites;
 
 import io.vertx.core.Handler;
 import io.vertx.ext.web.RoutingContext;
@@ -45,19 +44,17 @@ class IssuingHandler implements Handler<RoutingContext> {
         try {
             var options = IssuerOptions.getOptions(ctx);
 
-            final Proof proofOptions = getDraft(options);
+            final ProofDraft proofOptions = getDraft(options);
 
-            var signed = Vc.sign(
-                    JsonDocument
-                            .of(new StringReader(document.toString()))
-                            .getJsonContent()
-                            .orElseThrow(IllegalStateException::new)
-                            .asJsonObject(),
-                    KeyProvider.getKeyPair(options.cryptosuite()),
-                    proofOptions)
-                    .getCompacted();
+            var signed = getIssuer(options)
+                    .sign(
+                            JsonDocument
+                                    .of(new StringReader(document.toString()))
+                                    .getJsonContent()
+                                    .orElseThrow(IllegalStateException::new)
+                                    .asJsonObject(),
+                            proofOptions).compacted();
 
-            // FIXME, remove, hack to pass the testing suite
             signed = applyHacks(signed);
 
             var response = ctx.response();
@@ -72,37 +69,66 @@ class IssuingHandler implements Handler<RoutingContext> {
         }
     }
 
-    static final Proof getDraft(IssuerOptions options) throws DocumentError {
+    static final ProofDraft getDraft(IssuerOptions options) throws DocumentError {
 
         if ("ecdsa-2019".equals(options.cryptosuite())) {
-            return new ECDSASignature2019()
+            var draft = Suites.ECDSA_RDFC_2019_SUITE
                     .createP256Draft(
                             KeyProvider.getEcDsaMethod(),
-                            URI.create("https://w3id.org/security#assertionMethod"),
-                            options.created(),
-                            options.domain(),
-                            options.challenge());
+                            URI.create("https://w3id.org/security#assertionMethod"));
+            draft.created(options.created());
+            draft.domain(options.domain());
+            draft.challenge(options.challenge());
+            return draft;
 
         } else if ("eddsa-2022".equals(options.cryptosuite())) {
-            return new EdDSASignature2022()
+            var draft = Suites.EDDSA_RDFC_2022_SUITE
                     .createDraft(
                             KeyProvider.getEdDsaMethod(),
-                            URI.create("https://w3id.org/security#assertionMethod"),
-                            options.created(),
-                            options.challenge(),
-                            options.challenge());
+                            URI.create("https://w3id.org/security#assertionMethod"));
+            draft.created(options.created());
+            draft.domain(options.domain());
+            draft.challenge(options.challenge());
+            return draft;
+
+        } else if ("ecdsa-sd-2023".equals(options.cryptosuite())) {
+            var draft = Suites.ECDSA_SD_2023
+                    .createP256Draft(
+                            KeyProvider.getEcDsaMethod(),
+                            URI.create("https://w3id.org/security#assertionMethod"));
+            draft.created(options.created());
+            draft.domain(options.domain());
+            draft.challenge(options.challenge());
+            return draft;
         }
 
-        return Ed25519Signature2020
+        var draft = Ed25519Signature2020
                 .createDraft(
                         KeyProvider.getEd25519Method(),
-                        URI.create("https://w3id.org/security#assertionMethod"),
-                        options.created(),
-                        options.domain(),
-                        options.challenge());
+                        URI.create("https://w3id.org/security#assertionMethod"));
+
+        draft.created(options.created());
+        draft.domain(options.domain());
+        draft.challenge(options.challenge());
+        return draft;
     }
 
-    // FIXME, remove
+    static final Issuer getIssuer(IssuerOptions options) throws DocumentError {
+
+        if ("ecdsa-2019".equals(options.cryptosuite())) {
+            return Suites.ECDSA_RDFC_2019_SUITE.createIssuer(KeyProvider.getKeyPair(options.cryptosuite()));
+
+        } else if ("eddsa-2022".equals(options.cryptosuite())) {
+            return Suites.EDDSA_RDFC_2022_SUITE.createIssuer(KeyProvider.getKeyPair(options.cryptosuite()));
+
+        } else if ("ecdsa-sd-2023".equals(options.cryptosuite())) {
+            return Suites.ECDSA_SD_2023.createIssuer(KeyProvider.getKeyPair(options.cryptosuite()));
+        }
+
+        return Suites.ED25519_2020_SUITE.createIssuer(KeyProvider.getKeyPair(options.cryptosuite()));
+
+    }
+
     static final JsonObject applyHacks(final JsonObject signed) {
 
         var document = Json.createObjectBuilder(signed);

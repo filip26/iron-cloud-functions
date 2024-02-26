@@ -1,6 +1,7 @@
 package com.apicatalog.vc.service.verifier;
 
 import java.io.StringReader;
+import java.util.HashMap;
 
 import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.StringUtils;
@@ -8,12 +9,10 @@ import com.apicatalog.jsonld.document.JsonDocument;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.signature.VerificationError;
-import com.apicatalog.ld.signature.ecdsa.ECDSASignature2019;
-import com.apicatalog.ld.signature.ed25519.Ed25519Signature2020;
-import com.apicatalog.ld.signature.eddsa.EdDSASignature2022;
-import com.apicatalog.vc.Vc;
 import com.apicatalog.vc.integrity.DataIntegrityVocab;
 import com.apicatalog.vc.service.Constants;
+import com.apicatalog.vc.service.Suites;
+import com.apicatalog.vc.verifier.Verifier;
 
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
@@ -22,6 +21,8 @@ import io.vertx.ext.web.RoutingContext;
 
 class VerificationHandler implements Handler<RoutingContext> {
 
+    static final Verifier VERIFIER = Verifier.with(Suites.ALL);
+    
     @Override
     public void handle(RoutingContext ctx) {
 
@@ -54,22 +55,19 @@ class VerificationHandler implements Handler<RoutingContext> {
 
         try {
             verificationResult.addCheck("PROOF");
+            
+            var params = new HashMap<String, Object>();
+            params.put(DataIntegrityVocab.DOMAIN.name(), ctx.get(Constants.OPTION_DOMAIN, null));
+            params.put(DataIntegrityVocab.CHALLENGE.name(), ctx.get(Constants.OPTION_CHALLENGE, null));
+            params.put(DataIntegrityVocab.PURPOSE.name(), ctx.get(Constants.OPTION_PURPOSE, null));
 
-            Vc.verify(JsonDocument
-                    .of(new StringReader(document.toString()))
+            // assert document validity
+            VERIFIER.verify(JsonDocument.of(new StringReader(document.toString()))
                     .getJsonContent()
                     .orElseThrow(IllegalStateException::new)
                     .asJsonObject(),
-                    new EdDSASignature2022(),
-                    new ECDSASignature2019(),
-                    new Ed25519Signature2020())
-
-                    .param(DataIntegrityVocab.DOMAIN.name(), ctx.get(Constants.OPTION_DOMAIN, null))
-                    .param(DataIntegrityVocab.CHALLENGE.name(), ctx.get(Constants.OPTION_CHALLENGE, null))
-                    .param(DataIntegrityVocab.PURPOSE.name(), ctx.get(Constants.OPTION_PURPOSE, null))
-
-                    // assert document validity
-                    .isValid();
+                    params
+                    );
 
             ctx.json(verificationResult);
 

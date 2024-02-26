@@ -3,3 +3,4 @@
 /.settings/
 /.classpath
 /.env.yaml
+/private.gpg

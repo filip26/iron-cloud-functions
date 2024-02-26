@@ -61,17 +61,11 @@ public class KeyProvider {
                 null);
     }
 
-    public static VerificationMethod getEdDsaMethod() {
-        // verification key
-        var key = new MultiKey();
-        key.setId(ED_VERIFICATION_KEY);
-        return key;
+    public static URI getEdDsaMethod() {
+        return ED_VERIFICATION_KEY;
     }
 
-    public static VerificationMethod getEcDsaMethod() {
-        // verification key
-        var key = new MultiKey();
-        key.setId(EC_VERIFICATION_KEY);
-        return key;
+    public static URI getEcDsaMethod() {
+        return EC_VERIFICATION_KEY;
     }
 }

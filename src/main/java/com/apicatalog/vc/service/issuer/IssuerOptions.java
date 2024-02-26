@@ -37,7 +37,7 @@ public record IssuerOptions(
             challenge = options.getString(Constants.OPTION_CHALLENGE, null);
             
             var unknown = options.stream()
-                    .filter(e -> !Constants.OPTION_TYPE.contains(e.getKey()))
+                    .filter(e -> !Constants.OPTIONS_KEYS.contains(e.getKey()))
                     .map(e -> e.getKey() + ": " + e.getValue())
                     .collect(Collectors.joining(", "));
 

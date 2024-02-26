@@ -1,5 +1,8 @@
 package com.apicatalog.vc.service;
 
+import java.util.Arrays;
+import java.util.Collection;
+
 public class Constants {
 
     public static final String OPTIONS = "options";
@@ -9,6 +12,8 @@ public class Constants {
     public static final String OPTION_CREATED = "created";
     public static final String OPTION_PURPOSE = "expectedProofPurpose";
    
+    public static final Collection<String> OPTIONS_KEYS = Arrays.asList(OPTION_TYPE, OPTION_DOMAIN, OPTION_CHALLENGE, OPTION_CREATED, OPTION_PURPOSE);
+    
     public static final String CTX_RESULT = "verificationResult";
     public static final String CTX_DOCUMENT_KEY = "documentKey";
     public static final String CTX_STRICT = "strictMode";

@@ -120,16 +120,16 @@ class IssuingHandler implements Handler<RoutingContext> {
     static final Issuer getIssuer(IssuerOptions options) throws DocumentError {
 
         if ("ecdsa-2019".equals(options.cryptosuite())) {
-            return Suites.ECDSA_RDFC_2019.createIssuer(KeyProvider.getKeyPair(options.cryptosuite()));
+            return Suites.ECDSA_RDFC_2019.createIssuer(KeyProvider.getECDSA256Keys());
 
         } else if ("eddsa-2022".equals(options.cryptosuite())) {
-            return Suites.EDDSA_RDFC_2022.createIssuer(KeyProvider.getKeyPair(options.cryptosuite()));
+            return Suites.EDDSA_RDFC_2022.createIssuer(KeyProvider.getEdDSAKeys());
 
         } else if ("ecdsa-sd-2023".equals(options.cryptosuite())) {
-            return Suites.ECDSA_SD_2023.createIssuer(KeyProvider.getKeyPair(options.cryptosuite()));
+            return Suites.ECDSA_SD_2023.createIssuer(KeyProvider.getECDSA256Keys());
         }
 
-        return Suites.ED25519_2020.createIssuer(KeyProvider.getKeyPair(options.cryptosuite()));
+        return Suites.ED25519_2020.createIssuer(KeyProvider.getECDSA256Keys());
 
     }
 

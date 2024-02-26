@@ -2,6 +2,7 @@ package com.apicatalog.vc.service.issuer;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.stream.Collectors;
 
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.vc.service.Constants;
@@ -12,8 +13,7 @@ public record IssuerOptions(
         String cryptosuite,
         Instant created,
         String domain,
-        String challenge
-        ) {
+        String challenge) {
 
     static final IssuerOptions getOptions(RoutingContext ctx) throws DocumentError {
 
@@ -35,6 +35,15 @@ public record IssuerOptions(
             created = options.getInstant(Constants.OPTION_CREATED, created);
             domain = options.getString(Constants.OPTION_DOMAIN, null);
             challenge = options.getString(Constants.OPTION_CHALLENGE, null);
+            
+            var unknown = options.stream()
+                    .filter(e -> !Constants.OPTION_TYPE.contains(e.getKey()))
+                    .map(e -> e.getKey() + ": " + e.getValue())
+                    .collect(Collectors.joining(", "));
+
+            if (unknown != null && !unknown.isBlank()) {
+                System.out.println("UNKNOWN OPTIONS [" + unknown + "]");
+            }
         }
 
         return new IssuerOptions(suiteName, created, domain, challenge);

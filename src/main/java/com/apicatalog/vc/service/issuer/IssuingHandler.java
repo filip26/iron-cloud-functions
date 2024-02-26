@@ -9,6 +9,7 @@ import com.apicatalog.jsonld.document.JsonDocument;
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
+import com.apicatalog.ld.signature.KeyGenError;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.ed25519.Ed25519Signature2020;
 import com.apicatalog.vc.issuer.Issuer;
@@ -64,12 +65,13 @@ class IssuingHandler implements Handler<RoutingContext> {
             response.end(signed.toString());
 
         } catch (JsonLdError | DocumentError | IllegalStateException | SigningError e) {
-            e.printStackTrace();
+            ctx.fail(e);
+        } catch (KeyGenError e) {
             ctx.fail(e);
         }
     }
 
-    static final ProofDraft getDraft(IssuerOptions options) throws DocumentError {
+    static final ProofDraft getDraft(IssuerOptions options) throws DocumentError, KeyGenError {
 
         if ("ecdsa-2019".equals(options.cryptosuite())) {
             var draft = Suites.ECDSA_RDFC_2019_SUITE
@@ -99,6 +101,8 @@ class IssuingHandler implements Handler<RoutingContext> {
             draft.created(options.created());
             draft.domain(options.domain());
             draft.challenge(options.challenge());
+            draft.useGeneratedHmacKey(32);
+            draft.useGeneratedProofKeys();
             return draft;
         }
 

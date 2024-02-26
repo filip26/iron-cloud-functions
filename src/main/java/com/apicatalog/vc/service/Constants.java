@@ -11,8 +11,9 @@ public class Constants {
     public static final String OPTION_CHALLENGE = "challenge";
     public static final String OPTION_CREATED = "created";
     public static final String OPTION_PURPOSE = "expectedProofPurpose";
+    public static final String OPTION_MANDATORY_POINTERS = "mandatoryPointers";
 
-    public static final Collection<String> OPTIONS_KEYS = Arrays.asList(OPTION_TYPE, OPTION_DOMAIN, OPTION_CHALLENGE, OPTION_CREATED, OPTION_PURPOSE);
+    public static final Collection<String> OPTIONS_KEYS = Arrays.asList(OPTION_TYPE, OPTION_DOMAIN, OPTION_CHALLENGE, OPTION_CREATED, OPTION_PURPOSE, OPTION_MANDATORY_POINTERS);
 
     public static final String CTX_RESULT = "verificationResult";
     public static final String CTX_DOCUMENT_KEY = "documentKey";

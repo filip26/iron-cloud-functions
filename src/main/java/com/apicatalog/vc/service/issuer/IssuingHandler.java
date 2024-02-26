@@ -101,6 +101,7 @@ class IssuingHandler implements Handler<RoutingContext> {
             draft.created(options.created());
             draft.domain(options.domain());
             draft.challenge(options.challenge());
+            draft.selectors(options.mandatoryPointers());
             draft.useGeneratedHmacKey(32);
             draft.useGeneratedProofKeys();
             return draft;

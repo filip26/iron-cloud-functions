@@ -45,7 +45,7 @@ class IssuingHandler implements Handler<RoutingContext> {
         try {
             var options = IssuerOptions.getOptions(ctx);
 
-            final ProofDraft proofOptions = getDraft(options);
+            final ProofDraft proofDraft = getDraft(options);
 
             var signed = getIssuer(options)
                     .sign(
@@ -54,7 +54,7 @@ class IssuingHandler implements Handler<RoutingContext> {
                                     .getJsonContent()
                                     .orElseThrow(IllegalStateException::new)
                                     .asJsonObject(),
-                            proofOptions).compacted();
+                            proofDraft).compacted();
 
             signed = applyHacks(signed);
 

@@ -32,13 +32,15 @@ class HolderHandler implements Handler<RoutingContext> {
         }
 
         try {
+            var options = HolderOptions.getOptions(ctx);
+            
             var response = ctx.response();
 
             response.setStatusCode(503); // created
             response.putHeader("content-type", "application/ld+json");
             response.end();
 
-        } catch (IllegalStateException e) {
+        } catch (DocumentError | IllegalStateException e) {
             ctx.fail(e);
         }
     }

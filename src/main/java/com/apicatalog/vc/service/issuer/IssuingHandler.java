@@ -74,7 +74,7 @@ class IssuingHandler implements Handler<RoutingContext> {
     static final ProofDraft getDraft(IssuerOptions options) throws DocumentError, KeyGenError {
 
         if ("ecdsa-2019".equals(options.cryptosuite())) {
-            var draft = Suites.ECDSA_RDFC_2019_SUITE
+            var draft = Suites.ECDSA_RDFC_2019
                     .createP256Draft(
                             KeyProvider.getEcDsaMethod(),
                             URI.create("https://w3id.org/security#assertionMethod"));
@@ -84,7 +84,7 @@ class IssuingHandler implements Handler<RoutingContext> {
             return draft;
 
         } else if ("eddsa-2022".equals(options.cryptosuite())) {
-            var draft = Suites.EDDSA_RDFC_2022_SUITE
+            var draft = Suites.EDDSA_RDFC_2022
                     .createDraft(
                             KeyProvider.getEdDsaMethod(),
                             URI.create("https://w3id.org/security#assertionMethod"));
@@ -120,16 +120,16 @@ class IssuingHandler implements Handler<RoutingContext> {
     static final Issuer getIssuer(IssuerOptions options) throws DocumentError {
 
         if ("ecdsa-2019".equals(options.cryptosuite())) {
-            return Suites.ECDSA_RDFC_2019_SUITE.createIssuer(KeyProvider.getKeyPair(options.cryptosuite()));
+            return Suites.ECDSA_RDFC_2019.createIssuer(KeyProvider.getKeyPair(options.cryptosuite()));
 
         } else if ("eddsa-2022".equals(options.cryptosuite())) {
-            return Suites.EDDSA_RDFC_2022_SUITE.createIssuer(KeyProvider.getKeyPair(options.cryptosuite()));
+            return Suites.EDDSA_RDFC_2022.createIssuer(KeyProvider.getKeyPair(options.cryptosuite()));
 
         } else if ("ecdsa-sd-2023".equals(options.cryptosuite())) {
             return Suites.ECDSA_SD_2023.createIssuer(KeyProvider.getKeyPair(options.cryptosuite()));
         }
 
-        return Suites.ED25519_2020_SUITE.createIssuer(KeyProvider.getKeyPair(options.cryptosuite()));
+        return Suites.ED25519_2020.createIssuer(KeyProvider.getKeyPair(options.cryptosuite()));
 
     }
 

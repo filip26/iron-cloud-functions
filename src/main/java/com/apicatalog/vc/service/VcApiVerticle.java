@@ -4,6 +4,7 @@ import java.nio.charset.Charset;
 import java.time.Duration;
 import java.time.Instant;
 
+import com.apicatalog.vc.service.holder.HolderApi;
 import com.apicatalog.vc.service.issuer.IssuerApi;
 import com.apicatalog.vc.service.verifier.VerifierApi;
 
@@ -36,6 +37,9 @@ public class VcApiVerticle extends AbstractVerticle {
 
         // issuer's VC API
         IssuerApi.setup(router, schemaParser);
+        
+        // holder's VC API
+        HolderApi.setup(router, schemaParser);
         
         // static resources
         router

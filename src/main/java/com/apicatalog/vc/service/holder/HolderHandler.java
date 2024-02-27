@@ -1,10 +1,17 @@
 package com.apicatalog.vc.service.holder;
 
+import java.io.StringReader;
+
+import com.apicatalog.jsonld.JsonLdError;
 import com.apicatalog.jsonld.StringUtils;
+import com.apicatalog.jsonld.document.JsonDocument;
 import com.apicatalog.jsonld.json.JsonUtils;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.DocumentError.ErrorType;
+import com.apicatalog.ld.signature.SigningError;
+import com.apicatalog.vc.holder.Holder;
 import com.apicatalog.vc.service.Constants;
+import com.apicatalog.vc.service.Suites;
 
 import io.vertx.core.Handler;
 import io.vertx.ext.web.RoutingContext;
@@ -13,6 +20,8 @@ import jakarta.json.JsonObject;
 
 class HolderHandler implements Handler<RoutingContext> {
 
+    static final Holder HOLDER = Holder.with(Suites.ECDSA_SD_2023);
+    
     @Override
     public void handle(RoutingContext ctx) {
 
@@ -34,13 +43,22 @@ class HolderHandler implements Handler<RoutingContext> {
         try {
             var options = HolderOptions.getOptions(ctx);
             
+            var derived = HOLDER.derive(JsonDocument
+                    .of(new StringReader(document.toString()))
+                    .getJsonContent()
+                    .orElseThrow(IllegalStateException::new)
+                    .asJsonObject(), options.selectivePointers()).compacted();
+            
             var response = ctx.response();
 
-            response.setStatusCode(503); // created
-            response.putHeader("content-type", "application/ld+json");
-            response.end();
+            derived = applyHacks(derived);
 
-        } catch (DocumentError | IllegalStateException e) {
+            response.setStatusCode(201); // created
+            response.putHeader("content-type", "application/ld+json");
+            response.end(derived.toString());
+
+
+        } catch (DocumentError | IllegalStateException | JsonLdError | SigningError e) {
             ctx.fail(e);
         }
     }

@@ -25,16 +25,22 @@ All PR's welcome!
 
 ##### EDDSA Keys
 ```bash
-> export VC_PUBLIC_KEY=[MULTIBASE]
-> export VC_PRIVATE_KEY=[MULTIBASE]
-> export VC_VERIFICATION_KEY=[DID URL]
+> export ED_PUBLIC_KEY=[MULTIBASE]
+> export ED_PRIVATE_KEY=[MULTIBASE]
 ```
+
 ##### ECDSA P-256 Keys
 ```bash
-> export EC_PUBLIC_KEY=[MULTIBASE]
-> export EC_PRIVATE_KEY=[MULTIBASE]
-> export EC_VERIFICATION_KEY=[DID URL]
+> export P256_PUBLIC_KEY=[MULTIBASE]
+> export P256_PRIVATE_KEY=[MULTIBASE]
 ```
+
+##### ECDSA P-384 Keys
+```bash
+> export P384_PUBLIC_KEY=[MULTIBASE]
+> export P384_PRIVATE_KEY=[MULTIBASE]
+```
+
 See [IssuingHandler](https://github.com/filip26/iron-vc-api/blob/33004560eafb913ea812e7883d742acaea6da59f/src/main/java/com/apicatalog/vc/service/issuer/IssuingHandler.java#L32) and [VCApiTest](https://github.com/filip26/iron-vc-api/blob/33004560eafb913ea812e7883d742acaea6da59f/src/test/java/com/apicatalog/vc/service/VcApiTest.java#L40) for an example.
 
 ### Building
@@ -58,15 +64,14 @@ Fork and clone the project repository.
 
 1. Setup GAE project and install `gcloud` utility. 
 2. Create `.env.yaml` in the project root directory
-
 ```yaml
 env_variables:
-  VC_PUBLIC_KEY: [MULTIBASE]
-  VC_PRIVATE_KEY: [MULTIBASE]
-  VC_VERIFICATION_KEY: [DID URL]
-  EC_PUBLIC_KEY: [MULTIBASE]
-  EC_PRIVATE_KEY: [MULTIBASE]
-  EC_VERIFICATION_KEY: [DID URL]
+  ED_PUBLIC_KEY: [MULTIBASE]
+  ED_PRIVATE_KEY: [MULTIBASE]
+  P256_PUBLIC_KEY: [MULTIBASE]
+  P256_PRIVATE_KEY: [MULTIBASE]
+  P384_PUBLIC_KEY: [MULTIBASE]
+  P384_PRIVATE_KEY: [MULTIBASE]
 ```
 3. Edit [src/main/appengine/app.yaml](https://github.com/filip26/iron-vc-api/blob/33004560eafb913ea812e7883d742acaea6da59f/src/main/appengine/app.yaml)
 4. Compile and deploy

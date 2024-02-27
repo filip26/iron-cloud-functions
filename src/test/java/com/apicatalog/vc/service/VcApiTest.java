@@ -40,14 +40,15 @@ class VcApiTest {
     @DisplayName("Deploy a verticle")
     void deployVerticle(Vertx vertx, VertxTestContext testContext) {
         
-        //set environmental variables
-        System.setProperty("VC_PUBLIC_KEY", "z6Mkska8oQD7QQQWxqa7L5ai4mH98HfAdSwomPFYKuqNyE2y");
-        System.setProperty("VC_PRIVATE_KEY", "z3u2RRiEW8idMgvP3kthwjWqPo9W8X4pvEp52toGwp8EjJvg");
-        System.setProperty("VC_VERIFICATION_KEY", "did:key:z6Mkska8oQD7QQQWxqa7L5ai4mH98HfAdSwomPFYKuqNyE2y#z6Mkska8oQD7QQQWxqa7L5ai4mH98HfAdSwomPFYKuqNyE2y");
+        //set environmental variables - public test vector - DON'T USE IN PRODUCTION
+        System.setProperty("ED_PUBLIC_KEY", "z6Mkska8oQD7QQQWxqa7L5ai4mH98HfAdSwomPFYKuqNyE2y");
+        System.setProperty("ED_PRIVATE_KEY", "z3u2RRiEW8idMgvP3kthwjWqPo9W8X4pvEp52toGwp8EjJvg");
 
-        System.setProperty("EC_PUBLIC_KEY", "zDnaepBuvsQ8cpsWrVKw8fbpGpvPeNSjVPTWoq6cRqaYzBKVP");
-        System.setProperty("EC_PRIVATE_KEY", "z42twTcNeSYcnqg1FLuSFs2bsGH3ZqbRHFmvS9XMsYhjxvHN");
-        System.setProperty("EC_VERIFICATION_KEY", "did:key:zDnaepBuvsQ8cpsWrVKw8fbpGpvPeNSjVPTWoq6cRqaYzBKVP#zDnaepBuvsQ8cpsWrVKw8fbpGpvPeNSjVPTWoq6cRqaYzBKVP");
+        System.setProperty("P256_PUBLIC_KEY", "zDnaepBuvsQ8cpsWrVKw8fbpGpvPeNSjVPTWoq6cRqaYzBKVP");
+        System.setProperty("P256_PRIVATE_KEY", "z42twTcNeSYcnqg1FLuSFs2bsGH3ZqbRHFmvS9XMsYhjxvHN");
+
+        System.setProperty("P384_PUBLIC_KEY", "z82LkuBieyGShVBhvtE2zoiD6Kma4tJGFtkAhxR5pfkp5QPw4LutoYWhvQCnGjdVn14kujQ");
+        System.setProperty("P384_PRIVATE_KEY", "z2fanyY7zgwNpZGxX5fXXibvScNaUWNprHU9dKx7qpVj7mws9J8LLt4mDB5TyH2GLHWkUc");
 
         // start
         vertx.deployVerticle(new VcApiVerticle(), testContext.succeedingThenComplete());

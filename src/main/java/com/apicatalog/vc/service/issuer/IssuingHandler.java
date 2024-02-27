@@ -12,6 +12,7 @@ import com.apicatalog.ld.DocumentError.ErrorType;
 import com.apicatalog.ld.signature.KeyGenError;
 import com.apicatalog.ld.signature.SigningError;
 import com.apicatalog.ld.signature.ed25519.Ed25519Signature2020;
+import com.apicatalog.vc.integrity.DataIntegrityProofDraft;
 import com.apicatalog.vc.issuer.Issuer;
 import com.apicatalog.vc.issuer.ProofDraft;
 import com.apicatalog.vc.service.Constants;
@@ -54,7 +55,8 @@ class IssuingHandler implements Handler<RoutingContext> {
                                     .getJsonContent()
                                     .orElseThrow(IllegalStateException::new)
                                     .asJsonObject(),
-                            proofDraft).compacted();
+                            proofDraft)
+                    .compacted();
 
             signed = applyHacks(signed);
 
@@ -73,17 +75,27 @@ class IssuingHandler implements Handler<RoutingContext> {
 
     static final ProofDraft getDraft(IssuerOptions options) throws DocumentError, KeyGenError {
 
-        if ("ecdsa-2019".equals(options.cryptosuite())) {
-            var draft = Suites.ECDSA_RDFC_2019
+        if (IssuerOptions.ECDSA_RDFC_2019.equals(options.cryptosuite())) {
+            
+            DataIntegrityProofDraft draft = null;
+            
+            if (IssuerOptions.P384.equalsIgnoreCase(options.curve())) {
+                draft = Suites.ECDSA_RDFC_2019
+                        .createP384Draft(
+                                KeyProvider.getP384Method(),
+                                URI.create("https://w3id.org/security#assertionMethod"));            
+            } else {
+                draft = Suites.ECDSA_RDFC_2019
                     .createP256Draft(
-                            KeyProvider.getEcDsaMethod(),
+                            KeyProvider.getP256Method(),
                             URI.create("https://w3id.org/security#assertionMethod"));
+            }
             draft.created(options.created());
             draft.domain(options.domain());
             draft.challenge(options.challenge());
             return draft;
 
-        } else if ("eddsa-2022".equals(options.cryptosuite())) {
+        } else if (IssuerOptions.EDDSA_RDFC_2022.equals(options.cryptosuite())) {
             var draft = Suites.EDDSA_RDFC_2022
                     .createDraft(
                             KeyProvider.getEdDsaMethod(),
@@ -93,10 +105,10 @@ class IssuingHandler implements Handler<RoutingContext> {
             draft.challenge(options.challenge());
             return draft;
 
-        } else if ("ecdsa-sd-2023".equals(options.cryptosuite())) {
+        } else if (IssuerOptions.ECDSA_SD_2023.equals(options.cryptosuite())) {
             var draft = Suites.ECDSA_SD_2023
                     .createP256Draft(
-                            KeyProvider.getEcDsaMethod(),
+                            KeyProvider.getP256Method(),
                             URI.create("https://w3id.org/security#assertionMethod"));
             draft.created(options.created());
             draft.domain(options.domain());
@@ -120,17 +132,20 @@ class IssuingHandler implements Handler<RoutingContext> {
 
     static final Issuer getIssuer(IssuerOptions options) throws DocumentError {
 
-        if ("ecdsa-2019".equals(options.cryptosuite())) {
-            return Suites.ECDSA_RDFC_2019.createIssuer(KeyProvider.getECDSA256Keys());
+        if (IssuerOptions.ECDSA_RDFC_2019.equalsIgnoreCase(options.cryptosuite())) {
+            if (IssuerOptions.P384.equalsIgnoreCase(options.curve())) {
+                return Suites.ECDSA_RDFC_2019.createIssuer(KeyProvider.getP384Keys());
+            }
+            return Suites.ECDSA_RDFC_2019.createIssuer(KeyProvider.getP256Keys());
 
-        } else if ("eddsa-2022".equals(options.cryptosuite())) {
+        } else if (IssuerOptions.EDDSA_RDFC_2022.equalsIgnoreCase(options.cryptosuite())) {
             return Suites.EDDSA_RDFC_2022.createIssuer(KeyProvider.getEdDSAKeys());
 
-        } else if ("ecdsa-sd-2023".equals(options.cryptosuite())) {
-            return Suites.ECDSA_SD_2023.createIssuer(KeyProvider.getECDSA256Keys());
+        } else if (IssuerOptions.ECDSA_SD_2023.equalsIgnoreCase(options.cryptosuite())) {
+            return Suites.ECDSA_SD_2023.createIssuer(KeyProvider.getP256Keys());
         }
 
-        return Suites.ED25519_2020.createIssuer(KeyProvider.getECDSA256Keys());
+        return Suites.ED25519_2020.createIssuer(KeyProvider.getP256Keys());
 
     }
 

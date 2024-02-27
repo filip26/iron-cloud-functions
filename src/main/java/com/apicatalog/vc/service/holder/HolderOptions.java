@@ -2,6 +2,7 @@ package com.apicatalog.vc.service.holder;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.stream.Collectors;
 
 import com.apicatalog.ld.DocumentError;
@@ -21,7 +22,7 @@ public record HolderOptions(
         var options = body.getJsonObject(Constants.OPTIONS);
 
         // default values
-        Collection<String> selectivePointers = null; 
+        Collection<String> selectivePointers = Collections.emptyList(); 
 
         // request options
         if (options != null) {

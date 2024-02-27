@@ -42,7 +42,7 @@ class HolderHandler implements Handler<RoutingContext> {
 
         try {
             var options = HolderOptions.getOptions(ctx);
-            
+
             var derived = HOLDER.derive(JsonDocument
                     .of(new StringReader(document.toString()))
                     .getJsonContent()

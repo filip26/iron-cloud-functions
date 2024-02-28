@@ -1,4 +1,4 @@
-package com.apicatalog.vc.service.issuer;
+package com.apicatalog.vc.service.holder;
 
 import com.apicatalog.vc.service.Constants;
 
@@ -6,19 +6,17 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.ext.web.Router;
 
 
-public class IssuerApi extends AbstractVerticle {
+public class HolderApi extends AbstractVerticle {
 
     public static void setup(Router router) throws Exception {
-
-        // issues a credential and returns the signed credentials in the response body
         router
-            .post("/credentials/issue")
+            .post("/holder/derive")
             .consumes("application/ld+json")
             .consumes("application/json")
             .produces("application/ld+json")
             .produces("application/json")
-            .putMetadata(Constants.CTX_DOCUMENT_KEY, Constants.CREDENTIAL_KEY)
-            
+            .putMetadata(Constants.CTX_DOCUMENT_KEY, Constants.VERIFIABLE_CREDENTIAL_KEY)
+                        
             //FIXME remove
             .handler(ctx -> {
                 System.out.println(ctx.body().asString());
@@ -26,9 +24,9 @@ public class IssuerApi extends AbstractVerticle {
             })
             
             // issue
-            .blockingHandler(new IssuingHandler())
+            .blockingHandler(new HolderHandler())
 
             // handle errors
-            .failureHandler(new IssuerErrorHandler());
+            .failureHandler(new HolderErrorHandler());
     }
 }

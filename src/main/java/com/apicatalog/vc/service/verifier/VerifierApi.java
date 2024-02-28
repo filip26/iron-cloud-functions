@@ -1,20 +1,14 @@
 package com.apicatalog.vc.service.verifier;
 
-import static io.vertx.ext.web.validation.builder.Parameters.optionalParam;
-import static io.vertx.json.schema.common.dsl.Schemas.stringSchema;
-
 import com.apicatalog.vc.service.Constants;
 
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.validation.RequestParameters;
-import io.vertx.ext.web.validation.RequestPredicate;
 import io.vertx.ext.web.validation.ValidationHandler;
-import io.vertx.ext.web.validation.builder.ValidationHandlerBuilder;
-import io.vertx.json.schema.SchemaParser;
 
 public class VerifierApi  {
 
-    public static void setup(Router router, SchemaParser schemaParser) throws Exception {
+    public static void setup(Router router) throws Exception {
 
         router
             .post("/credentials/verify")
@@ -67,16 +61,6 @@ public class VerifierApi  {
             .consumes("application/json")
             .produces("application/json")
             .putMetadata(Constants.CTX_STRICT, false)
-
-            // validation
-            .handler(ValidationHandlerBuilder
-                        .create(schemaParser)                           //TODO body validation
-                        .queryParameter(optionalParam(Constants.OPTION_DOMAIN, stringSchema()))
-                        .queryParameter(optionalParam(Constants.OPTION_CHALLENGE, stringSchema()))
-
-                        .predicate(RequestPredicate.BODY_REQUIRED)      // request body is required
-                        .build()
-                    )
 
             // options
             .handler(ctx -> {

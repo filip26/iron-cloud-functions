@@ -5,7 +5,7 @@
 
     <groupId>com.apicatalog</groupId>
     <artifactId>iron-vc-api</artifactId>
-    <version>0.0.3-SNAPSHOT</version>
+    <version>0.0.5-SNAPSHOT</version>
 
     <name>Iron Verifiable Credentials HTTP API v0.3</name>
 
@@ -54,7 +54,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <argLine>-Dfile.encoding=UTF-8</argLine>
 
-        <iron.vc.version>0.11.0</iron.vc.version>
+        <iron.vc.version>0.14.0</iron.vc.version>
         <carbon.version>0.3.0</carbon.version>
         <copper.codec.version>0.1.1</copper.codec.version>
         <copper.base.version>0.5.0</copper.base.version>
@@ -94,6 +94,11 @@
             <artifactId>iron-ecdsa-rdfc-2019</artifactId>
             <version>${iron.vc.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.apicatalog</groupId>
+            <artifactId>iron-ecdsa-sd-2023</artifactId>
+            <version>${iron.vc.version}</version>
+        </dependency>        
         <dependency>
             <groupId>com.apicatalog</groupId>
             <artifactId>iron-verifiable-credentials</artifactId>

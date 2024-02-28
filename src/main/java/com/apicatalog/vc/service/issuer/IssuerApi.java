@@ -19,11 +19,6 @@ public class IssuerApi extends AbstractVerticle {
             .produces("application/json")
             .putMetadata(Constants.CTX_DOCUMENT_KEY, Constants.CREDENTIAL_KEY)
             
-            // validation TODO
-//            .handler(ctx -> {
-//                ctx.next();
-//            })
-            
             //FIXME remove
             .handler(ctx -> {
                 System.out.println(ctx.body().asString());

@@ -5,9 +5,9 @@
 
     <groupId>com.apicatalog</groupId>
     <artifactId>iron-vc-api</artifactId>
-    <version>0.0.5-SNAPSHOT</version>
+    <version>0.0.15-SNAPSHOT</version>
 
-    <name>Iron Verifiable Credentials HTTP API v0.3</name>
+    <name>Iron Verifiable Credentials HTTP API</name>
 
     <description>
         A HTTP API for Verifiable Credentials lifecycle management
@@ -54,74 +54,62 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <argLine>-Dfile.encoding=UTF-8</argLine>
 
-        <iron.vc.version>0.14.0</iron.vc.version>
-        <carbon.version>0.3.0</carbon.version>
-        <copper.codec.version>0.1.1</copper.codec.version>
-        <copper.base.version>0.5.0</copper.base.version>
-
-        <vertx.version>4.5.8</vertx.version>
+        <iron.vc.version>0.15.0-SNAPSHOT</iron.vc.version>
         <jakarta.json.version>2.0.1</jakarta.json.version>
-
-        <main.verticle>com.apicatalog.vc.service.VcApiVerticle</main.verticle>
-        <launcher.class>io.vertx.core.Launcher</launcher.class>
     </properties>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>io.vertx</groupId>
-                <artifactId>vertx-stack-depchain</artifactId>
-                <version>${vertx.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
     <dependencies>
-        <dependency>
-            <groupId>com.apicatalog</groupId>
-            <artifactId>iron-ed25519-cryptosuite-2020</artifactId>
-            <version>${iron.vc.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.apicatalog</groupId>
-            <artifactId>iron-eddsa-rdfc-2022</artifactId>
-            <version>${iron.vc.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.apicatalog</groupId>
-            <artifactId>iron-ecdsa-rdfc-2019</artifactId>
-            <version>${iron.vc.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.apicatalog</groupId>
-            <artifactId>iron-ecdsa-sd-2023</artifactId>
-            <version>${iron.vc.version}</version>
-        </dependency>        
-        <dependency>
-            <groupId>com.apicatalog</groupId>
-            <artifactId>iron-verifiable-credentials</artifactId>
-            <version>${iron.vc.version}</version>
-        </dependency>
 
         <dependency>
-            <groupId>com.apicatalog</groupId>
-            <artifactId>carbon-did</artifactId>
-            <version>${carbon.version}</version>
+            <groupId>com.google.cloud.functions</groupId>
+            <artifactId>functions-framework-api</artifactId>
+            <version>1.1.0</version>
+            <scope>provided</scope>
         </dependency>
 
-        <dependency>
-            <groupId>com.apicatalog</groupId>
-            <artifactId>copper-multicodec</artifactId>
-            <version>${copper.codec.version}</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.apicatalog</groupId>-->
+<!--            <artifactId>iron-ed25519-signature-2020</artifactId>-->
+<!--            <version>${iron.vc.version}</version>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>com.apicatalog</groupId>-->
+<!--            <artifactId>iron-eddsa-rdfc-2022</artifactId>-->
+<!--            <version>${iron.vc.version}</version>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>com.apicatalog</groupId>-->
+<!--            <artifactId>iron-ecdsa-rdfc-2019</artifactId>-->
+<!--            <version>${iron.vc.version}</version>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>com.apicatalog</groupId>-->
+<!--            <artifactId>iron-ecdsa-sd-2023</artifactId>-->
+<!--            <version>${iron.vc.version}</version>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>com.apicatalog</groupId>-->
+<!--            <artifactId>iron-verifiable-credentials</artifactId>-->
+<!--            <version>${iron.vc.version}</version>-->
+<!--        </dependency>-->
 
-        <dependency>
-            <groupId>com.apicatalog</groupId>
-            <artifactId>copper-multibase</artifactId>
-            <version>${copper.base.version}</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.apicatalog</groupId>-->
+<!--            <artifactId>carbon-did</artifactId>-->
+<!--            <version>${carbon.version}</version>-->
+<!--        </dependency>-->
+
+<!--        <dependency>-->
+<!--            <groupId>com.apicatalog</groupId>-->
+<!--            <artifactId>copper-multicodec</artifactId>-->
+<!--            <version>${copper.codec.version}</version>-->
+<!--        </dependency>-->
+
+<!--        <dependency>-->
+<!--            <groupId>com.apicatalog</groupId>-->
+<!--            <artifactId>copper-multibase</artifactId>-->
+<!--            <version>${copper.base.version}</version>-->
+<!--        </dependency>-->
 
         <dependency>
             <groupId>org.bouncycastle</groupId>
@@ -130,115 +118,36 @@
         </dependency>
 
         <dependency>
-            <groupId>io.vertx</groupId>
-            <artifactId>vertx-core</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>io.vertx</groupId>
-            <artifactId>vertx-web</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>io.vertx</groupId>
-            <artifactId>vertx-web-validation</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>org.glassfish</groupId>
             <artifactId>jakarta.json</artifactId>
             <version>${jakarta.json.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>io.vertx</groupId>
-            <artifactId>vertx-junit5</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>io.vertx</groupId>
-            <artifactId>vertx-web-client</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-
     </dependencies>
 
     <build>
         <plugins>
-
-<!--            <plugin>-->
-            <!--                <groupId>com.google.cloud.tools</groupId>-->
-            <!--                <artifactId>appengine-maven-plugin</artifactId>-->
-            <!--                <version>2.4.4</version>-->
-            <!--            </plugin>-->
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.3.0</version>
             </plugin>
 
             <plugin>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>3.3.1</version>
-                <executions>
-                    <execution>
-                        <id>position-react-build</id>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <phase>prepare-package</phase>
-                        <configuration>
-                            <outputDirectory>
-                                ${project.build.outputDirectory}/webroot</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>
-                                        ${project.basedir}/src/main/webapp</directory>
-                                    <filtering>false</filtering>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
+                <!--
+          Google Cloud Functions Framework Maven plugin
 
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
-                    <archive>
-                        <manifest>
-                            <mainClass>${launcher.class}</mainClass>
-                        </manifest>
-                        <manifestEntries>
-                            <Main-Verticle>${main.verticle}</Main-Verticle>
-                        </manifestEntries>
-                    </archive>
-                </configuration>
-            </plugin>
+          This plugin allows you to run Cloud Functions Java code
+          locally. Use the following terminal command to run a
+          given function locally:
 
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>3.3.0</version>
-                <configuration>
-                    <mainClass>${launcher.class}</mainClass>
-                    <arguments>
-                        <argument>run</argument>
-                        <argument>${main.verticle}</argument>
-                    </arguments>
-                </configuration>
+          mvn function:run -Drun.functionTarget=your.package.yourFunction
+        -->
+                <groupId>com.google.cloud.functions</groupId>
+                <artifactId>function-maven-plugin</artifactId>
+                <version>0.11.0</version>
+<!--                <configuration>-->
+<!--                    <functionTarget>com.apicatalog.vc.fnc.VerifyFunction</functionTarget>-->
+<!--                </configuration>-->
             </plugin>
         </plugins>
     </build>

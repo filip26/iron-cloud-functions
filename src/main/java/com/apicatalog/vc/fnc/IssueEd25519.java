@@ -6,23 +6,15 @@ import java.time.Instant;
 
 import com.apicatalog.controller.key.KeyPair;
 import com.apicatalog.cryptosuite.SigningError;
-import com.apicatalog.did.key.DidKey;
-import com.apicatalog.did.key.DidKeyResolver;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.ed25519.Ed25519ContextLoader;
 import com.apicatalog.ld.signature.ed25519.Ed25519Signature2020;
-import com.apicatalog.ld.signature.ed25519.Ed25519VerificationKey2020Provider;
 import com.apicatalog.multibase.Multibase;
-import com.apicatalog.multicodec.MulticodecDecoder;
 import com.apicatalog.multicodec.codec.KeyCodec;
 import com.apicatalog.multicodec.key.GenericMulticodecKey;
 import com.apicatalog.multikey.GenericMultikey;
 import com.apicatalog.vc.issuer.Issuer;
-import com.apicatalog.vc.method.resolver.ControllableKeyProvider;
-import com.apicatalog.vc.method.resolver.MethodPredicate;
-import com.apicatalog.vc.method.resolver.MethodSelector;
-import com.apicatalog.vc.method.resolver.VerificationKeyProvider;
 import com.google.cloud.functions.HttpFunction;
 
 import jakarta.json.JsonObject;
@@ -41,7 +33,7 @@ public class IssueEd25519 extends HttpJsonFunction implements HttpFunction {
 
     final static Issuer ISSUER = SUITE.createIssuer(KEY_PAIR).loader(LOADER);
 
-    public IssueEd25519(String method) {
+    public IssueEd25519() {
         super("POST", HttpURLConnection.HTTP_CREATED);
     }
 
@@ -54,6 +46,10 @@ public class IssueEd25519 extends HttpJsonFunction implements HttpFunction {
         var draft = Ed25519Signature2020.createDraft(VERIFICATION_METHOD, ASSERTION_PURPOSE);
 
         draft.created(Instant.now());
+        
+        if (issuanceRequest.credentialId() != null) {
+            draft.id(issuanceRequest.credentialId());
+        }
 
         try {
 
@@ -65,35 +61,6 @@ public class IssueEd25519 extends HttpJsonFunction implements HttpFunction {
         } catch (SigningError e) {
             throw new HttpFunctionError(e, HttpFunctionError.toString(e.getCode().name()));
         }
-    }
-
-    // TODO Auto-generated method stub
-
-//        draft.domain(testCase.domain);
-//        draft.challenge(testCase.challenge);
-//        draft.nonce(testCase.nonce);
-//
-
-//                .sign(testCase.input, draft);
-//
-
-//        response.setStatusCode(201); // created
-//        response.putHeader("content-type", "application/ld+json");
-//        response.end(signed.toString());   
-
-    static final VerificationKeyProvider defaultResolvers(DocumentLoader loader) {
-
-        return MethodSelector.create()
-                .with(MethodPredicate.methodId(
-                        // accept only https Ed25519VerificationKey2020
-                        m -> m.getScheme().equalsIgnoreCase("https")),
-                        new Ed25519VerificationKey2020Provider(loader))
-
-                // accept did:key
-                .with(MethodPredicate.methodId(DidKey::isDidKeyUrl),
-                        ControllableKeyProvider.of(new DidKeyResolver(MulticodecDecoder.getInstance(KeyCodec.ED25519_PUBLIC_KEY, KeyCodec.ED25519_PRIVATE_KEY))))
-
-                .build();
     }
 
     static final KeyPair getKeyPair() {

@@ -2,6 +2,7 @@ package com.apicatalog.vc.fnc;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.util.Collections;
 
 import com.google.cloud.functions.HttpFunction;
 import com.google.cloud.functions.HttpRequest;
@@ -9,8 +10,15 @@ import com.google.cloud.functions.HttpResponse;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
+import jakarta.json.JsonObjectBuilder;
+import jakarta.json.JsonStructure;
+import jakarta.json.JsonWriterFactory;
+import jakarta.json.stream.JsonParserFactory;
 
 public abstract class HttpJsonFunction implements HttpFunction {
+
+    protected static final JsonParserFactory JSON_PARSER_FACTORY = Json.createParserFactory(Collections.emptyMap());
+    protected static final JsonWriterFactory JSON_WRITER_FACTORY = Json.createWriterFactory(Collections.emptyMap());
 
     private final String method;
     private final int successCode;
@@ -32,47 +40,70 @@ public abstract class HttpJsonFunction implements HttpFunction {
             response.setStatusCode(HttpURLConnection.HTTP_UNSUPPORTED_TYPE);
         }
 
+        JsonStructure output = null;
+
         try {
-            var input = JsonRequest.of(request);
-            var output = process(input);
+            output = process(parseJson(request));
 
             if (output == null) {
                 throw new IllegalStateException();
             }
-            
-            response.setStatusCode(successCode);
 
-            try (var writer = response.getWriter()) {
-                response.setContentType("application/json");
-                writer.write(output.toString());
-            }
+            response.setStatusCode(successCode);
 
         } catch (HttpFunctionError e) {
 
             response.setStatusCode(HttpURLConnection.HTTP_BAD_REQUEST);
-            response.setContentType("application/json");
+            output = error(e);
 
-            // TODO Auto-generated catch block
-//            e.printStackTrace();
+        } catch (IllegalArgumentException e) {
+            response.setStatusCode(HttpURLConnection.HTTP_BAD_REQUEST);
+            output = error(e.getMessage(), null);
 
         } catch (IOException e) {
-            response.setStatusCode(HttpURLConnection.HTTP_BAD_REQUEST);
-            
+            response.setStatusCode(HttpURLConnection.HTTP_INTERNAL_ERROR);
+            output = null;
+        }
+
+        if (output != null) {
+            writeJson(output, response);
         }
     }
 
     protected abstract JsonObject process(JsonObject jsonData) throws HttpFunctionError;
 
-    protected static boolean isJsonRequest(HttpRequest httpRequest) {
+    protected static final boolean isJsonRequest(HttpRequest httpRequest) {
         var contentType = httpRequest.getContentType().orElse(null);
         return contentType != null && "application/json".equals(contentType);
     }
 
-    protected static JsonObject of(HttpRequest httpRequest) throws IOException {
-        try (var parser = Json.createParser(httpRequest.getReader())) {
+    protected static final JsonObject parseJson(HttpRequest httpRequest) throws IOException {
+        try (var parser = JSON_PARSER_FACTORY.createParser(httpRequest.getReader())) {
             parser.next();
             JsonObject data = parser.getObject();
             return data;
         }
+    }
+
+    protected static final void writeJson(JsonStructure data, HttpResponse response) throws IOException {
+        response.setContentType("application/json");
+        try (var writer = JSON_WRITER_FACTORY.createWriter(response.getWriter())) {
+            writer.write(data);
+        }
+    }
+
+    protected static final JsonObject error(HttpFunctionError error) {
+        return error(error.getMessage(), error.getCode());
+    }
+
+    protected static final JsonObject error(String message, String code) {
+        JsonObjectBuilder builder = Json.createObjectBuilder();
+        if (message != null) {
+            builder.add("message", message);
+        }
+        if (code != null) {
+            builder.add("code", code);
+        }
+        return builder.build();
     }
 }

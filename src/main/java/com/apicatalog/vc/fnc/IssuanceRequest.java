@@ -1,6 +1,7 @@
 package com.apicatalog.vc.fnc;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -8,7 +9,6 @@ import com.apicatalog.jsonld.json.JsonUtils;
 
 import jakarta.json.JsonObject;
 import jakarta.json.JsonString;
-import jakarta.json.JsonValue;
 
 public record IssuanceRequest(
         JsonObject credential,
@@ -17,9 +17,12 @@ public record IssuanceRequest(
         URI credentialId) {
 
     static final String OPTIONS = "options";
+    
     static final String CREDENTIAL = "credential";
-    public static final String OPTION_MANDATORY_POINTERS = "mandatoryPointers";
-    public static final String OPTION_CREDENTIAL_ID = "credentialId";
+
+    static final String OPTION_MANDATORY_POINTERS = "mandatoryPointers";
+
+    static final String OPTION_CREDENTIAL_ID = "credentialId";
 
     public static IssuanceRequest of(final JsonObject json) {
 
@@ -28,14 +31,33 @@ public record IssuanceRequest(
         Collection<String> mandatoryPointers = Collections.emptyList();
         String credentialId = null;
 
-        JsonValue options = json.get(OPTIONS);
+        var options = json.get(OPTIONS);
         if (JsonUtils.isObject(options)) {
-            JsonValue id = options.asJsonObject().get(OPTION_CREDENTIAL_ID);
+
+            // credential id
+            var id = options.asJsonObject().get(OPTION_CREDENTIAL_ID);
             if (JsonUtils.isString(id)) {
                 credentialId = ((JsonString) id).getString();
             }
+
+            // mandatory pointers
+            var pointers = options.asJsonObject().get(OPTION_MANDATORY_POINTERS);
+            if (JsonUtils.isArray(pointers)) {
+                mandatoryPointers = new ArrayList<>(pointers.asJsonArray().size());
+                for (var pointer : pointers.asJsonArray()) {
+                    if (JsonUtils.isNotString(pointer)) {
+                        throw new IllegalArgumentException("An invalid mandatory pointer [" + pointer + "], exptected string value.");
+                    }
+                    mandatoryPointers.add(((JsonString) pointer).getString());
+                }
+            }
         }
 
-        return new IssuanceRequest(credential, mandatoryPointers, URI.create(credentialId));
+        return new IssuanceRequest(
+                credential,
+                mandatoryPointers,
+                credentialId != null
+                        ? URI.create(credentialId)
+                        : null);
     }
 }

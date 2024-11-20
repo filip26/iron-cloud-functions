@@ -7,23 +7,24 @@ import java.time.Instant;
 import com.apicatalog.controller.key.KeyPair;
 import com.apicatalog.cryptosuite.SigningError;
 import com.apicatalog.jsonld.loader.DocumentLoader;
+import com.apicatalog.jsonld.loader.SchemeRouter;
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.signature.ed25519.Ed25519ContextLoader;
-import com.apicatalog.ld.signature.ed25519.Ed25519Signature2020;
+import com.apicatalog.ld.signature.eddsa.EdDSASignature2022;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.multicodec.codec.KeyCodec;
 import com.apicatalog.multicodec.key.GenericMulticodecKey;
 import com.apicatalog.multikey.GenericMultikey;
 import com.apicatalog.vc.issuer.Issuer;
+import com.apicatalog.vc.loader.StaticContextLoader;
 import com.google.cloud.functions.HttpFunction;
 
 import jakarta.json.JsonObject;
 
-public class IssueEd25519 extends HttpJsonFunction implements HttpFunction {
+public class IssueEdDsaRdfc2022 extends HttpJsonFunction implements HttpFunction {
 
-    final static DocumentLoader LOADER = new Ed25519ContextLoader();
+    final static DocumentLoader LOADER = new StaticContextLoader(SchemeRouter.defaultInstance());
 
-    final static Ed25519Signature2020 SUITE = new Ed25519Signature2020();
+    final static EdDSASignature2022 SUITE = new EdDSASignature2022();
 
     final static KeyPair KEY_PAIR = getKeyPair();
 
@@ -33,7 +34,7 @@ public class IssueEd25519 extends HttpJsonFunction implements HttpFunction {
 
     final static Issuer ISSUER = SUITE.createIssuer(KEY_PAIR).loader(LOADER);
 
-    public IssueEd25519() {
+    public IssueEdDsaRdfc2022() {
         super("POST", HttpURLConnection.HTTP_CREATED);
     }
 

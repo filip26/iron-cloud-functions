@@ -3,13 +3,13 @@ package com.apicatalog.vc.fnc;
 import java.io.StringReader;
 import java.net.URI;
 import java.time.Instant;
-import java.util.Map.Entry;
 
 import com.apicatalog.controller.key.KeyPair;
 import com.apicatalog.cryptosuite.SigningError;
 import com.apicatalog.did.key.DidKey;
 import com.apicatalog.did.key.DidKeyResolver;
 import com.apicatalog.jsonld.loader.DocumentLoader;
+import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.ed25519.Ed25519ContextLoader;
 import com.apicatalog.ld.signature.ed25519.Ed25519Signature2020;
 import com.apicatalog.ld.signature.ed25519.Ed25519Signature2020ProofDraft;
@@ -36,8 +36,6 @@ public class IssueEd25519 implements HttpFunction {
 
     final static DocumentLoader LOADER = new Ed25519ContextLoader();
 
-    final static VerificationKeyProvider RESOLVERS = defaultResolvers(LOADER);
-
     final static Ed25519Signature2020 SUITE = new Ed25519Signature2020();
 
     final static KeyPair KEY_PAIR = getKeyPair();
@@ -51,52 +49,35 @@ public class IssueEd25519 implements HttpFunction {
     @Override
     public void service(HttpRequest request, HttpResponse response) throws Exception {
 
-        response.setStatusCode(200);
-        response.setContentType("text/plain");
-
         try (var writer = response.getWriter()) {
-
-            var key = System.getenv("ED_PRIVATE_KEY_TEST_1");
-
-            writer.write(key == null ? "null" : key);
-
-            writer.write('\n');
-
-            writer.write(KEY_PAIR.id().toString());
-            writer.write('\n');
-            writer.write(KEY_PAIR.type());
-
-            writer.write('\n');
-            writer.write(ISSUER.getClass().getSimpleName());
-            writer.write('\n');
-            for (Entry<String, String> entry : System.getenv().entrySet()) {
-                writer.write(entry.getKey() + " -> " + entry.getValue());
-            }
-            writer.write('\n');
 
             // proof draft
             final Ed25519Signature2020ProofDraft draft = Ed25519Signature2020.createDraft(
                     VERIFICATION_METHOD, ASSERTION_PURPOSE);
 
             draft.created(Instant.now());
-
+            
             JsonObject data = null;
 
             try (JsonParser parser = Json.createParser(new StringReader(TEST))) {
                 parser.next();
                 data = parser.getObject();
 
-                writer.write(data.toString());
-                writer.write('\n');
-
                 JsonObject signed = ISSUER.sign(data, draft);
 
+                response.setStatusCode(201);
+                response.setContentType("application/ld+json");
                 writer.write(signed.toString());
-                writer.write('\n');
-            } catch (SigningError e) {
+
+            } catch (SigningError | DocumentError e) {
+                response.setStatusCode(400);
+                response.setContentType("text/plain");
                 writer.write(e.getMessage());
                 writer.write('\n');
+                
             } catch (Exception e) {
+                response.setStatusCode(500);
+                response.setContentType("text/plain");
                 writer.write(e.getMessage());
                 writer.write('\n');
 
@@ -155,7 +136,7 @@ public class IssueEd25519 implements HttpFunction {
                         KeyCodec.ED25519_PRIVATE_KEY.decode(Multibase.BASE_58_BTC.decode(privateKey))));
     }
 
-    static final URI getVerificationMethod() {
+    final static URI getVerificationMethod() {
 
         var publicKey = "z6MktgKTsu1QhX6QPbyqG6geXdw6FQCZBPq7uQpieWbiQiG7";
 

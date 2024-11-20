@@ -1,8 +1,10 @@
 package com.apicatalog.vc.fnc;
 
+import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.time.Instant;
+import java.util.UUID;
 
 import com.apicatalog.controller.key.KeyPair;
 import com.apicatalog.cryptosuite.SigningError;
@@ -17,6 +19,8 @@ import com.apicatalog.multikey.GenericMultikey;
 import com.apicatalog.vc.issuer.Issuer;
 import com.apicatalog.vc.loader.StaticContextLoader;
 import com.google.cloud.functions.HttpFunction;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
 
 import jakarta.json.JsonObject;
 
@@ -34,6 +38,8 @@ public class IssueEdDsaRdfc2022 extends HttpJsonFunction implements HttpFunction
 
     final static Issuer ISSUER = SUITE.createIssuer(KEY_PAIR).loader(LOADER);
 
+    final static Storage storage = StorageOptions.newBuilder().setProjectId("api-catalog").build().getService();
+
     public IssueEdDsaRdfc2022() {
         super("POST", HttpURLConnection.HTTP_CREATED);
     }
@@ -43,20 +49,37 @@ public class IssueEdDsaRdfc2022 extends HttpJsonFunction implements HttpFunction
 
         var issuanceRequest = IssuanceRequest.of(json);
 
+//        var future = Store.write(issuanceRequest.credential());
+
         // proof draft
         var draft = SUITE.createDraft(VERIFICATION_METHOD, ASSERTION_PURPOSE);
 
         draft.created(Instant.now());
-        
+
         try {
 
-            return ISSUER.sign(issuanceRequest.credential(), draft);
+            var signed = ISSUER.sign(issuanceRequest.credential(), draft);
+
+            String name = UUID.randomUUID().toString();
+
+            XStorage.uploadObject(storage, "issued/vc/" + name, signed);
+//            future.get();
+
+            return signed;
 
         } catch (DocumentError e) {
             throw new HttpFunctionError(e, HttpFunctionError.toString(e.code()));
 
         } catch (SigningError e) {
             throw new HttpFunctionError(e, HttpFunctionError.toString(e.getCode().name()));
+
+//        } catch (InterruptedException e) {
+//            throw new HttpFunctionError(e, e.getMessage());
+//            
+//        } catch (ExecutionException e) {
+//            throw new HttpFunctionError(e, e.getMessage());
+        } catch (IOException e) {
+            throw new HttpFunctionError(e, e.getMessage());
         }
     }
 

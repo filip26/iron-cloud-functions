@@ -106,4 +106,17 @@ public abstract class HttpJsonFunction implements HttpFunction {
         }
         return builder.build();
     }
+    
+//    // Set CORS headers
+//    //   Allows GETs from any origin with the Content-Type
+//    //   header and caches preflight response for 3600s
+//    response.appendHeader("Access-Control-Allow-Origin", "*");
+//
+//    if ("OPTIONS".equals(request.getMethod())) {
+//      response.appendHeader("Access-Control-Allow-Methods", "GET");
+//      response.appendHeader("Access-Control-Allow-Headers", "Content-Type");
+//      response.appendHeader("Access-Control-Max-Age", "3600");
+//      response.setStatusCode(HttpURLConnection.HTTP_NO_CONTENT);
+//      return;
+//    }
 }

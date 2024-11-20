@@ -56,7 +56,7 @@ public record IssuanceRequest(
         return new IssuanceRequest(
                 credential,
                 mandatoryPointers,
-                credentialId != null
+                credentialId != null && !credentialId.isEmpty()
                         ? URI.create(credentialId)
                         : null);
     }

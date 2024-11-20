@@ -1,52 +1,47 @@
 package com.apicatalog.vc.fnc;
 
-import java.net.HttpURLConnection;
 import java.net.URI;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 
-import com.apicatalog.controller.key.KeyPair;
 import com.apicatalog.cryptosuite.SigningError;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.ed25519.Ed25519ContextLoader;
 import com.apicatalog.ld.signature.ed25519.Ed25519Signature2020;
-import com.apicatalog.multibase.Multibase;
-import com.apicatalog.multicodec.codec.KeyCodec;
-import com.apicatalog.multicodec.key.GenericMulticodecKey;
-import com.apicatalog.multikey.GenericMultikey;
 import com.apicatalog.vc.issuer.Issuer;
 import com.google.cloud.functions.HttpFunction;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
 
 import jakarta.json.JsonObject;
 
-public class IssueEd25519 extends HttpJsonFunction implements HttpFunction {
+public class IssueEd25519 extends IssueFunction implements HttpFunction {
 
-    final static DocumentLoader LOADER = new Ed25519ContextLoader();
+    static final DocumentLoader LOADER = new Ed25519ContextLoader();
 
-    final static Ed25519Signature2020 SUITE = new Ed25519Signature2020();
+    static final Ed25519Signature2020 SUITE = new Ed25519Signature2020();
 
-    final static KeyPair KEY_PAIR = getKeyPair();
+    static final URI VERIFICATION_METHOD = Ed25520KeyPairProvider.getVerificationMethod();
 
-    final static URI VERIFICATION_METHOD = getVerificationMethod();
+    static final URI ASSERTION_PURPOSE = URI.create("https://w3id.org/security#assertionMethod");
 
-    final static URI ASSERTION_PURPOSE = URI.create("https://w3id.org/security#assertionMethod");
+    static final Issuer ISSUER = SUITE.createIssuer(Ed25520KeyPairProvider.getKeyPair()).loader(LOADER);
 
-    final static Issuer ISSUER = SUITE.createIssuer(KEY_PAIR).loader(LOADER);
+    static final Storage STORAGE = StorageOptions.newBuilder().build().getService();
 
     public IssueEd25519() {
-        super("POST", HttpURLConnection.HTTP_CREATED);
+        super(STORAGE);
     }
 
     @Override
-    protected JsonObject process(final JsonObject json) throws HttpFunctionError {
-
-        var issuanceRequest = IssuanceRequest.of(json);
-
+    protected JsonObject process(IssuanceRequest issuanceRequest) throws HttpFunctionError {
         // proof draft
         var draft = SUITE.createDraft(VERIFICATION_METHOD, ASSERTION_PURPOSE);
 
         draft.created(Instant.now());
-        
+        draft.expires(draft.created().plus(21, ChronoUnit.DAYS));
+
         try {
 
             return ISSUER.sign(issuanceRequest.credential(), draft);
@@ -57,30 +52,5 @@ public class IssueEd25519 extends HttpJsonFunction implements HttpFunction {
         } catch (SigningError e) {
             throw new HttpFunctionError(e, HttpFunctionError.toString(e.getCode().name()));
         }
-    }
-
-    static final KeyPair getKeyPair() {
-
-        var publicKey = "z6MktgKTsu1QhX6QPbyqG6geXdw6FQCZBPq7uQpieWbiQiG7";
-        var privateKey = System.getenv("ED_PRIVATE_KEY_TEST_1");
-
-        var id = URI.create("did:key:" + publicKey + "#" + publicKey);
-
-        return GenericMultikey.of(
-                id,
-                URI.create("did:key:" + publicKey),
-                new GenericMulticodecKey(
-                        KeyCodec.ED25519_PUBLIC_KEY,
-                        Multibase.BASE_58_BTC,
-                        KeyCodec.ED25519_PUBLIC_KEY.decode(Multibase.BASE_58_BTC.decode(publicKey))),
-                new GenericMulticodecKey(
-                        KeyCodec.ED25519_PRIVATE_KEY,
-                        Multibase.BASE_58_BTC,
-                        KeyCodec.ED25519_PRIVATE_KEY.decode(Multibase.BASE_58_BTC.decode(privateKey))));
-    }
-
-    final static URI getVerificationMethod() {
-        var publicKey = "z6MktgKTsu1QhX6QPbyqG6geXdw6FQCZBPq7uQpieWbiQiG7";
-        return URI.create("did:key:" + publicKey + "#" + publicKey);
     }
 }

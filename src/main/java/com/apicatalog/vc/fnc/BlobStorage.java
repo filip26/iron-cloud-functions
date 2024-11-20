@@ -2,45 +2,29 @@ package com.apicatalog.vc.fnc;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.UUID;
 
 import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
-import com.google.storage.control.v2.GetStorageLayoutRequest;
-import com.google.storage.control.v2.StorageControlClient;
-import com.google.storage.control.v2.StorageLayout;
-import com.google.storage.control.v2.StorageLayoutName;
 
 import jakarta.json.JsonObject;
 
-public class XStorage {
+public class BlobStorage {
 
-    public static void uploadObject(
+    protected static final String BUCKET_NAME = "iron-vc-demo";
+
+    public static void createBlob(
             Storage storage,
-            String objectName,
+            String blobName,
             JsonObject data) throws IOException {
 
-        String projectId = "api-catalog";
-        String bucketName = "iron-vc-demo";
-
-        // The ID of your GCP project
-        // String projectId = "your-project-id";
-
-        // The ID of your GCS bucket
-        // String bucketName = "your-unique-bucket-name";
-
-        // The ID of your GCS object
-        // String objectName = "your-object-name";
-
-        // The path to your file to upload
-        // String filePath = "path/to/your/file"
-
-        BlobId blobId = BlobId.of(bucketName, objectName);
+        BlobId blobId = BlobId.of(BUCKET_NAME, blobName);
         BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("application/ld+json").build();
 
         byte[] content = data.toString().getBytes(StandardCharsets.UTF_8);
 
+//        storage.get(blobId).get
+        
         // Optional: set a generation-match precondition to enable automatic retries,
         // avoid potential
         // race
@@ -67,20 +51,4 @@ public class XStorage {
 //          System.out.println(
 //              "File " + filePath + " uploaded to bucket " + bucketName + " as " + objectName);
     }
-
-    public static void init() throws Exception {
-        String bucketName = "iron-vc-demo";
-
-        // Instantiates a client in a try-with-resource to automatically cleanup
-        // underlying resources
-        try (StorageControlClient storageControlClient = StorageControlClient.create()) {
-            GetStorageLayoutRequest request = GetStorageLayoutRequest.newBuilder()
-                    // Set project to "_" to signify global bucket
-                    .setName(StorageLayoutName.format("_", bucketName))
-                    .build();
-            StorageLayout response = storageControlClient.getStorageLayout(request);
-            System.out.printf("Performed getStorageLayout request for %s", response.getName());
-        }
-    }
-
 }

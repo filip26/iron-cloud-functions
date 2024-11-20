@@ -1,6 +1,6 @@
 package com.apicatalog.vc.fnc;
 
-import java.io.StringReader;
+import java.net.HttpURLConnection;
 import java.net.URI;
 import java.time.Instant;
 
@@ -12,7 +12,6 @@ import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.ed25519.Ed25519ContextLoader;
 import com.apicatalog.ld.signature.ed25519.Ed25519Signature2020;
-import com.apicatalog.ld.signature.ed25519.Ed25519Signature2020ProofDraft;
 import com.apicatalog.ld.signature.ed25519.Ed25519VerificationKey2020Provider;
 import com.apicatalog.multibase.Multibase;
 import com.apicatalog.multicodec.MulticodecDecoder;
@@ -25,14 +24,10 @@ import com.apicatalog.vc.method.resolver.MethodPredicate;
 import com.apicatalog.vc.method.resolver.MethodSelector;
 import com.apicatalog.vc.method.resolver.VerificationKeyProvider;
 import com.google.cloud.functions.HttpFunction;
-import com.google.cloud.functions.HttpRequest;
-import com.google.cloud.functions.HttpResponse;
 
-import jakarta.json.Json;
 import jakarta.json.JsonObject;
-import jakarta.json.stream.JsonParser;
 
-public class IssueEd25519 implements HttpFunction {
+public class IssueEd25519 extends HttpJsonFunction implements HttpFunction {
 
     final static DocumentLoader LOADER = new Ed25519ContextLoader();
 
@@ -46,46 +41,33 @@ public class IssueEd25519 implements HttpFunction {
 
     final static Issuer ISSUER = SUITE.createIssuer(KEY_PAIR).loader(LOADER);
 
+    public IssueEd25519(String method) {
+        super("POST", HttpURLConnection.HTTP_CREATED);
+    }
+
     @Override
-    public void service(HttpRequest request, HttpResponse response) throws Exception {
+    protected JsonObject process(final JsonObject json) throws HttpFunctionError {
 
-        try (var writer = response.getWriter()) {
+        var issuanceRequest = IssuanceRequest.of(json);
 
-            // proof draft
-            final Ed25519Signature2020ProofDraft draft = Ed25519Signature2020.createDraft(
-                    VERIFICATION_METHOD, ASSERTION_PURPOSE);
+        // proof draft
+        var draft = Ed25519Signature2020.createDraft(VERIFICATION_METHOD, ASSERTION_PURPOSE);
 
-            draft.created(Instant.now());
-            
-            JsonObject data = null;
+        draft.created(Instant.now());
 
-            try (JsonParser parser = Json.createParser(new StringReader(TEST))) {
-                parser.next();
-                data = parser.getObject();
+        try {
 
-                JsonObject signed = ISSUER.sign(data, draft);
+            return ISSUER.sign(issuanceRequest.credential(), draft);
 
-                response.setStatusCode(201);
-                response.setContentType("application/ld+json");
-                writer.write(signed.toString());
+        } catch (DocumentError e) {
+            throw new HttpFunctionError(e, HttpFunctionError.toString(e.code()));
 
-            } catch (SigningError | DocumentError e) {
-                response.setStatusCode(400);
-                response.setContentType("text/plain");
-                writer.write(e.getMessage());
-                writer.write('\n');
-                
-            } catch (Exception e) {
-                response.setStatusCode(500);
-                response.setContentType("text/plain");
-                writer.write(e.getMessage());
-                writer.write('\n');
-
-            }
-
+        } catch (SigningError e) {
+            throw new HttpFunctionError(e, HttpFunctionError.toString(e.getCode().name()));
         }
+    }
 
-        // TODO Auto-generated method stub
+    // TODO Auto-generated method stub
 
 //        draft.domain(testCase.domain);
 //        draft.challenge(testCase.challenge);
@@ -97,9 +79,7 @@ public class IssueEd25519 implements HttpFunction {
 
 //        response.setStatusCode(201); // created
 //        response.putHeader("content-type", "application/ld+json");
-//        response.end(signed.toString());
-
-    }
+//        response.end(signed.toString());   
 
     static final VerificationKeyProvider defaultResolvers(DocumentLoader loader) {
 
@@ -137,18 +117,7 @@ public class IssueEd25519 implements HttpFunction {
     }
 
     final static URI getVerificationMethod() {
-
         var publicKey = "z6MktgKTsu1QhX6QPbyqG6geXdw6FQCZBPq7uQpieWbiQiG7";
-
         return URI.create("did:key:" + publicKey + "#" + publicKey);
     }
-
-    static String TEST = "{\n"
-            + "  \"@context\": \"https://www.w3.org/ns/credentials/v2\",\n"
-            + "  \"id\": \"https://apicatalog/com/vc/test-credentials#0001\",\n"
-            + "  \"type\": \"VerifiableCredential\",\n"
-            + "  \"issuer\": \"https://github.com/filip26/iron-verifiable-credentials/issuer/1\",\n"
-            + "  \"credentialSubject\": \"did:example:ebfeb1f712ebc6f1c276e12ec21\"\n"
-            + "}";
-
 }

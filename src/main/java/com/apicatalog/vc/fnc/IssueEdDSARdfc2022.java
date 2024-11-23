@@ -17,7 +17,7 @@ import com.google.cloud.storage.StorageOptions;
 
 import jakarta.json.JsonObject;
 
-public class IssueEdDsaRdfc2022 extends IssueFunction implements HttpFunction {
+public class IssueEdDSARdfc2022 extends IssueFunction implements HttpFunction {
 
     static final DocumentLoader LOADER = new StaticContextLoader(SchemeRouter.defaultInstance());
 
@@ -29,9 +29,9 @@ public class IssueEdDsaRdfc2022 extends IssueFunction implements HttpFunction {
 
     static final Issuer ISSUER = SUITE.createIssuer(Ed25520KeyPairProvider.getKeyPair()).loader(LOADER);
 
-    static final Storage STORAGE = StorageOptions.newBuilder().build().getService();
+    static final Storage STORAGE = StorageOptions.getDefaultInstance().getService();
 
-    public IssueEdDsaRdfc2022() {
+    public IssueEdDSARdfc2022() {
         super(STORAGE);
     }
 

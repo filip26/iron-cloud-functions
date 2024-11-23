@@ -6,21 +6,22 @@ import java.time.temporal.ChronoUnit;
 
 import com.apicatalog.cryptosuite.SigningError;
 import com.apicatalog.jsonld.loader.DocumentLoader;
+import com.apicatalog.jsonld.loader.SchemeRouter;
 import com.apicatalog.ld.DocumentError;
-import com.apicatalog.ld.signature.ed25519.Ed25519ContextLoader;
-import com.apicatalog.ld.signature.ed25519.Ed25519Signature2020;
+import com.apicatalog.ld.signature.eddsa.EdDsaJcs2022Suite;
 import com.apicatalog.vc.issuer.Issuer;
+import com.apicatalog.vc.loader.StaticContextLoader;
 import com.google.cloud.functions.HttpFunction;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
 
 import jakarta.json.JsonObject;
 
-public class IssueEd25519 extends IssueFunction implements HttpFunction {
+public class IssueEdDSAJcs2022 extends IssueFunction implements HttpFunction {
 
-    static final DocumentLoader LOADER = new Ed25519ContextLoader();
+    static final DocumentLoader LOADER = new StaticContextLoader(SchemeRouter.defaultInstance());
 
-    static final Ed25519Signature2020 SUITE = new Ed25519Signature2020();
+    static final EdDsaJcs2022Suite SUITE = new EdDsaJcs2022Suite();
 
     static final URI VERIFICATION_METHOD = Ed25520KeyPairProvider.getVerificationMethod();
 
@@ -29,14 +30,14 @@ public class IssueEd25519 extends IssueFunction implements HttpFunction {
     static final Issuer ISSUER = SUITE.createIssuer(Ed25520KeyPairProvider.getKeyPair()).loader(LOADER);
 
     static final Storage STORAGE = StorageOptions.getDefaultInstance().getService();
-            //.newBuilder().build().getService();
 
-    public IssueEd25519() {
+    public IssueEdDSAJcs2022() {
         super(STORAGE);
     }
 
     @Override
     protected JsonObject process(IssuanceRequest issuanceRequest) throws HttpFunctionError {
+
         // proof draft
         var draft = SUITE.createDraft(VERIFICATION_METHOD, ASSERTION_PURPOSE);
 
@@ -45,7 +46,9 @@ public class IssueEd25519 extends IssueFunction implements HttpFunction {
 
         try {
 
-            return ISSUER.sign(issuanceRequest.credential(), draft);
+            var signed = ISSUER.sign(issuanceRequest.credential(), draft);
+
+            return signed;
 
         } catch (DocumentError e) {
             throw new HttpFunctionError(e, HttpFunctionError.toString(e.code()));

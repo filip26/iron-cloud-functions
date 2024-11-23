@@ -95,23 +95,34 @@
             <scope>provided</scope>
         </dependency>
 
-  <dependency>
-    <groupId>com.google.cloud</groupId>
-    <artifactId>google-cloud-firestore</artifactId>
-  </dependency>
-  <dependency>
-    <groupId>com.google.cloud</groupId>
-    <artifactId>google-cloud-storage</artifactId>
-  </dependency>
-  <dependency>
-    <groupId>com.google.cloud</groupId>
-    <artifactId>google-cloud-storage-control</artifactId>
-  </dependency>  
-<!--        <dependency>-->
-<!--            <groupId>com.google.firebase</groupId>-->
-<!--            <artifactId>firebase-admin</artifactId>-->
-<!--            <version>9.4.1</version>-->
-<!--        </dependency>-->
+<!--    <dependency>-->
+<!--      <groupId>com.google.cloud</groupId>-->
+<!--      <artifactId>google-cloudevent-types</artifactId>-->
+<!--      <version>0.14.0</version>-->
+<!--    </dependency>-->
+<!--    <dependency>-->
+<!--      <groupId>com.google.protobuf</groupId>-->
+<!--      <artifactId>protobuf-java</artifactId>-->
+<!--    </dependency>-->
+        <dependency>
+            <groupId>com.google.cloud</groupId>
+            <artifactId>google-cloud-firestore</artifactId>
+        </dependency>
+        
+        <dependency>
+            <groupId>com.google.cloud</groupId>
+            <artifactId>google-cloud-storage</artifactId>
+        </dependency>
+        
+        <dependency>
+            <groupId>com.google.cloud</groupId>
+            <artifactId>google-cloud-storage-control</artifactId>
+        </dependency>
+        <!--        <dependency>-->
+        <!--            <groupId>com.google.firebase</groupId>-->
+        <!--            <artifactId>firebase-admin</artifactId>-->
+        <!--            <version>9.4.1</version>-->
+        <!--        </dependency>-->
 
         <dependency>
             <groupId>com.apicatalog</groupId>
@@ -123,6 +134,12 @@
             <artifactId>iron-eddsa-rdfc-2022</artifactId>
             <version>${iron.vc.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.apicatalog</groupId>
+            <artifactId>iron-eddsa-jcs-2022</artifactId>
+            <version>${iron.vc.version}</version>
+        </dependency>
+        
         <!--        <dependency>-->
         <!--            <groupId>com.apicatalog</groupId>-->
         <!--            <artifactId>iron-ecdsa-rdfc-2019</artifactId>-->

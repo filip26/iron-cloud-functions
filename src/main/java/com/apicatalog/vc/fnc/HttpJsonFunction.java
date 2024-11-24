@@ -8,6 +8,7 @@ import com.google.cloud.functions.HttpFunction;
 import com.google.cloud.functions.HttpRequest;
 import com.google.cloud.functions.HttpResponse;
 
+import jakarta.json.JsonException;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
 import jakarta.json.JsonStructure;
@@ -62,8 +63,12 @@ public abstract class HttpJsonFunction implements HttpFunction {
             response.setStatusCode(HttpURLConnection.HTTP_BAD_REQUEST);
             output = error(e.getMessage(), null);
 
+        } catch (JsonException e) {
+            response.setStatusCode(HttpURLConnection.HTTP_BAD_REQUEST);
+            output = error(e.getMessage(), null);
+            
         } catch (IOException e) {
-            response.setStatusCode(HttpURLConnection.HTTP_INTERNAL_ERROR);
+            response.setStatusCode(HttpURLConnection.HTTP_BAD_REQUEST);
             output = null;
         }
 

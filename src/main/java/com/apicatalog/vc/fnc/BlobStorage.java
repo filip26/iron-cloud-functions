@@ -19,12 +19,10 @@ public class BlobStorage {
             JsonObject data) throws IOException {
 
         BlobId blobId = BlobId.of(BUCKET_NAME, blobName);
-        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("application/ld+json").build();
+        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("application/json").build();
 
         byte[] content = data.toString().getBytes(StandardCharsets.UTF_8);
 
-//        storage.get(blobId).get
-        
         // Optional: set a generation-match precondition to enable automatic retries,
         // avoid potential
         // race

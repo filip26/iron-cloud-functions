@@ -1,6 +1,7 @@
 package com.apicatalog.vc.fnc;
 
 import java.net.URI;
+import java.util.Objects;
 
 import com.apicatalog.controller.key.KeyPair;
 import com.apicatalog.multibase.Multibase;
@@ -17,6 +18,8 @@ public class Ed25520KeyPairProvider {
 
         var publicKey = "z6MktgKTsu1QhX6QPbyqG6geXdw6FQCZBPq7uQpieWbiQiG7";
         var privateKey = System.getenv("ED_PRIVATE_KEY_TEST_1");
+
+        Objects.requireNonNull(privateKey);
 
         var id = URI.create("did:key:" + publicKey + "#" + publicKey);
 

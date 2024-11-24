@@ -8,17 +8,19 @@ import com.google.cloud.functions.HttpFunction;
 import com.google.cloud.functions.HttpRequest;
 import com.google.cloud.functions.HttpResponse;
 
-import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
 import jakarta.json.JsonStructure;
 import jakarta.json.JsonWriterFactory;
+import jakarta.json.spi.JsonProvider;
 import jakarta.json.stream.JsonParserFactory;
 
 public abstract class HttpJsonFunction implements HttpFunction {
 
-    protected static final JsonParserFactory JSON_PARSER_FACTORY = Json.createParserFactory(Collections.emptyMap());
-    protected static final JsonWriterFactory JSON_WRITER_FACTORY = Json.createWriterFactory(Collections.emptyMap());
+    protected static final JsonProvider JSON = JsonProvider.provider();
+
+    protected static final JsonParserFactory JSON_PARSER_FACTORY = JSON.createParserFactory(Collections.emptyMap());
+    protected static final JsonWriterFactory JSON_WRITER_FACTORY = JSON.createWriterFactory(Collections.emptyMap());
 
     private final String method;
     private final int successCode;
@@ -41,7 +43,7 @@ public abstract class HttpJsonFunction implements HttpFunction {
         }
 
         JsonStructure output = null;
-
+        
         try {
             output = process(parseJson(request));
 
@@ -97,7 +99,7 @@ public abstract class HttpJsonFunction implements HttpFunction {
     }
 
     protected static final JsonObject error(String message, String code) {
-        JsonObjectBuilder builder = Json.createObjectBuilder();
+        JsonObjectBuilder builder = JSON.createObjectBuilder();
         if (message != null) {
             builder.add("message", message);
         }
@@ -106,7 +108,7 @@ public abstract class HttpJsonFunction implements HttpFunction {
         }
         return builder.build();
     }
-    
+
 //    // Set CORS headers
 //    //   Allows GETs from any origin with the Content-Type
 //    //   header and caches preflight response for 3600s

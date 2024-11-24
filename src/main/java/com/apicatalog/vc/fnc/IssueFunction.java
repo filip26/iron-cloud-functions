@@ -76,7 +76,7 @@ public abstract class IssueFunction extends HttpJsonFunction implements HttpFunc
         
         Map<String, Object> data = new HashMap<>();
 
-        data.put("cryptosuite", issuer.cryptosuite().id());
+        data.put("cryptosuite", issuer.cryptosuite().name());
         data.put("keyLength", issuer.cryptosuite().keyLength());
         
         data.put("draft", toProofDraftData(draft));

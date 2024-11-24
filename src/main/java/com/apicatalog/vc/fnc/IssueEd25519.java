@@ -1,8 +1,6 @@
 package com.apicatalog.vc.fnc;
 
 import java.net.URI;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.signature.ed25519.Ed25519ContextLoader;
@@ -44,9 +42,12 @@ public class IssueEd25519 extends IssueFunction implements HttpFunction {
         // proof draft
         Ed25519Signature2020ProofDraft draft = issuer.createDraft(VERIFICATION_METHOD);
 
-        draft.purpose(ASSERTION_PURPOSE);
-        draft.created(Instant.now());
-        draft.expires(draft.created().plus(21, ChronoUnit.DAYS));
+        draft.purpose(issuanceRequest.purpose());
+        draft.created(issuanceRequest.created());
+        draft.expires(issuanceRequest.expires());
+        draft.challenge(issuanceRequest.challenge());
+        draft.domain(issuanceRequest.domain());
+        draft.nonce(issuanceRequest.nonce());
 
         return draft;
     }

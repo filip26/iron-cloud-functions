@@ -11,7 +11,7 @@ import jakarta.json.JsonObject;
 
 public class BlobStorage {
 
-    protected static final String BUCKET_NAME = "iron-vc-demo";
+    public static final String BUCKET_NAME = "iron-vc-demo";
 
     public static void createBlob(
             Storage storage,

@@ -66,14 +66,23 @@ public class VerifyFunction extends HttpJsonFunction implements HttpFunction {
 
             var result = JSON.createObjectBuilder()
                     .add("verified", JsonValue.TRUE)
-                    .add("isCredential", verifiable.isCredential())
-                    .add("isPresentation", verifiable.isPresentation())
-                    .add("type", JSON.createArrayBuilder(verifiable.type()))
-                    .add("proofsCount", verifiable.proofs().size());
+                    .add("type", JSON.createArrayBuilder(verifiable.type()));
 
             if (verifiable.id() != null) {
                 result.add("id", verifiable.id().toString());
             }
+
+            var proofs = JSON.createArrayBuilder();
+            
+            verifiable.proofs().forEach(proof -> {
+                proofs.add(JSON.createObjectBuilder()
+                        .add("type", JSON.createArrayBuilder(proof.type()))
+                        .add("cryptosuite", proof.cryptoSuite().name())
+                        .add("keyLength", proof.cryptoSuite().keyLength())
+                        );
+            });
+            
+            result.add("proofs", proofs);
 
             return result.build();
 

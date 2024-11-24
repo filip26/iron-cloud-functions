@@ -10,7 +10,7 @@
     <name>Iron Verifiable Credentials HTTP API</name>
 
     <description>
-        A HTTP API for Verifiable Credentials lifecycle management
+        HTTP triggered Google Run functions for W3C Verifiable Credentials. 
     </description>
 
     <url>https://github.com/filip26/iron-vc-api</url>
@@ -54,7 +54,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <argLine>-Dfile.encoding=UTF-8</argLine>
 
-        <iron.vc.version>0.15.7-SNAPSHOT</iron.vc.version>
+        <iron.vc.version>0.15.8-SNAPSHOT</iron.vc.version>
         <jakarta.json.version>2.0.1</jakarta.json.version>
 
         <!-- REMOVE -->

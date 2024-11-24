@@ -9,6 +9,7 @@ import com.apicatalog.ld.signature.ed25519.Ed25519ContextLoader;
 import com.apicatalog.ld.signature.ed25519.Ed25519Signature2020;
 import com.apicatalog.vc.issuer.Issuer;
 import com.apicatalog.vc.issuer.ProofDraft;
+import com.apicatalog.vcdi.DataIntegrityProofDraft;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.FirestoreOptions;
 import com.google.cloud.functions.HttpFunction;
@@ -42,8 +43,9 @@ public class IssueEd25519 extends IssueFunction implements HttpFunction {
     @Override
     protected ProofDraft getProofDraft(IssuanceRequest issuanceRequest) throws HttpFunctionError {
         // proof draft
-        var draft = SUITE.createDraft(VERIFICATION_METHOD, ASSERTION_PURPOSE);
+        DataIntegrityProofDraft draft = issuer.createProofDraft(VERIFICATION_METHOD);
 
+        draft.purpose(ASSERTION_PURPOSE);
         draft.created(Instant.now());
         draft.expires(draft.created().plus(21, ChronoUnit.DAYS));
 

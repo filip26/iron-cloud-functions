@@ -10,6 +10,7 @@ import com.apicatalog.ld.signature.eddsa.EdDSAJcs2022Suite;
 import com.apicatalog.vc.issuer.Issuer;
 import com.apicatalog.vc.issuer.ProofDraft;
 import com.apicatalog.vc.loader.StaticContextLoader;
+import com.apicatalog.vcdi.DataIntegrityProofDraft;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.FirestoreOptions;
 import com.google.cloud.functions.HttpFunction;
@@ -44,8 +45,9 @@ public class IssueEdDSAJcs2022 extends IssueFunction implements HttpFunction {
     protected ProofDraft getProofDraft(IssuanceRequest issuanceRequest) throws HttpFunctionError {
 
         // proof draft
-        var draft = SUITE.createDraft(VERIFICATION_METHOD, ASSERTION_PURPOSE);
+        DataIntegrityProofDraft draft = issuer.createProofDraft(VERIFICATION_METHOD);
 
+        draft.purpose(ASSERTION_PURPOSE);
         draft.created(Instant.now());
         draft.expires(draft.created().plus(21, ChronoUnit.DAYS));
 

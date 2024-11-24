@@ -51,7 +51,7 @@ public abstract class IssueFunction extends HttpJsonFunction implements HttpFunc
             var log = write("gs://" + BlobStorage.BUCKET_NAME + "/issued/" + uuid, issuer, draft, JsonLdContext.strings(signed));
 
             BlobStorage.createBlob(storage, "issued/" + uuid, JSON.createObjectBuilder()
-                    .add("suite", issuer.cyptosuite().id())
+                    .add("suite", issuer.cryptosuite().id())
                     .add("signed", signed)
                     .build());
 
@@ -79,8 +79,8 @@ public abstract class IssueFunction extends HttpJsonFunction implements HttpFunc
         
         Map<String, Object> data = new HashMap<>();
 
-        data.put("cryptosuite", issuer.cyptosuite().id());
-        data.put("keyLength", issuer.cyptosuite().keyLength());
+        data.put("cryptosuite", issuer.cryptosuite().id());
+        data.put("keyLength", issuer.cryptosuite().keyLength());
         
         data.put("draft", toProofDraftData(draft));
         

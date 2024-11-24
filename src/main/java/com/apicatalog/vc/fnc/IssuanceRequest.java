@@ -39,10 +39,6 @@ public record IssuanceRequest(
     static final String OPTION_MANDATORY_POINTERS = "mandatoryPointers";
     static final String OPTION_CREDENTIAL_ID = "credentialId";
 
-    public URI purpose() {
-        return purpose;
-    }
-
     public static IssuanceRequest of(final JsonObject json) {
 
         JsonObject credential = json.getJsonObject(CREDENTIAL);

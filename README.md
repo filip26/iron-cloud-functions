@@ -11,8 +11,8 @@ An example implementation of HTTP triggered [Google Run functions](https://cloud
 All PR's welcome!
 
 ## Resources
-* [Iron Verifiable Credentials](https://github.com/filip26/iron-verifiable-credentials)
 * [W3C Verifiable Credentials HTTP API](https://w3c-ccg.github.io/vc-api/)
+* [Iron Verifiable Credentials](https://github.com/filip26/iron-verifiable-credentials)
 
 ## Sponsors
 

@@ -1,12 +1,15 @@
 package com.apicatalog.vc.fnc;
 
-import java.io.BufferedWriter;
-import java.util.Map.Entry;
+import java.net.HttpURLConnection;
+import java.util.HashMap;
 
+import com.apicatalog.cryptosuite.VerificationError;
+import com.apicatalog.cryptosuite.VerificationError.VerificationErrorCode;
 import com.apicatalog.did.key.DidKey;
 import com.apicatalog.did.key.DidKeyResolver;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.jsonld.loader.SchemeRouter;
+import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.ecdsa.ECDSAJcs2019Suite;
 import com.apicatalog.ld.signature.ecdsa.ECDSARdfc2019Suite;
 import com.apicatalog.ld.signature.ed25519.Ed25519Signature2020;
@@ -20,11 +23,13 @@ import com.apicatalog.vc.method.resolver.MethodPredicate;
 import com.apicatalog.vc.method.resolver.MethodSelector;
 import com.apicatalog.vc.method.resolver.VerificationKeyProvider;
 import com.apicatalog.vc.verifier.Verifier;
+import com.apicatalog.vcdi.VcdiVocab;
 import com.google.cloud.functions.HttpFunction;
-import com.google.cloud.functions.HttpRequest;
-import com.google.cloud.functions.HttpResponse;
 
-public class VerifyFunction implements HttpFunction {
+import jakarta.json.JsonObject;
+import jakarta.json.JsonValue;
+
+public class VerifyFunction extends HttpJsonFunction implements HttpFunction {
 
     static final DocumentLoader LOADER = new StaticContextLoader(SchemeRouter.defaultInstance());
 
@@ -37,31 +42,46 @@ public class VerifyFunction implements HttpFunction {
             .methodResolver(defaultResolvers(LOADER))
             .loader(LOADER);
 
+    public VerifyFunction() {
+        super("POST", HttpURLConnection.HTTP_OK);
+    }
+
     @Override
-    public void service(HttpRequest request, HttpResponse response) throws Exception {
+    protected JsonObject process(JsonObject json) throws HttpFunctionError {
 
-        String contentType = request.getContentType().orElseThrow();
+        try {
+            var request = VerificationRequest.of(json);
 
-//       Verifier verifier = Verifier.with(null);
-//       
-//       
-//
-//        try (JsonParser parser = Json.createParser(request.getInputStream())) {
-//            parser.next();
-//            JsonValue jsonValue = parser.getValue();
-//            
-//            verifier.verify(jsonValue.asJsonObject());     
-//        } catch (VerificationError | DocumentError e) {
-//            // TODO Auto-generated catch block
-//            e.printStackTrace();
-//        }
+            var params = new HashMap<String, Object>();
+            params.put(VcdiVocab.PURPOSE.name(), request.purpose());
+            params.put(VcdiVocab.CHALLENGE.name(), request.challenge());
+            params.put(VcdiVocab.DOMAIN.name(), request.domain());
+            params.put(VcdiVocab.NONCE.name(), request.nonce());
 
-        response.setStatusCode(200);
-        response.setContentType("text/plain");
-        BufferedWriter writer = response.getWriter();
-        writer.write("Test");
-        for (Entry<String, String> entry : System.getenv().entrySet()) {
-            writer.write(entry.getKey() + " -> " + entry.getValue());
+            var verifiable = VERIFIER.verify(request.verifiable(), params);
+
+            if (verifiable == null) {
+                throw new HttpFunctionError(HttpFunctionError.toString(VerificationErrorCode.InvalidSignature.name()));
+            }
+
+            var result = JSON.createObjectBuilder()
+                    .add("verified", JsonValue.TRUE)
+                    .add("isCredential", verifiable.isCredential())
+                    .add("isPresentation", verifiable.isPresentation())
+                    .add("type", JSON.createArrayBuilder(verifiable.type()))
+                    .add("proofsCount", verifiable.proofs().size());
+
+            if (verifiable.id() != null) {
+                result.add("id", verifiable.id().toString());
+            }
+
+            return result.build();
+
+        } catch (DocumentError e) {
+            throw new HttpFunctionError(e, HttpFunctionError.toString(e.code()));
+
+        } catch (VerificationError e) {
+            throw new HttpFunctionError(e, HttpFunctionError.toString(e.getCode().name()));
         }
     }
 

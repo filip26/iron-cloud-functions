@@ -8,6 +8,10 @@ public class HttpFunctionError extends Exception {
     
     protected String code;
 
+    public HttpFunctionError(String code) {
+        this.code = code;
+    }
+
     public HttpFunctionError(Throwable e, String code) {
         super(e.getMessage(), e);
         this.code = code;

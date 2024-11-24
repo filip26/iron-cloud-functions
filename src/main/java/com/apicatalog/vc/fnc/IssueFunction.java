@@ -40,13 +40,13 @@ public abstract class IssueFunction extends HttpJsonFunction implements HttpFunc
         JsonObject signed = null;
 
         try {
-            var issuanceRequest = IssuanceRequest.of(json);
+            var request = IssuanceRequest.of(json);
 
             String uuid = UUID.randomUUID().toString();
 
-            var draft = getProofDraft(issuanceRequest);
+            var draft = getProofDraft(request);
 
-            signed = issuer.sign(issuanceRequest.credential(), draft);
+            signed = issuer.sign(request.credential(), draft);
 
             var log = write("gs://" + BlobStorage.BUCKET_NAME + "/issued/" + uuid, issuer, draft, JsonLdContext.strings(signed));
 

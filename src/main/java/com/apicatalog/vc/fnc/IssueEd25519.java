@@ -32,7 +32,6 @@ public class IssueEd25519 extends IssueFunction implements HttpFunction {
 
     static final Firestore DB = FirestoreOptions.getDefaultInstance().toBuilder()
             .setDatabaseId("iron-vc-demo")
-            .setProjectId("api-catalog")
             .build()
             .getService();
 
@@ -43,7 +42,7 @@ public class IssueEd25519 extends IssueFunction implements HttpFunction {
     @Override
     protected ProofDraft getProofDraft(IssuanceRequest issuanceRequest) throws HttpFunctionError {
         // proof draft
-        DataIntegrityProofDraft draft = issuer.createProofDraft(VERIFICATION_METHOD);
+        DataIntegrityProofDraft draft = issuer.createDraft(VERIFICATION_METHOD);
 
         draft.purpose(ASSERTION_PURPOSE);
         draft.created(Instant.now());

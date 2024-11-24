@@ -12,12 +12,12 @@ import com.apicatalog.multikey.GenericMultikey;
 /**
  * For demo purposes only. Do not use in a production.
  */
-public class Ed25520KeyPairProvider {
+public class P384KeyPairProvider {
 
     public static final KeyPair getKeyPair() {
 
-        var publicKey = "z6MktgKTsu1QhX6QPbyqG6geXdw6FQCZBPq7uQpieWbiQiG7";
-        var privateKey = System.getenv("ED_PRIVATE_KEY_TEST_1");
+        var publicKey = "z82LkuBieyGShVBhvtE2zoiD6Kma4tJGFtkAhxR5pfkp5QPw4LutoYWhvQCnGjdVn14kujQ";
+        var privateKey = System.getenv("P384_PRIVATE_KEY_TEST_1");
 
         Objects.requireNonNull(privateKey);
 
@@ -27,17 +27,17 @@ public class Ed25520KeyPairProvider {
                 id,
                 URI.create("did:key:" + publicKey),
                 new GenericMulticodecKey(
-                        KeyCodec.ED25519_PUBLIC_KEY,
+                        KeyCodec.P384_PUBLIC_KEY,
                         Multibase.BASE_58_BTC,
-                        KeyCodec.ED25519_PUBLIC_KEY.decode(Multibase.BASE_58_BTC.decode(publicKey))),
+                        KeyCodec.P384_PUBLIC_KEY.decode(Multibase.BASE_58_BTC.decode(publicKey))),
                 new GenericMulticodecKey(
-                        KeyCodec.ED25519_PRIVATE_KEY,
+                        KeyCodec.P384_PRIVATE_KEY,
                         Multibase.BASE_58_BTC,
-                        KeyCodec.ED25519_PRIVATE_KEY.decode(Multibase.BASE_58_BTC.decode(privateKey))));
+                        KeyCodec.P384_PRIVATE_KEY.decode(Multibase.BASE_58_BTC.decode(privateKey))));
     }
 
     public static final URI getVerificationMethod() {
-        var publicKey = "z6MktgKTsu1QhX6QPbyqG6geXdw6FQCZBPq7uQpieWbiQiG7";
+        var publicKey = "z82LkuBieyGShVBhvtE2zoiD6Kma4tJGFtkAhxR5pfkp5QPw4LutoYWhvQCnGjdVn14kujQ";
         return URI.create("did:key:" + publicKey + "#" + publicKey);
     }
 }

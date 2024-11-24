@@ -49,7 +49,7 @@ public abstract class IssueFunction extends HttpJsonFunction implements HttpFunc
 
             signed = issuer.sign(issuanceRequest.credential(), draft);
 
-            var log = write(uuid, issuer, JsonLdContext.strings(signed));
+            var log = write(uuid, issuer, draft, JsonLdContext.strings(signed));
 
             BlobStorage.createBlob(storage, "issued/" + uuid, JSON.createObjectBuilder()
                     .add("suite", issuer.cyptosuite().id())
@@ -76,11 +76,25 @@ public abstract class IssueFunction extends HttpJsonFunction implements HttpFunc
 
     protected abstract ProofDraft getProofDraft(IssuanceRequest issuanceRequest) throws HttpFunctionError;
 
-    protected ApiFuture<DocumentReference> write(String uuid, Issuer issuer, Collection<String> context) {
+    protected ApiFuture<DocumentReference> write(String uuid, Issuer issuer, ProofDraft draft, Collection<String> context) {
         CollectionReference docRef = db.collection("issued");
         Map<String, Object> data = new HashMap<>();
         data.put("cryptosuite", issuer.cyptosuite().id());
         data.put("keyLength", issuer.cyptosuite().keyLength());
+        
+        if (draft.created() != null) {
+            data.put("created", draft.created());
+        }
+        if (draft.expires() != null) {
+            data.put("expires", draft.expires());
+        }
+        if (draft.purpose() != null) {
+            data.put("purpose", draft.purpose().toString());
+        }
+        if (draft.id() != null) {
+            data.put("proofId", draft.id().toString());
+        }        
+
         data.put("context", context);
         data.put("gsid", uuid);
 

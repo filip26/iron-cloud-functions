@@ -7,9 +7,9 @@ import java.time.temporal.ChronoUnit;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.ld.signature.ed25519.Ed25519ContextLoader;
 import com.apicatalog.ld.signature.ed25519.Ed25519Signature2020;
+import com.apicatalog.ld.signature.ed25519.Ed25519Signature2020ProofDraft;
 import com.apicatalog.vc.issuer.Issuer;
 import com.apicatalog.vc.issuer.ProofDraft;
-import com.apicatalog.vcdi.DataIntegrityProofDraft;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.FirestoreOptions;
 import com.google.cloud.functions.HttpFunction;
@@ -42,7 +42,7 @@ public class IssueEd25519 extends IssueFunction implements HttpFunction {
     @Override
     protected ProofDraft getProofDraft(IssuanceRequest issuanceRequest) throws HttpFunctionError {
         // proof draft
-        DataIntegrityProofDraft draft = issuer.createDraft(VERIFICATION_METHOD);
+        Ed25519Signature2020ProofDraft draft = issuer.createDraft(VERIFICATION_METHOD);
 
         draft.purpose(ASSERTION_PURPOSE);
         draft.created(Instant.now());

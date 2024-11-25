@@ -17,6 +17,7 @@ import com.apicatalog.ld.signature.eddsa.EdDSAJcs2022Suite;
 import com.apicatalog.ld.signature.eddsa.EdDSARdfc2022Suite;
 import com.apicatalog.multicodec.Multicodec.Tag;
 import com.apicatalog.multicodec.MulticodecDecoder;
+import com.apicatalog.vc.Verifiable;
 import com.apicatalog.vc.loader.StaticContextLoader;
 import com.apicatalog.vc.method.resolver.ControllableKeyProvider;
 import com.apicatalog.vc.method.resolver.MethodPredicate;
@@ -64,27 +65,7 @@ public class VerifyFunction extends HttpJsonFunction implements HttpFunction {
                 throw new HttpFunctionError(HttpFunctionError.toString(VerificationErrorCode.InvalidSignature.name()));
             }
 
-            var result = JSON.createObjectBuilder()
-                    .add("verified", JsonValue.TRUE)
-                    .add("type", JSON.createArrayBuilder(verifiable.type()));
-
-            if (verifiable.id() != null) {
-                result.add("id", verifiable.id().toString());
-            }
-
-            var proofs = JSON.createArrayBuilder();
-            
-            verifiable.proofs().forEach(proof -> {
-                proofs.add(JSON.createObjectBuilder()
-                        .add("type", JSON.createArrayBuilder(proof.type()))
-                        .add("cryptosuite", proof.cryptoSuite().name())
-                        .add("keyLength", proof.cryptoSuite().keyLength())
-                        );
-            });
-            
-            result.add("proofs", proofs);
-
-            return result.build();
+            return write(verifiable);
 
         } catch (DocumentError e) {
             throw new HttpFunctionError(e, HttpFunctionError.toString(e.code()));
@@ -101,6 +82,29 @@ public class VerifyFunction extends HttpJsonFunction implements HttpFunction {
                         ControllableKeyProvider.of(new DidKeyResolver(MulticodecDecoder.getInstance(Tag.Key))))
 
                 .build();
+    }
+
+    static final JsonObject write(Verifiable verifiable) {
+        var result = JSON.createObjectBuilder()
+                .add("verified", JsonValue.TRUE)
+                .add("type", JSON.createArrayBuilder(verifiable.type()));
+
+        if (verifiable.id() != null) {
+            result.add("id", verifiable.id().toString());
+        }
+
+        var proofs = JSON.createArrayBuilder();
+
+        verifiable.proofs().forEach(proof -> {
+            proofs.add(JSON.createObjectBuilder()
+                    .add("type", JSON.createArrayBuilder(proof.type()))
+                    .add("cryptosuite", proof.cryptoSuite().name())
+                    .add("keyLength", proof.cryptoSuite().keyLength()));
+        });
+
+        result.add("proofs", proofs);
+
+        return result.build();
     }
 
 }

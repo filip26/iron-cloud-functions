@@ -17,7 +17,8 @@ public record VerificationRequest(
         String nonce) {
 
     static final String CREDENTIAL = "verifiableCredential";
-
+    static final String PRESENTATION = "verifiablePresentation";
+    
     static final String OPTIONS = "options";
 
     static final String OPTION_DOMAIN = "domain";
@@ -28,7 +29,15 @@ public record VerificationRequest(
 
     public static VerificationRequest of(final JsonObject json) {
 
-        JsonObject verifiable = json.getJsonObject(CREDENTIAL);
+        JsonObject document = json;
+        
+        // unwrap
+        if (json.containsKey(CREDENTIAL)) {
+            document = json.getJsonObject(CREDENTIAL);
+            
+        } else if (json.containsKey(PRESENTATION)) {
+            document = json.getJsonObject(PRESENTATION);
+        }
 
         URI purpose = null;
         String challenge = null;
@@ -47,7 +56,7 @@ public record VerificationRequest(
         }
 
         return new VerificationRequest(
-                verifiable,
+                document,
                 purpose,
                 challenge,
                 domain,

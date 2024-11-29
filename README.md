@@ -1,6 +1,6 @@
 # Verifiable Credentials HTTP API
 
-An example implementation of HTTP triggered [Google Run functions](https://cloud.google.com/functions) implementing
+An example implementation of HTTP triggered [Google Run Functions](https://cloud.google.com/functions) implementing
 [W3C Verifiable Credentials HTTP API](https://w3c-ccg.github.io/vc-api/).
 
 [![Java 21 CI](https://github.com/filip26/vc-http-api/actions/workflows/java21-build.yml/badge.svg)](https://github.com/filip26/vc-http-api/actions/workflows/java21-build.yml)

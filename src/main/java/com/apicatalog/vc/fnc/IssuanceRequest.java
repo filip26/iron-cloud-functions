@@ -28,6 +28,7 @@ public record IssuanceRequest(
     static final URI ASSERTION_PURPOSE = URI.create("https://w3id.org/security#assertionMethod");
 
     static final String CREDENTIAL = "credential";
+    static final String PRESENTATION = "presentation";
 
     static final String OPTIONS = "options";
 
@@ -41,7 +42,15 @@ public record IssuanceRequest(
 
     public static IssuanceRequest of(final JsonObject json) {
 
-        JsonObject credential = json.getJsonObject(CREDENTIAL);
+        JsonObject document = json;
+
+        // unwrap
+        if (json.containsKey(CREDENTIAL)) {
+            document = json.getJsonObject(CREDENTIAL);
+
+        } else if (json.containsKey(PRESENTATION)) {
+            document = json.getJsonObject(PRESENTATION);
+        }
 
         Instant created = Instant.now().truncatedTo(ChronoUnit.SECONDS);
         Instant expires = null;
@@ -84,7 +93,7 @@ public record IssuanceRequest(
         }
 
         return new IssuanceRequest(
-                credential,
+                document,
                 ASSERTION_PURPOSE,
                 created,
                 expires,

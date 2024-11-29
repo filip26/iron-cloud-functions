@@ -5,7 +5,7 @@
 
     <groupId>com.apicatalog</groupId>
     <artifactId>iron-vc-api</artifactId>
-    <version>0.0.16-SNAPSHOT</version>
+    <version>0.1.18-SNAPSHOT</version>
 
     <name>Iron Verifiable Credentials HTTP API</name>
 
@@ -54,7 +54,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <argLine>-Dfile.encoding=UTF-8</argLine>
 
-        <iron.vc.version>0.15.16-SNAPSHOT</iron.vc.version>
+        <iron.vc.version>0.15.19-SNAPSHOT</iron.vc.version>
         <jakarta.json.version>2.0.1</jakarta.json.version>
 
         <!-- REMOVE -->

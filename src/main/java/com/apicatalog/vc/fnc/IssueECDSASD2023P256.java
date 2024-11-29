@@ -2,10 +2,13 @@ package com.apicatalog.vc.fnc;
 
 import java.net.URI;
 
+import com.apicatalog.cryptosuite.CryptoSuiteError;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.jsonld.loader.SchemeRouter;
+import com.apicatalog.ld.signature.ecdsa.sd.ECDSASD2023Draft;
 import com.apicatalog.ld.signature.ecdsa.sd.ECDSASD2023Suite;
 import com.apicatalog.vc.issuer.Issuer;
+import com.apicatalog.vc.issuer.ProofDraft;
 import com.apicatalog.vc.loader.StaticContextLoader;
 import com.apicatalog.vc.suite.SignatureSuite;
 import com.google.cloud.firestore.Firestore;
@@ -33,5 +36,18 @@ public class IssueECDSASD2023P256 extends DataIntegrityIssueFunction implements 
 
     public IssueECDSASD2023P256() {
         super(ISSUER, STORAGE, DB, VERIFICATION_METHOD);
+    }
+
+    @Override
+    protected ProofDraft getProofDraft(IssuanceRequest issuanceRequest) throws HttpFunctionError {
+        var draft = (ECDSASD2023Draft) super.getProofDraft(issuanceRequest);
+        draft.selectors(issuanceRequest.mandatoryPointers());
+        try {
+            draft.useGeneratedHmacKey(32);
+            draft.useGeneratedProofKeys();
+            return draft;
+        } catch (CryptoSuiteError e) {
+            throw new HttpFunctionError(e, "Internal");
+        }
     }
 }

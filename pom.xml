@@ -64,7 +64,7 @@
         <titanium.version>1.4.1</titanium.version>
         <carbon.version>0.10.0-SNAPSHOT</carbon.version>
         <rdf-urdna.version>1.3</rdf-urdna.version>
-
+        <cbor-java.version>0.9</cbor-java.version>
     </properties>
 
     <repositories>
@@ -160,24 +160,6 @@
             <version>${iron.vc.version}</version>
         </dependency>
 
-        <!--        <dependency>-->
-        <!--            <groupId>com.apicatalog</groupId>-->
-        <!--            <artifactId>carbon-did</artifactId>-->
-        <!--            <version>${carbon.version}</version>-->
-        <!--        </dependency>-->
-
-        <!--        <dependency>-->
-        <!--            <groupId>com.apicatalog</groupId>-->
-        <!--            <artifactId>copper-multicodec</artifactId>-->
-        <!--            <version>${copper.codec.version}</version>-->
-        <!--        </dependency>-->
-
-        <!--        <dependency>-->
-        <!--            <groupId>com.apicatalog</groupId>-->
-        <!--            <artifactId>copper-multibase</artifactId>-->
-        <!--            <version>${copper.base.version}</version>-->
-        <!--        </dependency>-->
-
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk18on</artifactId>
@@ -220,6 +202,11 @@
             <groupId>com.apicatalog</groupId>
             <artifactId>carbon-did</artifactId>
             <version>${carbon.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>co.nstant.in</groupId>
+            <artifactId>cbor</artifactId>
+            <version>${cbor-java.version}</version>
         </dependency>
 
 

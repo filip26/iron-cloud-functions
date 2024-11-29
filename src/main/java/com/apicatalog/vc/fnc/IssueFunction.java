@@ -8,11 +8,11 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
-import com.apicatalog.cryptosuite.SigningError;
-import com.apicatalog.ld.DocumentError;
+import com.apicatalog.cryptosuite.CryptoSuiteError;
 import com.apicatalog.linkedtree.jsonld.JsonLdContext;
 import com.apicatalog.vc.issuer.Issuer;
 import com.apicatalog.vc.issuer.ProofDraft;
+import com.apicatalog.vc.model.DocumentError;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.Firestore;
@@ -57,8 +57,8 @@ public abstract class IssueFunction extends HttpJsonFunction implements HttpFunc
         } catch (DocumentError e) {
             throw new HttpFunctionError(e, HttpFunctionError.toString(e.code()));
 
-        } catch (SigningError e) {
-            throw new HttpFunctionError(e, HttpFunctionError.toString(e.getCode().name()));
+        } catch (CryptoSuiteError e) {
+            throw new HttpFunctionError(e, HttpFunctionError.toString(e.code().name()));
 
         } catch (IOException e) {
             throw new HttpFunctionError(e, e.getMessage());

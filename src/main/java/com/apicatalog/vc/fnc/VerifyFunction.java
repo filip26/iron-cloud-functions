@@ -9,22 +9,23 @@ import com.apicatalog.did.key.DidKey;
 import com.apicatalog.did.key.DidKeyResolver;
 import com.apicatalog.jsonld.loader.DocumentLoader;
 import com.apicatalog.jsonld.loader.SchemeRouter;
-import com.apicatalog.ld.DocumentError;
 import com.apicatalog.ld.signature.ecdsa.ECDSAJcs2019Suite;
 import com.apicatalog.ld.signature.ecdsa.ECDSARdfc2019Suite;
+import com.apicatalog.ld.signature.ecdsa.sd.ECDSASD2023Suite;
 import com.apicatalog.ld.signature.ed25519.Ed25519Signature2020;
 import com.apicatalog.ld.signature.eddsa.EdDSAJcs2022Suite;
 import com.apicatalog.ld.signature.eddsa.EdDSARdfc2022Suite;
 import com.apicatalog.multicodec.Multicodec.Tag;
 import com.apicatalog.multicodec.MulticodecDecoder;
-import com.apicatalog.vc.Verifiable;
+import com.apicatalog.vc.VerifiableDocument;
+import com.apicatalog.vc.di.VcdiVocab;
 import com.apicatalog.vc.loader.StaticContextLoader;
-import com.apicatalog.vc.method.resolver.ControllableKeyProvider;
-import com.apicatalog.vc.method.resolver.MethodPredicate;
-import com.apicatalog.vc.method.resolver.MethodSelector;
-import com.apicatalog.vc.method.resolver.VerificationKeyProvider;
+import com.apicatalog.vc.method.ControllableKeyProvider;
+import com.apicatalog.vc.method.MethodPredicate;
+import com.apicatalog.vc.method.MethodSelector;
+import com.apicatalog.vc.method.VerificationKeyProvider;
+import com.apicatalog.vc.model.DocumentError;
 import com.apicatalog.vc.verifier.Verifier;
-import com.apicatalog.vcdi.VcdiVocab;
 import com.google.cloud.functions.HttpFunction;
 
 import jakarta.json.JsonObject;
@@ -39,7 +40,8 @@ public class VerifyFunction extends HttpJsonFunction implements HttpFunction {
             new EdDSAJcs2022Suite(),
             new ECDSARdfc2019Suite(),
             new ECDSAJcs2019Suite(),
-            new Ed25519Signature2020())
+            new Ed25519Signature2020(),
+            new ECDSASD2023Suite())
             .methodResolver(defaultResolvers(LOADER))
             .loader(LOADER);
 
@@ -71,7 +73,7 @@ public class VerifyFunction extends HttpJsonFunction implements HttpFunction {
             throw new HttpFunctionError(e, HttpFunctionError.toString(e.code()));
 
         } catch (VerificationError e) {
-            throw new HttpFunctionError(e, HttpFunctionError.toString(e.getCode().name()));
+            throw new HttpFunctionError(e, HttpFunctionError.toString(e.code().name()));
         }
     }
 
@@ -84,7 +86,7 @@ public class VerifyFunction extends HttpJsonFunction implements HttpFunction {
                 .build();
     }
 
-    static final JsonObject write(Verifiable verifiable) {
+    static final JsonObject write(VerifiableDocument verifiable) {
         var result = JSON.createObjectBuilder()
                 .add("verified", JsonValue.TRUE)
                 .add("type", JSON.createArrayBuilder(verifiable.type()));
@@ -98,8 +100,8 @@ public class VerifyFunction extends HttpJsonFunction implements HttpFunction {
         verifiable.proofs().forEach(proof -> {
             proofs.add(JSON.createObjectBuilder()
                     .add("type", JSON.createArrayBuilder(proof.type()))
-                    .add("cryptosuite", proof.cryptoSuite().name())
-                    .add("keyLength", proof.cryptoSuite().keyLength()));
+                    .add("cryptosuite", proof.cryptosuite().name())
+                    .add("keyLength", proof.cryptosuite().keyLength()));
         });
 
         result.add("proofs", proofs);

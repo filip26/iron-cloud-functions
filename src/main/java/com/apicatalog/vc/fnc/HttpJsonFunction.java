@@ -34,6 +34,16 @@ public abstract class HttpJsonFunction implements HttpFunction {
     @Override
     public void service(final HttpRequest request, final HttpResponse response) throws IOException {
 
+        response.appendHeader("Access-Control-Allow-Origin", "*");
+
+        if ("OPTIONS".equals(request.getMethod())) {
+            response.appendHeader("Access-Control-Allow-Methods", "POST");
+            response.appendHeader("Access-Control-Allow-Headers", "Content-Type");
+            response.appendHeader("Access-Control-Max-Age", "3600");
+            response.setStatusCode(HttpURLConnection.HTTP_NO_CONTENT);
+            return;
+        }
+
         if (!method.equalsIgnoreCase(request.getMethod())) {
             response.setStatusCode(HttpURLConnection.HTTP_BAD_METHOD);
             return;
@@ -44,7 +54,7 @@ public abstract class HttpJsonFunction implements HttpFunction {
         }
 
         JsonStructure output = null;
-        
+
         try {
             output = process(parseJson(request));
 
@@ -66,7 +76,7 @@ public abstract class HttpJsonFunction implements HttpFunction {
         } catch (JsonException e) {
             response.setStatusCode(HttpURLConnection.HTTP_BAD_REQUEST);
             output = error(e.getMessage(), null);
-            
+
         } catch (IOException e) {
             response.setStatusCode(HttpURLConnection.HTTP_BAD_REQUEST);
             output = null;

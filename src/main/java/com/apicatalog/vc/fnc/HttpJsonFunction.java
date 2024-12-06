@@ -65,7 +65,6 @@ public abstract class HttpJsonFunction implements HttpFunction {
             response.setStatusCode(successCode);
 
         } catch (HttpFunctionError e) {
-
             response.setStatusCode(HttpURLConnection.HTTP_BAD_REQUEST);
             output = error(e);
 
@@ -76,11 +75,6 @@ public abstract class HttpJsonFunction implements HttpFunction {
         } catch (JsonException e) {
             response.setStatusCode(HttpURLConnection.HTTP_BAD_REQUEST);
             output = error(e.getMessage(), null);
-
-        } catch (IOException e) {
-            response.setStatusCode(HttpURLConnection.HTTP_BAD_REQUEST);
-            output = null;
-        }
 
         if (output != null) {
             writeJson(output, response);
@@ -94,11 +88,13 @@ public abstract class HttpJsonFunction implements HttpFunction {
         return contentType != null && "application/json".equals(contentType);
     }
 
-    protected static final JsonObject parseJson(HttpRequest httpRequest) throws IOException {
+    protected static final JsonObject parseJson(HttpRequest httpRequest) throws HttpFunctionError {
         try (var parser = JSON_PARSER_FACTORY.createParser(httpRequest.getReader())) {
             parser.next();
             JsonObject data = parser.getObject();
             return data;
+        } catch (Exception e) {
+            throw new HttpFunctionError(e, "InvalidDocument");
         }
     }
 

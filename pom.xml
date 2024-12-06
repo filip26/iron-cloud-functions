@@ -5,7 +5,7 @@
 
     <groupId>com.apicatalog</groupId>
     <artifactId>iron-vc-api</artifactId>
-    <version>0.1.18-SNAPSHOT</version>
+    <version>0.1.19-SNAPSHOT</version>
 
     <name>Iron Verifiable Credentials HTTP API</name>
 
@@ -54,7 +54,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <argLine>-Dfile.encoding=UTF-8</argLine>
 
-        <iron.vc.version>0.15.19-SNAPSHOT</iron.vc.version>
+        <iron.vc.version>0.15.21-SNAPSHOT</iron.vc.version>
         <jakarta.json.version>2.0.1</jakarta.json.version>
 
         <!-- REMOVE -->
@@ -62,8 +62,8 @@
         <copper.multicodec.version>1.1.0</copper.multicodec.version>
         <copper.multibase.version>1.0.0</copper.multibase.version>
         <titanium.version>1.4.1</titanium.version>
+        <titanium.rdfc.version>1.0.0</titanium.rdfc.version>
         <carbon.version>0.10.0-SNAPSHOT</carbon.version>
-        <rdf-urdna.version>1.3</rdf-urdna.version>
         <cbor-java.version>0.9</cbor-java.version>
     </properties>
 
@@ -194,9 +194,9 @@
             <version>${titanium.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.setl</groupId>
-            <artifactId>rdf-urdna</artifactId>
-            <version>${rdf-urdna.version}</version>
+            <groupId>com.apicatalog</groupId>
+            <artifactId>titanium-rdfc</artifactId>
+            <version>${titanium.rdfc.version}</version>
         </dependency>
         <dependency>
             <groupId>com.apicatalog</groupId>

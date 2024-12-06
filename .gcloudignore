@@ -19,7 +19,6 @@
 .project
 README.md
 LICENSE
-private.gpg
 
 # Target directory for maven builds
 target/

@@ -75,7 +75,7 @@ public abstract class HttpJsonFunction implements HttpFunction {
         } catch (JsonException e) {
             response.setStatusCode(HttpURLConnection.HTTP_BAD_REQUEST);
             output = error(e.getMessage(), null);
-
+        }
         if (output != null) {
             writeJson(output, response);
         }

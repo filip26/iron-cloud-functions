@@ -1,6 +1,7 @@
 package com.apicatalog.vc.fnc;
 
 import java.io.IOException;
+import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.util.Collections;
 
@@ -89,7 +90,15 @@ public abstract class HttpJsonFunction implements HttpFunction {
     }
 
     protected static final JsonObject parseJson(HttpRequest httpRequest) throws HttpFunctionError {
-        try (var parser = JSON_PARSER_FACTORY.createParser(httpRequest.getReader())) {
+        try {
+            return parseJson(httpRequest.getReader());
+        } catch (Exception e) {
+            throw new HttpFunctionError(e, "InvalidDocument");
+        }
+    }
+
+    protected static final JsonObject parseJson(Reader reader) throws HttpFunctionError {
+        try (var parser = JSON_PARSER_FACTORY.createParser(reader)) {
             parser.next();
             JsonObject data = parser.getObject();
             return data;

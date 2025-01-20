@@ -19,7 +19,9 @@ import com.google.cloud.firestore.Firestore;
 import com.google.cloud.functions.HttpFunction;
 import com.google.cloud.storage.Storage;
 
+import jakarta.json.Json;
 import jakarta.json.JsonObject;
+import jakarta.json.JsonStructure;
 
 public abstract class IssueFunction extends HttpJsonFunction implements HttpFunction {
 
@@ -46,7 +48,21 @@ public abstract class IssueFunction extends HttpJsonFunction implements HttpFunc
 
             var draft = getProofDraft(request);
 
-            signed = issuer.sign(request.credential(), draft);
+            var document = request.document();
+
+            // TODO better
+            if (request.credential() 
+                    && !document.containsKey("proof") 
+                    && !document.containsKey("credentialStatus")) {
+                var status = getStatus();
+
+                if (status != null) {
+                    // TODO decouple from vc model
+                    document = Json.createObjectBuilder(document).add("credentialStatus", status).build();
+                }
+            }
+
+            signed = issuer.sign(document, draft);
 
             var log = write("gs://" + BlobStorage.BUCKET_NAME + "/issued/" + uuid, issuer, draft, JsonLdContext.strings(signed));
 
@@ -72,15 +88,19 @@ public abstract class IssueFunction extends HttpJsonFunction implements HttpFunc
 
     protected abstract ProofDraft getProofDraft(IssuanceRequest issuanceRequest) throws HttpFunctionError;
 
+    protected JsonStructure getStatus() throws HttpFunctionError {
+        return null;
+    }
+
     protected ApiFuture<DocumentReference> write(String gsid, Issuer issuer, ProofDraft draft, Collection<String> context) {
-        
+
         Map<String, Object> data = new HashMap<>();
 
         data.put("cryptosuite", issuer.cryptosuite().name());
         data.put("keyLength", issuer.cryptosuite().keyLength());
-        
+
         data.put("draft", toProofDraftData(draft));
-        
+
         data.put("context", context);
         data.put("source", gsid);
 

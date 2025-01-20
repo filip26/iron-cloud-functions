@@ -1,5 +1,6 @@
 package com.apicatalog.vc.fnc;
 
+import java.io.StringReader;
 import java.net.URI;
 
 import com.apicatalog.jsonld.loader.DocumentLoader;
@@ -12,6 +13,8 @@ import com.google.cloud.firestore.FirestoreOptions;
 import com.google.cloud.functions.HttpFunction;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
+
+import jakarta.json.JsonStructure;
 
 public class IssueEdDSARdfc2022 extends DataIntegrityIssueFunction implements HttpFunction {
 
@@ -30,7 +33,20 @@ public class IssueEdDSARdfc2022 extends DataIntegrityIssueFunction implements Ht
             .build()
             .getService();
     
+    static final HttpClientApi clientApi = new HttpClientApi();
+    
     public IssueEdDSARdfc2022() {
         super(ISSUER, STORAGE, DB, VERIFICATION_METHOD);
+    }
+    
+    @Override
+    protected JsonStructure getStatus() throws HttpFunctionError {   
+        try {
+            var json = clientApi.callApi("https://us-central1-api-catalog.cloudfunctions.net/statusGetIndex", "POST", "{\"purpose\":\"revocation\"}");            
+            return parseJson(new StringReader(json));
+            
+        } catch (Exception e) {
+            throw new HttpFunctionError(e, "InvalidDocument");
+        }        
     }
 }

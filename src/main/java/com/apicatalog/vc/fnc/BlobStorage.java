@@ -17,8 +17,16 @@ public class BlobStorage {
             Storage storage,
             String blobName,
             JsonObject data) throws IOException {
+        createBlob(storage, BUCKET_NAME, blobName, data);
+    }
+    
+    public static void createBlob(
+            Storage storage,
+            String bucketName,
+            String blobName,
+            JsonObject data) throws IOException {
 
-        BlobId blobId = BlobId.of(BUCKET_NAME, blobName);
+        BlobId blobId = BlobId.of(bucketName, blobName);
         BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("application/json").build();
 
         byte[] content = data.toString().getBytes(StandardCharsets.UTF_8);

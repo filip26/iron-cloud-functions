@@ -14,7 +14,8 @@ import jakarta.json.JsonObject;
 import jakarta.json.JsonString;
 
 public record IssuanceRequest(
-        JsonObject credential,
+        JsonObject document,
+        boolean credential,
         // options
         URI purpose,
         Instant created,
@@ -43,13 +44,15 @@ public record IssuanceRequest(
     public static IssuanceRequest of(final JsonObject json) {
 
         JsonObject document = json;
-
+        boolean credential = true;
+        
         // unwrap
         if (json.containsKey(CREDENTIAL)) {
             document = json.getJsonObject(CREDENTIAL);
 
         } else if (json.containsKey(PRESENTATION)) {
             document = json.getJsonObject(PRESENTATION);
+            credential = false;
         }
 
         Instant created = Instant.now().truncatedTo(ChronoUnit.SECONDS);
@@ -94,6 +97,7 @@ public record IssuanceRequest(
 
         return new IssuanceRequest(
                 document,
+                credential,
                 ASSERTION_PURPOSE,
                 created,
                 expires,

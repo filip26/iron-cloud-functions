@@ -32,10 +32,10 @@ public record VerificationRequest(
         JsonObject document = json;
         
         // unwrap
-        if (json.containsKey(CREDENTIAL) && JsonUtils.isObject(json.getValue(CREDENTIAL))) {
+        if (json.containsKey(CREDENTIAL) && JsonUtils.isObject(json.get(CREDENTIAL))) {
             document = json.getJsonObject(CREDENTIAL);
             
-        } else if (json.containsKey(PRESENTATION) && JsonUtils.isObject(json.getValue(PRESENTATION))) {
+        } else if (json.containsKey(PRESENTATION) && JsonUtils.isObject(json.get(PRESENTATION))) {
             document = json.getJsonObject(PRESENTATION);
         }
 

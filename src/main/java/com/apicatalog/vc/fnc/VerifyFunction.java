@@ -51,7 +51,6 @@ public class VerifyFunction extends HttpJsonFunction implements HttpFunction {
 
     @Override
     protected JsonObject process(JsonObject json) throws HttpFunctionError {
-
         try {
             var request = VerificationRequest.of(json);
 

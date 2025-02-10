@@ -34,7 +34,6 @@ public abstract class HttpJsonFunction implements HttpFunction {
 
     @Override
     public void service(final HttpRequest request, final HttpResponse response) throws IOException {
-
         response.appendHeader("Access-Control-Allow-Origin", "*");
 
         if ("OPTIONS".equals(request.getMethod())) {

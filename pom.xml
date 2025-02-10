@@ -57,6 +57,8 @@
         <iron.vc.version>0.15.22-SNAPSHOT</iron.vc.version>
         <jakarta.json.version>2.0.1</jakarta.json.version>
 
+        <junit.version>5.11.3</junit.version>
+
         <!-- REMOVE -->
         <linked-tree.version>0.0.68-SNAPSHOT</linked-tree.version>
         <copper.multicodec.version>1.1.0</copper.multicodec.version>
@@ -170,6 +172,14 @@
             <groupId>org.glassfish</groupId>
             <artifactId>jakarta.json</artifactId>
             <version>${jakarta.json.version}</version>
+        </dependency>
+
+        <!-- Tests -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
         </dependency>
 
         <!-- REMOVE -->

@@ -59,7 +59,7 @@
         <copper.codec.version>1.1.0</copper.codec.version>
         <copper.base.version>1.0.0</copper.base.version>
 
-        <vertx.version>4.5.12</vertx.version>
+        <vertx.version>4.5.13</vertx.version>
         <jakarta.json.version>2.0.1</jakarta.json.version>
 
         <main.verticle>com.apicatalog.vc.service.VcApiVerticle</main.verticle>

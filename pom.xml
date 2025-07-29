@@ -57,7 +57,7 @@
         <iron.vc.version>0.14.0</iron.vc.version>
         <carbon.version>0.3.0</carbon.version>
         <copper.codec.version>1.1.0</copper.codec.version>
-        <copper.base.version>1.0.0</copper.base.version>
+        <copper.base.version>1.1.0</copper.base.version>
 
         <vertx.version>4.5.14</vertx.version>
         <jakarta.json.version>2.0.1</jakarta.json.version>

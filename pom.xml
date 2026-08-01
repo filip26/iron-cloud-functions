@@ -60,7 +60,7 @@
 
 
     <modules>
-        <module>gc-jcs-issuer</module>
+        <module>di-jcs-issuer-service</module>
     </modules>
 
     <build>

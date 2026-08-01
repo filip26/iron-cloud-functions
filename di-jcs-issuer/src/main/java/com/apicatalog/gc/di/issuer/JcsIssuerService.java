@@ -1,4 +1,4 @@
-package com.apicatalog.iron.gc.issuer;
+package com.apicatalog.gc.di.issuer;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -177,6 +177,7 @@ public class JcsIssuerService implements HttpFunction {
             issueRequest = IssueRequest.from(document);
 
         } catch (Exception e) {
+            e.printStackTrace();
             response.setStatusCode(HttpURLConnection.HTTP_BAD_REQUEST);
         }
 
@@ -206,12 +207,14 @@ public class JcsIssuerService implements HttpFunction {
 
         updater.addProof(proofDraft.context(), DataIntegrityProof.compact(proof));
 
+        
         var signed = updater.compacted();
-        IO.println(signed);
 
         var p = signed.get("proof");
         ((Map) p).put("@context", issueRequest.document().get("@context"));
 
+        IO.println(signed);
+        
         try (var writer = Jackson2Emitter.newEmitter(response.getOutputStream(), JSON_FACTORY)) {
             response.setStatusCode(HttpStatus.SC_OK);
             response.setContentType("application/json");

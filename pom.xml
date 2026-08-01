@@ -60,7 +60,8 @@
 
 
     <modules>
-        <module>di-jcs-issuer-service</module>
+        <module>di-jcs-issuer</module>
+        <module>di-verifier</module>
     </modules>
 
     <build>

@@ -17,6 +17,14 @@ HTTP-triggered [Google Cloud Run Functions](https://cloud.google.com/functions) 
 - HTTP-triggered Google Cloud Run Functions
 - Serverless deployment with automatic scaling
 
+## Developing
+
+TBD
+
+```bash
+gcloud auth application-default login
+```
+
 ## 🤝 Contributing
 
 Contributions of all kinds are welcome - whether it’s code, documentation, testing, or community support! Please open PR or issue to get started.

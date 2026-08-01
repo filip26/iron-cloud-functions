@@ -1,4 +1,4 @@
-package com.apicatalog.iron.gc.issuer;
+package com.apicatalog.gc.di.issuer;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;

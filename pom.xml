@@ -5,12 +5,13 @@
 
     <groupId>com.apicatalog</groupId>
     <artifactId>iron-cloud-functions</artifactId>
-    <version>0.1.20-SNAPSHOT</version>
+    <version>0.2.0-SNAPSHOT</version>
 
     <name>Iron Cloud Functions</name>
 
     <description>
-      An implementation of HTTP-triggered Google Cloud Run Functions providing W3C Verifiable Credentials Issuer and Verifier endpoints.
+        An implementation of HTTP-triggered Google Cloud Run Functions providing
+        W3C Verifiable Credentials Issuer and Verifier endpoints.
     </description>
 
     <url>https://github.com/filip26/iron-cloud-functions</url>
@@ -29,7 +30,8 @@
 
     <scm>
         <connection>scm:git:git://github.com/filip26/iron-cloud-functions.git</connection>
-        <developerConnection>scm:git:git://github.com/filip26/iron-cloud-functions.git</developerConnection>
+        <developerConnection>
+            scm:git:git://github.com/filip26/iron-cloud-functions.git</developerConnection>
         <url>https://github.com/filip26/iron-cloud-functions/tree/main</url>
     </scm>
 
@@ -47,41 +49,33 @@
     <inceptionYear>2022</inceptionYear>
 
     <properties>
-        <maven.compiler.target>21</maven.compiler.target>
-        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.release>25</maven.compiler.release>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <argLine>-Dfile.encoding=UTF-8</argLine>
 
-        <iron.vc.version>0.15.22-SNAPSHOT</iron.vc.version>
-        <jakarta.json.version>2.0.1</jakarta.json.version>
-
-        <junit.version>5.11.3</junit.version>
+        <iron-di.version>1.0.0-M1</iron-di.version>
+        <crypto-gc.version>1.0.0</crypto-gc.version>
+        <tree-io.version>1.0.0-M2</tree-io.version>
+        <junit.version>6.1.2</junit.version>
 
         <!-- REMOVE -->
-        <linked-tree.version>0.0.68-SNAPSHOT</linked-tree.version>
+        <!--        <linked-tree.version>0.0.68-SNAPSHOT</linked-tree.version>
         <copper.multicodec.version>1.1.0</copper.multicodec.version>
         <copper.multibase.version>1.0.0</copper.multibase.version>
         <titanium.version>1.4.1</titanium.version>
         <titanium.rdfc.version>1.0.0</titanium.rdfc.version>
         <carbon.version>0.10.0-SNAPSHOT</carbon.version>
-        <cbor-java.version>0.9</cbor-java.version>
+        <cbor-java.version>0.9</cbor-java.version>-->
     </properties>
-
-    <repositories>
-        <repository>
-            <id>deps</id>
-            <url>file:///${project.basedir}/deps</url>
-        </repository>
-    </repositories>
 
     <dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>com.google.cloud</groupId>
                 <artifactId>libraries-bom</artifactId>
-                <version>26.50.0</version>
+                <version>26.85.1</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -93,87 +87,57 @@
         <dependency>
             <groupId>com.google.cloud.functions</groupId>
             <artifactId>functions-framework-api</artifactId>
-            <version>1.1.0</version>
+            <version>2.0.1</version>
             <scope>provided</scope>
         </dependency>
-
-        <!--    <dependency>-->
-        <!--      <groupId>com.google.cloud</groupId>-->
-        <!--      <artifactId>google-cloudevent-types</artifactId>-->
-        <!--      <version>0.14.0</version>-->
-        <!--    </dependency>-->
-        <!--    <dependency>-->
-        <!--      <groupId>com.google.protobuf</groupId>-->
-        <!--      <artifactId>protobuf-java</artifactId>-->
-        <!--    </dependency>-->
+        <dependency>
+            <groupId>com.google.cloud</groupId>
+            <artifactId>google-cloud-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.cloud</groupId>
+            <artifactId>google-cloud-kms</artifactId>
+        </dependency>
         <dependency>
             <groupId>com.google.cloud</groupId>
             <artifactId>google-cloud-firestore</artifactId>
         </dependency>
-
         <dependency>
             <groupId>com.google.cloud</groupId>
             <artifactId>google-cloud-storage</artifactId>
         </dependency>
-
         <dependency>
             <groupId>com.google.cloud</groupId>
             <artifactId>google-cloud-storage-control</artifactId>
         </dependency>
-        <!--        <dependency>-->
-        <!--            <groupId>com.google.firebase</groupId>-->
-        <!--            <artifactId>firebase-admin</artifactId>-->
-        <!--            <version>9.4.1</version>-->
-        <!--        </dependency>-->
-
         <dependency>
             <groupId>com.apicatalog</groupId>
-            <artifactId>iron-ed25519-signature-2020</artifactId>
-            <version>${iron.vc.version}</version>
+            <artifactId>iron-crypto-gcloud-kms</artifactId>
+            <version>${crypto-gc.version}</version>
+        </dependency>        
+        <dependency>
+            <groupId>com.apicatalog</groupId>
+            <artifactId>iron-data-integrity</artifactId>
+            <version>${iron-di.version}</version>
         </dependency>
         <dependency>
             <groupId>com.apicatalog</groupId>
-            <artifactId>iron-eddsa-rdfc-2022</artifactId>
-            <version>${iron.vc.version}</version>
+            <artifactId>tree-io-jakarta</artifactId>
+            <version>${tree-io.version}</version>
         </dependency>
         <dependency>
             <groupId>com.apicatalog</groupId>
-            <artifactId>iron-eddsa-jcs-2022</artifactId>
-            <version>${iron.vc.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.apicatalog</groupId>
-            <artifactId>iron-ecdsa-rdfc-2019</artifactId>
-            <version>${iron.vc.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.apicatalog</groupId>
-            <artifactId>iron-ecdsa-jcs-2019</artifactId>
-            <version>${iron.vc.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.apicatalog</groupId>
-            <artifactId>iron-ecdsa-sd-2023</artifactId>
-            <version>${iron.vc.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.apicatalog</groupId>
-            <artifactId>iron-verifiable-credentials</artifactId>
-            <version>${iron.vc.version}</version>
+            <artifactId>tree-io-jackson2</artifactId>
+            <version>${tree-io.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk18on</artifactId>
-            <version>1.80</version>
-        </dependency>
-
+        <!--
         <dependency>
             <groupId>org.glassfish</groupId>
             <artifactId>jakarta.json</artifactId>
             <version>${jakarta.json.version}</version>
         </dependency>
-
+-->
         <!-- Tests -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -181,45 +145,6 @@
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
-
-        <!-- REMOVE -->
-        <dependency>
-            <groupId>com.apicatalog</groupId>
-            <artifactId>linked-tree</artifactId>
-            <version>${linked-tree.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.apicatalog</groupId>
-            <artifactId>copper-multibase</artifactId>
-            <version>${copper.multibase.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.apicatalog</groupId>
-            <artifactId>copper-multicodec</artifactId>
-            <version>${copper.multicodec.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.apicatalog</groupId>
-            <artifactId>titanium-json-ld</artifactId>
-            <version>${titanium.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.apicatalog</groupId>
-            <artifactId>titanium-rdfc</artifactId>
-            <version>${titanium.rdfc.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.apicatalog</groupId>
-            <artifactId>carbon-did</artifactId>
-            <version>${carbon.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>co.nstant.in</groupId>
-            <artifactId>cbor</artifactId>
-            <version>${cbor-java.version}</version>
-        </dependency>
-
-
     </dependencies>
 
     <build>
@@ -227,25 +152,6 @@
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.5.2</version>
-            </plugin>
-
-            <plugin>
-                <!--
-          Google Cloud Functions Framework Maven plugin
-
-          This plugin allows you to run Cloud Functions Java code
-          locally. Use the following terminal command to run a
-          given function locally:
-
-          mvn function:run -Drun.functionTarget=your.package.yourFunction
-        -->
-                <groupId>com.google.cloud.functions</groupId>
-                <artifactId>function-maven-plugin</artifactId>
-                <version>0.11.0</version>
-                <!--                <configuration>-->
-                <!--
-                <functionTarget>com.apicatalog.vc.fnc.VerifyFunction</functionTarget>-->
-                <!--                </configuration>-->
             </plugin>
         </plugins>
     </build>

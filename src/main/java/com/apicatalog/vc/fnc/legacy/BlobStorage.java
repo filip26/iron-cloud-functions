@@ -1,13 +1,12 @@
-package com.apicatalog.vc.fnc;
+package com.apicatalog.vc.fnc.legacy;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
-
-import jakarta.json.JsonObject;
 
 public class BlobStorage {
 
@@ -16,7 +15,7 @@ public class BlobStorage {
     public static void createBlob(
             Storage storage,
             String blobName,
-            JsonObject data) throws IOException {
+            Map data) throws IOException {
         createBlob(storage, BUCKET_NAME, blobName, data);
     }
     
@@ -24,7 +23,7 @@ public class BlobStorage {
             Storage storage,
             String bucketName,
             String blobName,
-            JsonObject data) throws IOException {
+            Map data) throws IOException {
 
         BlobId blobId = BlobId.of(bucketName, blobName);
         BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("application/json").build();

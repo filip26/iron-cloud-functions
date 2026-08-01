@@ -1,4 +1,4 @@
-package com.apicatalog.vc.fnc;
+package com.apicatalog.vc.fnc.legacy;
 
 import java.net.URI;
 import java.net.http.HttpClient;

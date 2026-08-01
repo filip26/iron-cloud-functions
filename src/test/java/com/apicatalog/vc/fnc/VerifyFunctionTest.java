@@ -6,6 +6,7 @@ import java.io.IOException;
 
 import org.junit.jupiter.api.Test;
 
+import com.apicatalog.vc.fnc.legacy.VerifyFunction;
 import com.google.cloud.functions.HttpRequest;
 
 public class VerifyFunctionTest {

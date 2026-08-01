@@ -33,9 +33,9 @@ import com.google.cloud.functions.HttpResponse;
 import com.google.cloud.kms.v1.CryptoKeyVersionName;
 import com.google.cloud.kms.v1.KeyManagementServiceClient;
 
-public class JCSIssuerService implements HttpFunction {
+public class JcsIssuerService implements HttpFunction {
 
-    private static final Logger LOG = Logger.getLogger(JCSIssuerService.class.getName());
+    private static final Logger LOG = Logger.getLogger(JcsIssuerService.class.getName());
 
     /**
      * Reusable KMS client to minimize latency during "warm" starts. Initialized
@@ -114,10 +114,26 @@ public class JCSIssuerService implements HttpFunction {
 
         switch (publicKey.getAlgorithm()) {
         case EC_SIGN_P256_SHA256:
-            SIGNATURE_ALGORITHM = EdDSA2022.ALGORITHM;
+            SIGNATURE_ALGORITHM = ECDSA2019.P256;
             SIGNER = KmsAsymmetricSigner.newP256Instance(KMS_RESOURCE, KMS)::sign;
             CRYPTOSUITE = ECDSA2019.withJCS();
             modelBuilder.proof(ECDSA2019.withJCS());
+            keyLength = 32;
+            break;
+
+        case EC_SIGN_P384_SHA384:
+            SIGNATURE_ALGORITHM = ECDSA2019.P384;
+            SIGNER = KmsAsymmetricSigner.newP384Instance(KMS_RESOURCE, KMS)::sign;
+            CRYPTOSUITE = ECDSA2019.withJCS();
+            modelBuilder.proof(ECDSA2019.withJCS());
+            keyLength = 48;
+            break;
+
+        case EC_SIGN_ED25519:
+            SIGNATURE_ALGORITHM = EdDSA2022.ALGORITHM;
+            SIGNER = KmsAsymmetricSigner.newEd25519Instance(KMS_RESOURCE, KMS)::sign;
+            CRYPTOSUITE = EdDSA2022.withJCS();
+            modelBuilder.proof(EdDSA2022.withJCS());
             keyLength = 32;
             break;
 
@@ -151,21 +167,28 @@ public class JCSIssuerService implements HttpFunction {
         }
 
         // TODO validate and log content type
-
+        IO.println(request.getContentType().orElse(null));
+        Map<String, Object> document = null;
         IssueRequest issueRequest = null;
 
         try (var parser = Jackson2Parser.newParser(request.getInputStream(), JSON_FACTORY)) {
 
-            Map<String, Object> document = Tree.read(parser);
+            document = Tree.read(parser);
             issueRequest = IssueRequest.from(document);
 
         } catch (Exception e) {
             response.setStatusCode(HttpURLConnection.HTTP_BAD_REQUEST);
         }
 
+        IO.println(document);
+
         var proofDraft = CRYPTOSUITE.createProofDraft();
 
-        issueRequest.options().init(issueRequest.context(), VERIFICATION_METHOD, proofDraft);
+        if (issueRequest.options() != null) {
+            issueRequest.options().init(issueRequest.context(), proofDraft);
+        }
+
+        proofDraft.verificationMethod(VERIFICATION_METHOD);
 
         var updater = LEXICAL_MODEL.createUpdater(issueRequest.document());
 
@@ -184,6 +207,10 @@ public class JCSIssuerService implements HttpFunction {
         updater.addProof(proofDraft.context(), DataIntegrityProof.compact(proof));
 
         var signed = updater.compacted();
+        IO.println(signed);
+
+        var p = signed.get("proof");
+        ((Map) p).put("@context", issueRequest.document().get("@context"));
 
         try (var writer = Jackson2Emitter.newEmitter(response.getOutputStream(), JSON_FACTORY)) {
             response.setStatusCode(HttpStatus.SC_OK);
@@ -194,4 +221,5 @@ public class JCSIssuerService implements HttpFunction {
             response.setStatusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
         }
     }
+
 }

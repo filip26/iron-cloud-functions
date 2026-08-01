@@ -5,8 +5,14 @@ import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import com.apicatalog.di.suite.StandardCryptoSuite.ProofDraft;
+import com.google.cloud.kms.v1.CryptoKey;
+import com.google.cloud.kms.v1.CryptoKeyVersion;
+import com.google.cloud.kms.v1.KeyManagementServiceClient;
+import com.google.cloud.kms.v1.KeyRingName;
+import com.google.cloud.kms.v1.PublicKey;
 
 public record IssueRequest(
         Collection<String> context,
@@ -105,7 +111,7 @@ public record IssueRequest(
 
         }
 
-        public void init(Collection<String> documentContext, String method, ProofDraft proofDraft) {
+        public void init(Collection<String> documentContext, ProofDraft proofDraft) {
             proofDraft.context(context != null
                     ? context
                     : documentContext);
@@ -115,9 +121,34 @@ public record IssueRequest(
             proofDraft.nonce(nonce);
             proofDraft.previousProof(previous);
             proofDraft.purpose(purpose);
-            proofDraft.verificationMethod(method);
             proofDraft.domain(domain);
         }
 
+    }
+
+    // TODO move to crypto-kms
+    static void forEachPublicKey(KeyManagementServiceClient client, KeyRingName keyRingName, Consumer<PublicKey> consumer) throws Exception {
+
+//        try (KeyManagementServiceClient client = KeyManagementServiceClient.create()) {
+
+            for (CryptoKey cryptoKey : client.listCryptoKeys(keyRingName).iterateAll()) {
+                CryptoKey.CryptoKeyPurpose purpose = cryptoKey.getPurpose();
+
+                if (purpose == CryptoKey.CryptoKeyPurpose.ASYMMETRIC_SIGN) {
+                    for (CryptoKeyVersion version : client.listCryptoKeyVersions(cryptoKey.getName()).iterateAll()) {
+                        if (version.getState() == CryptoKeyVersion.CryptoKeyVersionState.ENABLED) {
+                            consumer.accept(client.getPublicKey(version.getName()));
+//                            PublicKey publicKey = client.getPublicKey(version.getName());
+//                            try {
+//                                System.out.printf("Key %s, Version: %s%n", publicKey.getAlgorithm(), version.getName());
+//                                IO.println(KmsPublicKeyExporter.publicKeyMultibase(publicKey));
+//                            } catch (IllegalArgumentException e) {
+//                                IO.println(e.getMessage());
+//                            }
+                        }
+                    }
+                }
+            }
+//        }
     }
 }

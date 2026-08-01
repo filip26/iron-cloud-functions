@@ -1,0 +1,16 @@
+[
+  {
+    "id": "issuer-ecdsa-jcs-2019",
+    "type": "JcsIssuerService",
+    "region": "us-central1",
+    "serviceAccount": "",
+    "options": "--allow-unauthenticated",
+    "jvm": "-XX:+UseSerialGC -Xss256k -XX:MaxRAMPercentage=80 -XX:+UnlockExperimentalVMOptions -XX:+UseCompactObjectHeaders -XX:TieredStopAtLevel=1 -Xshare:on",
+    "env": {
+      "KMS_LOCATION": "",
+      "KMS_KEY_RING": "",
+      "KMS_KEY_ID": "",
+      "VERIFICATION_METHOD": ""
+    }
+  }
+]

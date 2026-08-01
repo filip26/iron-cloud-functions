@@ -7,6 +7,8 @@
     <artifactId>iron-cloud-functions</artifactId>
     <version>0.2.0-SNAPSHOT</version>
 
+    <packaging>pom</packaging>
+
     <name>Iron Cloud Functions</name>
 
     <description>
@@ -54,105 +56,26 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <argLine>-Dfile.encoding=UTF-8</argLine>
-
-        <iron-di.version>1.0.0-M1</iron-di.version>
-        <crypto-gc.version>1.0.0</crypto-gc.version>
-        <tree-io.version>1.0.0-M2</tree-io.version>
-        <junit.version>6.1.2</junit.version>
-
-        <!-- REMOVE -->
-        <!--        <linked-tree.version>0.0.68-SNAPSHOT</linked-tree.version>
-        <copper.multicodec.version>1.1.0</copper.multicodec.version>
-        <copper.multibase.version>1.0.0</copper.multibase.version>
-        <titanium.version>1.4.1</titanium.version>
-        <titanium.rdfc.version>1.0.0</titanium.rdfc.version>
-        <carbon.version>0.10.0-SNAPSHOT</carbon.version>
-        <cbor-java.version>0.9</cbor-java.version>-->
     </properties>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>com.google.cloud</groupId>
-                <artifactId>libraries-bom</artifactId>
-                <version>26.85.1</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 
-    <dependencies>
-
-        <dependency>
-            <groupId>com.google.cloud.functions</groupId>
-            <artifactId>functions-framework-api</artifactId>
-            <version>2.0.1</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.google.cloud</groupId>
-            <artifactId>google-cloud-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.google.cloud</groupId>
-            <artifactId>google-cloud-kms</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.google.cloud</groupId>
-            <artifactId>google-cloud-firestore</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.google.cloud</groupId>
-            <artifactId>google-cloud-storage</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.google.cloud</groupId>
-            <artifactId>google-cloud-storage-control</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.apicatalog</groupId>
-            <artifactId>iron-crypto-gcloud-kms</artifactId>
-            <version>${crypto-gc.version}</version>
-        </dependency>        
-        <dependency>
-            <groupId>com.apicatalog</groupId>
-            <artifactId>iron-data-integrity</artifactId>
-            <version>${iron-di.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.apicatalog</groupId>
-            <artifactId>tree-io-jakarta</artifactId>
-            <version>${tree-io.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.apicatalog</groupId>
-            <artifactId>tree-io-jackson2</artifactId>
-            <version>${tree-io.version}</version>
-        </dependency>
-
-        <!--
-        <dependency>
-            <groupId>org.glassfish</groupId>
-            <artifactId>jakarta.json</artifactId>
-            <version>${jakarta.json.version}</version>
-        </dependency>
--->
-        <!-- Tests -->
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
+    <modules>
+        <module>gc-jcs-issuer</module>
+    </modules>
 
     <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.5.2</version>
-            </plugin>
-        </plugins>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-deploy-plugin</artifactId>
+                    <version>3.1.4</version>
+                    <configuration>
+                        <skip>true</skip>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
     </build>
+
 </project>

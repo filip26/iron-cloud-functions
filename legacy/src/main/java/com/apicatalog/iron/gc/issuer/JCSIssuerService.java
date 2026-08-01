@@ -15,6 +15,7 @@ import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.di.suite.ECDSA2019;
 import com.apicatalog.di.suite.EdDSA2022;
 import com.apicatalog.di.suite.StandardCryptoSuite;
+import com.apicatalog.jcs.Jcs;
 import com.apicatalog.security.AsymmetricSigner;
 import com.apicatalog.tree.io.Tree;
 import com.apicatalog.tree.io.jakcson.Jackson2Emitter;
@@ -62,11 +63,10 @@ public class JCSIssuerService implements HttpFunction {
         var keyId = System.getenv("KMS_KEY_ID");
 
         var version = System.getenv().getOrDefault("KMS_KEY_VERSION", "1");
-        var c14n = System.getenv("C14N");
 
         VERIFICATION_METHOD = System.getenv("VERIFICATION_METHOD");
 
-        if (location == null || keyRing == null || keyId == null || VERIFICATION_METHOD == null || c14n == null) {
+        if (location == null || keyRing == null || keyId == null || VERIFICATION_METHOD == null) {
             throw new IllegalStateException("Incomplete environment configuration");
         }
 
@@ -106,7 +106,7 @@ public class JCSIssuerService implements HttpFunction {
 
         var modelBuilder = DataIntegrity.createLexicalModel(Model.C14N_JCS)
                 .proofProperty(DataIntegrity.VOCAB_PROOF_KEY)
-//                .c14n(Jcs::canonize)
+                .c14n(Jcs::canonize)
                 .adapter(MapAdapter::newInstance)
                 .cursor(MapProofCursor::newInstance);
 
@@ -193,6 +193,5 @@ public class JCSIssuerService implements HttpFunction {
         } catch (Exception e) {
             response.setStatusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
         }
-
     }
 }

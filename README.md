@@ -2,7 +2,7 @@
 
 HTTP-triggered [Google Cloud Run Functions](https://cloud.google.com/functions) providing W3C Data Integerity Verifiable Credentials **Issuer** and **Verifier** endpoints.
 
-[![Java 25 CI](https://github.com/filip26/iron-cloud-functions/actions/workflows/java25-build.yml/badge.svg)](https://github.com/filip26/iron-cloud-functions/actions/workflows/java25-build.yml)
+[![Java 25 CI](https://github.com/filip26/iron-cloud-functions/actions/workflows/build.yml/badge.svg)](https://github.com/filip26/iron-cloud-functions/actions/workflows/build.yml)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 > [!NOTE]

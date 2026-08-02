@@ -14,6 +14,8 @@ import com.apicatalog.di.DataIntegrity;
 import com.apicatalog.di.proof.DataIntegrityProof;
 import com.apicatalog.di.suite.ECDSA2019;
 import com.apicatalog.di.suite.EdDSA2022;
+import com.apicatalog.di.suite.MLDSA2024;
+import com.apicatalog.di.suite.SLHDSA2024;
 import com.apicatalog.di.suite.StandardCryptoSuite;
 import com.apicatalog.jcs.Jcs;
 import com.apicatalog.security.AsymmetricSigner;
@@ -23,6 +25,7 @@ import com.apicatalog.tree.io.jakcson.Jackson2Parser;
 import com.apicatalog.trust.lexical.LexicalModel;
 import com.apicatalog.trust.lexical.MapAdapter;
 import com.apicatalog.trust.lexical.MapProofCursor;
+import com.apicatalog.trust.model.ContextAwareResolver;
 import com.apicatalog.trust.model.Model;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.google.api.client.http.HttpMethods;
@@ -117,31 +120,42 @@ public class JcsIssuerService implements HttpFunction {
             SIGNATURE_ALGORITHM = ECDSA2019.P256;
             SIGNER = KmsAsymmetricSigner.newP256Instance(KMS_RESOURCE, KMS)::sign;
             CRYPTOSUITE = ECDSA2019.withJCS();
-            modelBuilder.proof(ECDSA2019.withJCS());
-            keyLength = 32;
+            keyLength = ECDSA2019.P256_PUBLIC_KEY_SIZE;
             break;
 
         case EC_SIGN_P384_SHA384:
             SIGNATURE_ALGORITHM = ECDSA2019.P384;
             SIGNER = KmsAsymmetricSigner.newP384Instance(KMS_RESOURCE, KMS)::sign;
             CRYPTOSUITE = ECDSA2019.withJCS();
-            modelBuilder.proof(ECDSA2019.withJCS());
-            keyLength = 48;
+            keyLength = ECDSA2019.P384_PUBLIC_KEY_SIZE;
             break;
 
         case EC_SIGN_ED25519:
             SIGNATURE_ALGORITHM = EdDSA2022.ALGORITHM;
             SIGNER = KmsAsymmetricSigner.newEd25519Instance(KMS_RESOURCE, KMS)::sign;
             CRYPTOSUITE = EdDSA2022.withJCS();
-            modelBuilder.proof(EdDSA2022.withJCS());
-            keyLength = 32;
+            keyLength = EdDSA2022.PUBLIC_KEY_SIZE;
+            break;
+
+        case PQ_SIGN_ML_DSA_44:
+            SIGNATURE_ALGORITHM = MLDSA2024.ALGORITHM_44;
+            SIGNER = KmsAsymmetricSigner.newDSAInstance(KMS_RESOURCE, KMS)::sign;
+            CRYPTOSUITE = MLDSA2024.get44withJCS();
+            keyLength = MLDSA2024.PUBLIC_KEY_SIZE;
+            break;
+
+        case PQ_SIGN_SLH_DSA_SHA2_128S:
+            SIGNATURE_ALGORITHM = SLHDSA2024.ALGORITHM_SHA2_128s;
+            SIGNER = KmsAsymmetricSigner.newDSAInstance(KMS_RESOURCE, KMS)::sign;
+            CRYPTOSUITE = SLHDSA2024.get128withJCS();
+            keyLength = SLHDSA2024.SHA2_128S_PUBLIC_KEY_SIZE;
             break;
 
         default:
-            throw new IllegalArgumentException("Unsupported private key algorithm: " + publicKey.getAlgorithm());
+            throw new IllegalArgumentException("Unsupported key algorithm: " + publicKey.getAlgorithm());
         }
 
-        LEXICAL_MODEL = modelBuilder.build();
+        LEXICAL_MODEL = modelBuilder.proof(CRYPTOSUITE).build();
 
         LOG.info("Initialized for %s with %s (%d bytes)".formatted(
                 CRYPTOSUITE.id(),
@@ -183,7 +197,11 @@ public class JcsIssuerService implements HttpFunction {
 
         IO.println(document);
 
+        var documentContext = ContextAwareResolver.getContexts(document);
+
         var proofDraft = CRYPTOSUITE.createProofDraft();
+
+        proofDraft.context(documentContext);
 
         if (issueRequest.options() != null) {
             issueRequest.options().init(issueRequest.context(), proofDraft);
@@ -205,16 +223,18 @@ public class JcsIssuerService implements HttpFunction {
                 _ -> sha256::digest,
                 payload.digestible());
 
-        updater.addProof(proofDraft.context(), DataIntegrityProof.compact(proof));
+        updater.addProof(proofDraft.context(), DataIntegrityProof.compact(proof, true));
 
-        
         var signed = updater.compacted();
 
-        var p = signed.get("proof");
-        ((Map) p).put("@context", issueRequest.document().get("@context"));
-
+//        //TODO
+//        var p = (Map)signed.get("proof");
+//        var x = LinkedHashMap.newLinkedHashMap(p.size() + 1);
+//        
+//        ((Map) p).put("@context", issueRequest.document().get("@context"));
+//
         IO.println(signed);
-        
+
         try (var writer = Jackson2Emitter.newEmitter(response.getOutputStream(), JSON_FACTORY)) {
             response.setStatusCode(HttpStatus.SC_OK);
             response.setContentType("application/json");

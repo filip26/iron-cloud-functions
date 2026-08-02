@@ -119,11 +119,6 @@
         </dependency>
         <dependency>
             <groupId>com.apicatalog</groupId>
-            <artifactId>tree-io-jakarta</artifactId>
-            <version>${tree-io.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.apicatalog</groupId>
             <artifactId>tree-io-jackson2</artifactId>
             <version>${tree-io.version}</version>
         </dependency>

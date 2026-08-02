@@ -50,7 +50,7 @@ public class VerifierService implements HttpFunction {
     // Static initialization
     private static final JsonFactory JSON_FACTORY = JsonFactory.builder().build();
 
-    private static LexicalModel LEXICAL_MODEL = DataIntegrity.createLexicalModel(Model.C14N_JCS)
+    private static final LexicalModel LEXICAL_MODEL = DataIntegrity.createLexicalModel(Model.C14N_JCS)
             .proofProperty(DataIntegrity.VOCAB_PROOF_KEY)
             .proof(EdDSA2022.withJCS())
             .proof(ECDSA2019.withJCS())
@@ -61,7 +61,7 @@ public class VerifierService implements HttpFunction {
             .cursor(MapProofCursor::newInstance)
             .build();
 
-    private static SemanticModel SEMANTIC_MODEL = DataIntegrity.createSematicModel(Model.C14N_RDFC)
+    private static final SemanticModel SEMANTIC_MODEL = DataIntegrity.createSematicModel(Model.C14N_RDFC)
             .proofPredicate(DataIntegrity.VOCAB_PROOF_URI)
             .proof(EdDSA2022.withRDFC())
             .proof(ECDSA2019.withRDFC())
@@ -78,7 +78,7 @@ public class VerifierService implements HttpFunction {
             .payload(GraphPayloadGenerator::new)
             .build();
 
-    private static final ContextAwareResolver MODEL_RESOLVER = ContextAwareResolver.builder()
+    private static final ContextAwareResolver MODEL_RESOLVER = ContextAwareResolver.newBuilder()
             // accept any context - for test purposes only
             .model(Predicate.not(Collection::isEmpty),
                     // in processing preferences order
@@ -103,7 +103,7 @@ public class VerifierService implements HttpFunction {
             .documentResolver(DidKey.METHOD_NAME, DID_KEY_RESOLVER)
             .build();
 
-    private static ProofVerifier PROOF_VERIFIER = ProofVerifier.builder()
+    private static final ProofVerifier PROOF_VERIFIER = ProofVerifier.newBuilder()
             .publicKeyResolver(MULTIKEY_RESOLVER::getPublicKey)
             .verifier(EdDSA2022.ALGORITHM, BCEd25519Verifier.getInstance()::verify)
             .verifier(ECDSA2019.P256, BCECDSAVerifier.getP256Instance()::verify)

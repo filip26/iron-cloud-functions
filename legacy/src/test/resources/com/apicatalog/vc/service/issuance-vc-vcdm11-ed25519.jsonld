@@ -1,0 +1,15 @@
+{
+    "credential": {
+        "@context": [
+            "https://www.w3.org/2018/credentials/v1"
+        ],
+        "id": "urn:uuid:8663c22b-72b6-4a61-b65b-3de5d4d10e87",
+        "type": "VerifiableCredential",
+        "issuer": "did:key:z6Mkska8oQD7QQQWxqa7L5ai4mH98HfAdSwomPFYKuqNyE2y",
+        "credentialSubject": "did:key:z6MktKwz7Ge1Yxzr4JHavN33wiwa8y81QdcMRLXQsrH9T53b",
+        "issuanceDate": "2023-07-26T16:30:23Z"
+    },
+    "options": {
+        "type": "ecdsa-2019"
+    }
+}

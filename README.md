@@ -1,94 +1,38 @@
-# Verifiable Credentials HTTP API
+# Serverless Data Integrity Verifiable Credentials
 
-An example implementation of the [Verifiable Credentials HTTP API](https://w3c-ccg.github.io/vc-api/) using [Iron Verifiable Credentials](https://github.com/filip26/iron-verifiable-credentials), [Titanium JSON-LD](https://github.com/filip26/titanium-json-ld) and [Vert.x](https://vertx.io/).
+HTTP-triggered [Google Cloud Run Functions](https://cloud.google.com/functions) providing W3C Data Integerity Verifiable Credentials **Issuer** and **Verifier** endpoints.
 
-[![Java 17 CI](https://github.com/filip26/vc-http-api/actions/workflows/java17-build.yml/badge.svg)](https://github.com/filip26/vc-http-api/actions/workflows/java17-build.yml)
+[![Java 25 CI](https://github.com/filip26/iron-cloud-functions/actions/workflows/build.yml/badge.svg)](https://github.com/filip26/iron-cloud-functions/actions/workflows/build.yml)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
+> [!NOTE]
+> Your feedback is essential to the improvement of this library. Please share any concerns, primary use cases, areas for enhancement, or challenges you have encountered. Your insights help refine and optimize the library to better meet user needs. Thank you for your time and contributions.
 
-## Demo
+## ✨ Features
 
-[https://vc.apicatalog.com/*](https://vc.apicatalog.com)
+- Google Cloud KMS-backed W3C Data Integrity proof signing (private keys never leave KMS)
+- Configurable Verifiable Credential issuer endpoints
+- Configurable Verifiable Credential verifier endpoints
+- Support for multiple W3C Data Integrity cryptographic suites
+- HTTP-triggered Google Cloud Run Functions
+- Serverless deployment with automatic scaling
 
-## Extra Endpoints
+## Developing
 
-### POST /verify?[domain=]
-Verifies verifiable credentials and presentations sent in raw JSON[-LD] format, expanded or compacted.
-
-## Contributing
-
-All PR's welcome!
-
-### Setup
-
-#### Variables
-
-##### EDDSA Keys
-```bash
-> export ED_PUBLIC_KEY=[MULTIBASE]
-> export ED_PRIVATE_KEY=[MULTIBASE]
-```
-
-##### ECDSA P-256 Keys
-```bash
-> export P256_PUBLIC_KEY=[MULTIBASE]
-> export P256_PRIVATE_KEY=[MULTIBASE]
-```
-
-##### ECDSA P-384 Keys
-```bash
-> export P384_PUBLIC_KEY=[MULTIBASE]
-> export P384_PRIVATE_KEY=[MULTIBASE]
-```
-
-See [IssuingHandler](https://github.com/filip26/iron-vc-api/blob/33004560eafb913ea812e7883d742acaea6da59f/src/main/java/com/apicatalog/vc/service/issuer/IssuingHandler.java#L32) and [VCApiTest](https://github.com/filip26/iron-vc-api/blob/33004560eafb913ea812e7883d742acaea6da59f/src/test/java/com/apicatalog/vc/service/VcApiTest.java#L40) for an example.
-
-### Building
-
-Fork and clone the project repository.
+TBD
 
 ```bash
-> cd iron-vc-api
-> mvn clean package
+gcloud auth application-default login
 ```
 
-### Developing
+## 🤝 Contributing
 
-```bash
-> cd iron-vc-api
-> chmod +x ./bin/start.sh
-> ./bin/start.sh dev
-```
+Contributions of all kinds are welcome - whether it’s code, documentation, testing, or community support! Please open PR or issue to get started.
 
-### Deployment
+## 📚 Resources
 
-1. Setup GAE project and install `gcloud` utility. 
-2. Create `.env.yaml` in the project root directory
-```yaml
-env_variables:
-  ED_PUBLIC_KEY: [MULTIBASE]
-  ED_PRIVATE_KEY: [MULTIBASE]
-  P256_PUBLIC_KEY: [MULTIBASE]
-  P256_PRIVATE_KEY: [MULTIBASE]
-  P384_PUBLIC_KEY: [MULTIBASE]
-  P384_PRIVATE_KEY: [MULTIBASE]
-```
-3. Edit [src/main/appengine/app.yaml](https://github.com/filip26/iron-vc-api/blob/33004560eafb913ea812e7883d742acaea6da59f/src/main/appengine/app.yaml)
-4. Compile and deploy
-```bash
-> ./bin/deploy.sh
-```
 
-## Resources
-* [Iron Verifiable Credentials](https://github.com/filip26/iron-verifiable-credentials)
-* [Verifiable Credentials HTTP API](https://w3c-ccg.github.io/vc-api/)
-* [https://github.com/w3c-ccg/vc-api/](https://github.com/w3c-ccg/vc-api/)
+## 💼 Commercial Support
 
-## Sponsors
-
-<a href="https://github.com/digitalbazaar">
-  <img src="https://avatars.githubusercontent.com/u/167436?s=200&v=4" width="40" />
-</a> 
-
-## Commercial Support
-Commercial support is available at filip26@gmail.com
+Commercial support and consulting are available.
+For inquiries, please contact: <filip26@gmail.com>

@@ -8,6 +8,7 @@ import java.net.HttpURLConnection;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.SignatureException;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +40,7 @@ import com.apicatalog.tree.io.jakcson.Jackson2Emitter;
 import com.apicatalog.tree.io.jakcson.Jackson2Parser;
 import com.apicatalog.trust.model.ContextAwareResolver;
 import com.apicatalog.trust.model.Model;
+import com.apicatalog.trust.proof.Proof;
 import com.apicatalog.trust.semantic.GraphAccessor;
 import com.apicatalog.trust.semantic.GraphPayloadGenerator;
 import com.apicatalog.trust.semantic.GraphProofCursor;
@@ -171,6 +173,7 @@ public class RDFCIssuerService implements HttpFunction {
             SIGNER = KmsAsymmetricSigner.newP256Instance(KMS_RESOURCE, KMS)::sign;
             CRYPTOSUITE = ECDSA2019.withRDFC();
             keyLength = ECDSA2019.P256_PUBLIC_KEY_SIZE;
+            MODEL = modelBuilder.cryptosuite(CRYPTOSUITE).build();
             break;
 
         case EC_SIGN_P384_SHA384:
@@ -183,6 +186,7 @@ public class RDFCIssuerService implements HttpFunction {
             SIGNER = KmsAsymmetricSigner.newP384Instance(KMS_RESOURCE, KMS)::sign;
             CRYPTOSUITE = ECDSA2019.withRDFC();
             keyLength = ECDSA2019.P384_PUBLIC_KEY_SIZE;
+            MODEL = modelBuilder.cryptosuite(CRYPTOSUITE).build();
             break;
 
         case EC_SIGN_ED25519:
@@ -192,6 +196,7 @@ public class RDFCIssuerService implements HttpFunction {
                 DIGEST_NAME = Ed25519Signature2020.HASH_ALGORITHM;
                 CRYPTOSUITE = null;
                 keyLength = EdDSA2022.PUBLIC_KEY_SIZE;
+                MODEL = modelBuilder.Ed25519Signature2020().build();
 
             } else if (DataIntegrityProof.TYPE_NAME.equals(proofType)) {
                 ISSUER = RDFCIssuerService::issue;
@@ -199,6 +204,7 @@ public class RDFCIssuerService implements HttpFunction {
                 CRYPTOSUITE = EdDSA2022.withRDFC();
                 DIGEST_NAME = Digestor.SHA_256;
                 keyLength = EdDSA2022.PUBLIC_KEY_SIZE;
+                MODEL = modelBuilder.cryptosuite(CRYPTOSUITE).build();
 
             } else {
                 throw new IllegalArgumentException();
@@ -217,6 +223,7 @@ public class RDFCIssuerService implements HttpFunction {
             SIGNER = KmsAsymmetricSigner.newDSAInstance(KMS_RESOURCE, KMS)::sign;
             CRYPTOSUITE = MLDSA2024.get44withRDFC();
             keyLength = MLDSA2024.PUBLIC_KEY_SIZE;
+            MODEL = modelBuilder.cryptosuite(CRYPTOSUITE).build();
             break;
 
         case PQ_SIGN_SLH_DSA_SHA2_128S:
@@ -229,13 +236,12 @@ public class RDFCIssuerService implements HttpFunction {
             SIGNER = KmsAsymmetricSigner.newDSAInstance(KMS_RESOURCE, KMS)::sign;
             CRYPTOSUITE = SLHDSA2024.get128withRDFC();
             keyLength = SLHDSA2024.SHA2_128S_PUBLIC_KEY_SIZE;
+            MODEL = modelBuilder.cryptosuite(CRYPTOSUITE).build();
             break;
 
         default:
             throw new IllegalArgumentException("Unsupported key algorithm: " + publicKey.getAlgorithm());
         }
-
-        MODEL = modelBuilder.cryptosuite(CRYPTOSUITE).build();
 
         if (CRYPTOSUITE != null) {
             LOG.info("Initialized for %s (%s) with %s (%d bytes)".formatted(
@@ -332,6 +338,14 @@ public class RDFCIssuerService implements HttpFunction {
             proofDraft.options(issueRequest.options().proofDraft());
         }
 
+        if (proofDraft.purpose() == null) {
+            proofDraft.purpose(Proof.Purpose.ASSERTION);
+        }
+
+        if (proofDraft.created() == null) {
+            proofDraft.created(Instant.now());
+        }
+
         proofDraft.verificationMethod(VERIFICATION_METHOD);
 
         if (proofDraft.hasRequired()) {
@@ -373,6 +387,14 @@ public class RDFCIssuerService implements HttpFunction {
 
         proofDraft.verificationMethod(VERIFICATION_METHOD);
 
+        if (proofDraft.purpose() == null) {
+            proofDraft.purpose(Proof.Purpose.ASSERTION);
+        }
+
+        if (proofDraft.created() == null) {
+            proofDraft.created(Instant.now());
+        }
+        
         if (proofDraft.hasRequired()) {
             throw new IllegalArgumentException();
         }

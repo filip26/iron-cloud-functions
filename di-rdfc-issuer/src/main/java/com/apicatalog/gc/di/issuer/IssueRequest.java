@@ -47,8 +47,6 @@ public record IssueRequest(
             Collection<String> mandatoryPointers,
             Map<String, Object> proofDraft) {
 
-        static final String ASSERTION_PURPOSE = "assertionMethod";
-
         static final String OPTION_DOMAIN = "domain";
         static final String OPTION_CHALLENGE = "challenge";
         static final String OPTION_NONCE = "nonce";
@@ -89,25 +87,13 @@ public record IssueRequest(
                     proofDraft);
 
         }
-
-//        public void init(SequencedCollection<String> documentContext, ProofDraft proofDraft) {
-//            proofDraft.context(context != null
-//                    ? context
-//                    : documentContext);
-//            proofDraft.created(created);
-//            proofDraft.challenge(challenge);
-//            proofDraft.expires(expires);
-//            proofDraft.nonce(nonce);
-//            proofDraft.previousProof(previous);
-//            proofDraft.purpose(Proof.Purpose.from(purpose));
-//            proofDraft.domain(domain);
-//        }
-
     }
 
     // TODO move to crypto-kms
-    static void forEachPublicKey(KeyManagementServiceClient client, KeyRingName keyRingName,
-            Consumer<PublicKey> consumer) throws Exception {
+    static void forEachPublicKey(
+            KeyManagementServiceClient client,
+            KeyRingName keyRingName,
+            Consumer<PublicKey> consumer) {
 
 //        try (KeyManagementServiceClient client = KeyManagementServiceClient.create()) {
 

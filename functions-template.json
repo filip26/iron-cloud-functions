@@ -1,12 +1,27 @@
 [
   {
     "id": "issuer-ecdsa-jcs-2019",
-    "type": "JcsIssuerService",
+    "type": "JCSIssuerService",
     "region": "us-central1",
     "serviceAccount": "",
     "options": "--allow-unauthenticated",
     "jvm": "-XX:+UseSerialGC -Xss256k -XX:MaxRAMPercentage=80 -XX:+UnlockExperimentalVMOptions -XX:+UseCompactObjectHeaders -XX:TieredStopAtLevel=1 -Xshare:on",
     "env": {
+      "KMS_LOCATION": "",
+      "KMS_KEY_RING": "",
+      "KMS_KEY_ID": "",
+      "VERIFICATION_METHOD": ""
+    }
+  },
+  {
+    "id": "issuer-ed25519-signature-2020",
+    "type": "RDFCIssuerService",
+    "region": "us-central1",
+    "serviceAccount": "",
+    "options": "--allow-unauthenticated",
+    "jvm": "-XX:+UseSerialGC -Xss256k -XX:MaxRAMPercentage=80 -XX:+UnlockExperimentalVMOptions -XX:+UseCompactObjectHeaders -XX:TieredStopAtLevel=1 -Xshare:on",
+    "env": {
+      "PROOF_TYPE": "Ed25519Signature2020",
       "KMS_LOCATION": "",
       "KMS_KEY_RING": "",
       "KMS_KEY_ID": "",

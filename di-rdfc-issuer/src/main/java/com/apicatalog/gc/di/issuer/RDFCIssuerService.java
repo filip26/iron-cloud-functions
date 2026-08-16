@@ -284,7 +284,7 @@ public class RDFCIssuerService implements HttpFunction {
             document = Tree.read(parser);
             issueRequest = IssueRequest.from(document);
 
-        } catch (RuntimeException e) {
+        } catch (Throwable e) {
             e.printStackTrace();
             response.setStatusCode(HttpURLConnection.HTTP_BAD_REQUEST);
         }
@@ -297,6 +297,8 @@ public class RDFCIssuerService implements HttpFunction {
             signed = ISSUER.issue(document, issueRequest, _ -> sha::digest);
 
         } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+            response.setStatusCode(HttpURLConnection.HTTP_BAD_REQUEST);
 
         } catch (Throwable e) {
             LOG.log(Level.SEVERE, e, e::getMessage);

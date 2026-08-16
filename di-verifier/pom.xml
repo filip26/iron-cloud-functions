@@ -55,7 +55,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <argLine>-Dfile.encoding=UTF-8</argLine>
 
-        <iron-di.version>1.0.0-M1</iron-di.version>
+        <di.version>1.0.0-M1-SNAPSHOT</di.version>
         <crypto-bc.version>1.0.0</crypto-bc.version>
         <did.key.version>0.11.0</did.key.version>
         <jcs.version>3.0.0-M4</jcs.version>
@@ -111,7 +111,7 @@
         <dependency>
             <groupId>com.apicatalog</groupId>
             <artifactId>iron-data-integrity</artifactId>
-            <version>${iron-di.version}</version>
+            <version>${di.version}</version>
         </dependency>
         <dependency>
             <groupId>com.apicatalog</groupId>

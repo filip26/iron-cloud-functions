@@ -1,23 +1,20 @@
-package com.apicatalog.gc.di.verifier;
+package com.apicatalog.gc.di.issuer;
 
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.SequencedCollection;
 import java.util.function.Consumer;
 
-import com.apicatalog.di.suite.StandardCryptoSuite.ProofDraft;
-import com.apicatalog.trust.proof.Proof;
 import com.google.cloud.kms.v1.CryptoKey;
 import com.google.cloud.kms.v1.CryptoKeyVersion;
 import com.google.cloud.kms.v1.KeyManagementServiceClient;
 import com.google.cloud.kms.v1.KeyRingName;
 import com.google.cloud.kms.v1.PublicKey;
 
-public record VerifyRequest(
-        Collection<String> context,
+public record IssueRequest(
+        SequencedCollection<String> context,
         Map<String, Object> document,
         Options options) {
 
@@ -25,9 +22,9 @@ public record VerifyRequest(
     static final String PRESENTATION = "presentation";
     static final String OPTIONS = "options";
 
-    public static VerifyRequest from(final Map<String, Object> source) {
+    public static IssueRequest from(final Map<String, Object> source) {
 
-        Collection<String> context = List.of();
+        SequencedCollection<String> context = List.of();
         Map<String, Object> document = source;
         Options options = null;
 
@@ -42,20 +39,13 @@ public record VerifyRequest(
             }
         }
 
-        return new VerifyRequest(context, document, options);
+        return new IssueRequest(context, document, options);
     }
 
     static record Options(
             String credentialId,
             Collection<String> mandatoryPointers,
-            SequencedCollection<String> context,
-            String purpose,
-            Instant created,
-            Instant expires,
-            String challenge,
-            SequencedCollection<String> domain,
-            String nonce,
-            SequencedCollection<String> previous) {
+            Map<String, Object> proofDraft) {
 
         static final String ASSERTION_PURPOSE = "assertionMethod";
 
@@ -70,29 +60,23 @@ public record VerifyRequest(
 
         static Options from(Map<String, ?> source) {
 
-            Instant created = Instant.now().truncatedTo(ChronoUnit.SECONDS);
-            Instant expires = null;
-            String challenge = null;
-            SequencedCollection<String> domain = null;
-            String nonce = null;
-            SequencedCollection<String> previous = null;
-
             String credentialId = null;
-            SequencedCollection<String> context = List.of();
             Collection<String> mandatoryPointers = List.of();
+            Map<String, Object> proofDraft = HashMap.newHashMap(source.size());
 
             for (var entry : source.entrySet()) {
 
                 switch (entry.getKey()) {
                 case OPTION_CREDENTIAL_ID -> credentialId = MapEntryAdapter.string(entry);
                 case OPTION_MANDATORY_POINTERS -> mandatoryPointers = MapEntryAdapter.stringCollection(entry);
-                case OPTION_CREATED -> created = MapEntryAdapter.instant(entry);
-                case OPTION_EXPIRES -> expires = MapEntryAdapter.instant(entry);
-                case OPTION_CHALLENGE -> challenge = MapEntryAdapter.string(entry);
-                case OPTION_DOMAIN -> domain = MapEntryAdapter.stringCollection(entry);
-                case OPTION_NONCE -> nonce = MapEntryAdapter.string(entry);
-                case OPTION_PREVIOUS -> previous = MapEntryAdapter.stringCollection(entry);
-                case "@context" -> context = MapEntryAdapter.stringCollection(entry);
+                case OPTION_CREATED,
+                        OPTION_EXPIRES,
+                        OPTION_CHALLENGE,
+                        OPTION_DOMAIN,
+                        OPTION_NONCE,
+                        OPTION_PREVIOUS,
+                        "@context" ->
+                    proofDraft.put(entry.getKey(), entry.getValue());
 
                 default ->
                     throw new IllegalArgumentException("Unexpected option: " + entry.getKey() + "=" + entry.getValue());
@@ -102,44 +86,38 @@ public record VerifyRequest(
             return new Options(
                     credentialId,
                     mandatoryPointers,
-                    context,
-                    ASSERTION_PURPOSE,
-                    created,
-                    expires,
-                    challenge,
-                    domain,
-                    nonce,
-                    previous);
+                    proofDraft);
 
         }
 
-        public void init(SequencedCollection<String> documentContext, ProofDraft proofDraft) {
-            proofDraft.context(context != null
-                    ? context
-                    : documentContext);
-            proofDraft.created(created);
-            proofDraft.challenge(challenge);
-            proofDraft.expires(expires);
-            proofDraft.nonce(nonce);
-            proofDraft.previousProof(previous);
-            proofDraft.purpose(Proof.Purpose.from(purpose));
-            proofDraft.domain(domain);
-        }
+//        public void init(SequencedCollection<String> documentContext, ProofDraft proofDraft) {
+//            proofDraft.context(context != null
+//                    ? context
+//                    : documentContext);
+//            proofDraft.created(created);
+//            proofDraft.challenge(challenge);
+//            proofDraft.expires(expires);
+//            proofDraft.nonce(nonce);
+//            proofDraft.previousProof(previous);
+//            proofDraft.purpose(Proof.Purpose.from(purpose));
+//            proofDraft.domain(domain);
+//        }
 
     }
 
     // TODO move to crypto-kms
-    static void forEachPublicKey(KeyManagementServiceClient client, KeyRingName keyRingName, Consumer<PublicKey> consumer) throws Exception {
+    static void forEachPublicKey(KeyManagementServiceClient client, KeyRingName keyRingName,
+            Consumer<PublicKey> consumer) throws Exception {
 
 //        try (KeyManagementServiceClient client = KeyManagementServiceClient.create()) {
 
-            for (CryptoKey cryptoKey : client.listCryptoKeys(keyRingName).iterateAll()) {
-                CryptoKey.CryptoKeyPurpose purpose = cryptoKey.getPurpose();
+        for (CryptoKey cryptoKey : client.listCryptoKeys(keyRingName).iterateAll()) {
+            CryptoKey.CryptoKeyPurpose purpose = cryptoKey.getPurpose();
 
-                if (purpose == CryptoKey.CryptoKeyPurpose.ASYMMETRIC_SIGN) {
-                    for (CryptoKeyVersion version : client.listCryptoKeyVersions(cryptoKey.getName()).iterateAll()) {
-                        if (version.getState() == CryptoKeyVersion.CryptoKeyVersionState.ENABLED) {
-                            consumer.accept(client.getPublicKey(version.getName()));
+            if (purpose == CryptoKey.CryptoKeyPurpose.ASYMMETRIC_SIGN) {
+                for (CryptoKeyVersion version : client.listCryptoKeyVersions(cryptoKey.getName()).iterateAll()) {
+                    if (version.getState() == CryptoKeyVersion.CryptoKeyVersionState.ENABLED) {
+                        consumer.accept(client.getPublicKey(version.getName()));
 //                            PublicKey publicKey = client.getPublicKey(version.getName());
 //                            try {
 //                                System.out.printf("Key %s, Version: %s%n", publicKey.getAlgorithm(), version.getName());
@@ -147,10 +125,10 @@ public record VerifyRequest(
 //                            } catch (IllegalArgumentException e) {
 //                                IO.println(e.getMessage());
 //                            }
-                        }
                     }
                 }
             }
+        }
 //        }
     }
 }

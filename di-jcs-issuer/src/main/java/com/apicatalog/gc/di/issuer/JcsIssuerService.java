@@ -23,8 +23,8 @@ import com.apicatalog.tree.io.Tree;
 import com.apicatalog.tree.io.jakcson.Jackson2Emitter;
 import com.apicatalog.tree.io.jakcson.Jackson2Parser;
 import com.apicatalog.trust.lexical.LexicalModel;
-import com.apicatalog.trust.lexical.MapAdapter;
-import com.apicatalog.trust.lexical.MapProofCursor;
+import com.apicatalog.trust.lexical.PropertyMapAccessor;
+import com.apicatalog.trust.lexical.PropertyProofCursor;
 import com.apicatalog.trust.model.ContextAwareResolver;
 import com.apicatalog.trust.model.Model;
 import com.fasterxml.jackson.core.JsonFactory;
@@ -107,11 +107,11 @@ public class JcsIssuerService implements HttpFunction {
         // permissive
         final var publicKey = KMS.getPublicKey(KMS_RESOURCE);
 
-        var modelBuilder = DataIntegrity.createLexicalModel(Model.C14N_JCS)
-                .proofProperty(DataIntegrity.VOCAB_PROOF_KEY)
+        var modelBuilder = DataIntegrity.newLexicalModel(Model.C14N_JCS)
+                .proofProperty(DataIntegrity.PROPERTY_PROOF)
                 .c14n(Jcs::canonize)
-                .adapter(MapAdapter::newInstance)
-                .cursor(MapProofCursor::newInstance);
+                .accessor(PropertyMapAccessor::newInstance)
+                .cursor(PropertyProofCursor::newInstance);
 
         int keyLength = -1;
 
@@ -199,7 +199,7 @@ public class JcsIssuerService implements HttpFunction {
 
         var documentContext = ContextAwareResolver.getContexts(document);
 
-        var proofDraft = CRYPTOSUITE.createProofDraft();
+        var proofDraft = CRYPTOSUITE.newProofDraft();
 
         proofDraft.context(documentContext);
 

@@ -5,9 +5,11 @@ import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.SequencedCollection;
 import java.util.function.Consumer;
 
 import com.apicatalog.di.suite.StandardCryptoSuite.ProofDraft;
+import com.apicatalog.trust.proof.Proof;
 import com.google.cloud.kms.v1.CryptoKey;
 import com.google.cloud.kms.v1.CryptoKeyVersion;
 import com.google.cloud.kms.v1.KeyManagementServiceClient;
@@ -15,7 +17,7 @@ import com.google.cloud.kms.v1.KeyRingName;
 import com.google.cloud.kms.v1.PublicKey;
 
 public record IssueRequest(
-        Collection<String> context,
+        SequencedCollection<String> context,
         Map<String, Object> document,
         Options options) {
 
@@ -25,7 +27,7 @@ public record IssueRequest(
 
     public static IssueRequest from(final Map<String, Object> source) {
 
-        Collection<String> context = List.of();
+        SequencedCollection<String> context = List.of();
         Map<String, Object> document = source;
         Options options = null;
 
@@ -46,14 +48,14 @@ public record IssueRequest(
     static record Options(
             String credentialId,
             Collection<String> mandatoryPointers,
-            Collection<String> context,
+            SequencedCollection<String> context,
             String purpose,
             Instant created,
             Instant expires,
             String challenge,
-            Collection<String> domain,
+            SequencedCollection<String> domain,
             String nonce,
-            Collection<String> previous) {
+            SequencedCollection<String> previous) {
 
         static final String ASSERTION_PURPOSE = "assertionMethod";
 
@@ -71,12 +73,12 @@ public record IssueRequest(
             Instant created = Instant.now().truncatedTo(ChronoUnit.SECONDS);
             Instant expires = null;
             String challenge = null;
-            Collection<String> domain = null;
+            SequencedCollection<String> domain = null;
             String nonce = null;
-            Collection<String> previous = null;
+            SequencedCollection<String> previous = null;
 
             String credentialId = null;
-            Collection<String> context = List.of();
+            SequencedCollection<String> context = List.of();
             Collection<String> mandatoryPointers = List.of();
 
             for (var entry : source.entrySet()) {
@@ -111,7 +113,7 @@ public record IssueRequest(
 
         }
 
-        public void init(Collection<String> documentContext, ProofDraft proofDraft) {
+        public void init(SequencedCollection<String> documentContext, ProofDraft proofDraft) {
             proofDraft.context(context != null
                     ? context
                     : documentContext);
@@ -120,7 +122,7 @@ public record IssueRequest(
             proofDraft.expires(expires);
             proofDraft.nonce(nonce);
             proofDraft.previousProof(previous);
-            proofDraft.purpose(purpose);
+            proofDraft.purpose(Proof.Purpose.from(purpose));
             proofDraft.domain(domain);
         }
 

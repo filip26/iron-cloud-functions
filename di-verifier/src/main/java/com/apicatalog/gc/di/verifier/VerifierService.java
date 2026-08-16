@@ -27,12 +27,12 @@ import com.apicatalog.multicodec.codec.KeyCodec;
 import com.apicatalog.tree.io.Tree;
 import com.apicatalog.tree.io.jakcson.Jackson2Parser;
 import com.apicatalog.trust.lexical.LexicalModel;
-import com.apicatalog.trust.lexical.MapAdapter;
-import com.apicatalog.trust.lexical.MapProofCursor;
+import com.apicatalog.trust.lexical.PropertyMapAccessor;
+import com.apicatalog.trust.lexical.PropertyProofCursor;
 import com.apicatalog.trust.model.ContextAwareResolver;
 import com.apicatalog.trust.model.Model;
 import com.apicatalog.trust.proof.ProofVerifier;
-import com.apicatalog.trust.semantic.GraphAdapter;
+import com.apicatalog.trust.semantic.GraphAccessor;
 import com.apicatalog.trust.semantic.GraphPayloadGenerator;
 import com.apicatalog.trust.semantic.GraphProofCursor;
 import com.apicatalog.trust.semantic.GraphUpdater;
@@ -50,29 +50,29 @@ public class VerifierService implements HttpFunction {
     // Static initialization
     private static final JsonFactory JSON_FACTORY = JsonFactory.builder().build();
 
-    private static final LexicalModel LEXICAL_MODEL = DataIntegrity.createLexicalModel(Model.C14N_JCS)
-            .proofProperty(DataIntegrity.VOCAB_PROOF_KEY)
+    private static final LexicalModel LEXICAL_MODEL = DataIntegrity.newLexicalModel(Model.C14N_JCS)
+            .proofProperty(DataIntegrity.PROPERTY_PROOF)
             .proof(EdDSA2022.withJCS())
             .proof(ECDSA2019.withJCS())
             .proof(MLDSA2024.get44withJCS())
             .proof(SLHDSA2024.get128withJCS())
             .c14n(Jcs::canonize)
-            .adapter(MapAdapter::newInstance)
-            .cursor(MapProofCursor::newInstance)
+            .accessor(PropertyMapAccessor::newInstance)
+            .cursor(PropertyProofCursor::newInstance)
             .build();
 
-    private static final SemanticModel SEMANTIC_MODEL = DataIntegrity.createSematicModel(Model.C14N_RDFC)
-            .proofPredicate(DataIntegrity.VOCAB_PROOF_URI)
-            .proof(EdDSA2022.withRDFC())
-            .proof(ECDSA2019.withRDFC())
-            .proof(MLDSA2024.get44withRDFC())
-            .proof(SLHDSA2024.get128withRDFC())
+    private static final SemanticModel SEMANTIC_MODEL = DataIntegrity.newSematicModel(Model.C14N_RDFC)
+            .proofPredicate(DataIntegrity.PREDICATE_PROOF)
+            .cryptosuite(EdDSA2022.withRDFC())
+            .cryptosuite(ECDSA2019.withRDFC())
+            .cryptosuite(MLDSA2024.get44withRDFC())
+            .cryptosuite(SLHDSA2024.get128withRDFC())
             .Ed25519Signature2020()
 //FIXME
 //            .expand(Resources::expand)
 //            .tordf(Resources::toRDF)
 //            .c14n(Resources::createRDFC)
-            .adapter(GraphAdapter::newInstance)
+            .accessor(GraphAccessor::newInstance)
             .updater(GraphUpdater::new)
             .cursor(GraphProofCursor::newInstance)
             .payload(GraphPayloadGenerator::new)

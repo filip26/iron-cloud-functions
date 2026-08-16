@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.SequencedCollection;
 
 class MapEntryAdapter {
 
@@ -61,7 +62,7 @@ class MapEntryAdapter {
         return value;
     }
 
-    public static Collection<String> stringCollection(Map.Entry<String, ?> entry) {
+    public static SequencedCollection<String> stringCollection(Map.Entry<String, ?> entry) {
 
         if (entry.getValue() == null) {
             return List.of();

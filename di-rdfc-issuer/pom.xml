@@ -43,6 +43,8 @@
             <roles>
                 <role>author</role>
             </roles>
+            <organization>APICatalog</organization>
+            <organizationUrl>https://apicatalog.com</organizationUrl>
         </developer>
     </developers>
 
@@ -56,6 +58,7 @@
         <argLine>-Dfile.encoding=UTF-8</argLine>
 
         <di.version>1.0.0-M1-SNAPSHOT</di.version>
+        <contexts.version>1.1.0-SNAPSHOT</contexts.version>
         <crypto-gc.version>1.0.0</crypto-gc.version>
         <jsonld.version>1.7.0</jsonld.version>
         <rdfc.version>3.0.0</rdfc.version>
@@ -76,7 +79,6 @@
     </dependencyManagement>
 
     <dependencies>
-
         <dependency>
             <groupId>com.google.cloud.functions</groupId>
             <artifactId>functions-framework-api</artifactId>
@@ -108,6 +110,11 @@
             <artifactId>iron-crypto-gcloud-kms</artifactId>
             <version>${crypto-gc.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.apicatalog</groupId>
+            <artifactId>iron-security-contexts</artifactId>
+            <version>${contexts.version}</version>
+        </dependency>        
         <dependency>
             <groupId>com.apicatalog</groupId>
             <artifactId>iron-data-integrity</artifactId>

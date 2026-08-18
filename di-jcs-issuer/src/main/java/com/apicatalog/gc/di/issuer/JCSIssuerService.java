@@ -36,9 +36,9 @@ import com.google.cloud.functions.HttpResponse;
 import com.google.cloud.kms.v1.CryptoKeyVersionName;
 import com.google.cloud.kms.v1.KeyManagementServiceClient;
 
-public class JcsIssuerService implements HttpFunction {
+public class JCSIssuerService implements HttpFunction {
 
-    private static final Logger LOG = Logger.getLogger(JcsIssuerService.class.getName());
+    private static final Logger LOG = Logger.getLogger(JCSIssuerService.class.getName());
 
     /**
      * Reusable KMS client to minimize latency during "warm" starts. Initialized

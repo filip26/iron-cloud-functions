@@ -104,7 +104,11 @@ public class RDFCIssuerService implements HttpFunction {
 
         VERIFICATION_METHOD = env.get("VERIFICATION_METHOD");
 
-        if (proofType == null || location == null || keyRing == null || keyId == null || VERIFICATION_METHOD == null) {
+        if (proofType == null 
+                || location == null 
+                || keyRing == null 
+                || keyId == null 
+                || VERIFICATION_METHOD == null) {
             throw new IllegalStateException(
                     """
                     Missing environment configuration:
@@ -165,9 +169,12 @@ public class RDFCIssuerService implements HttpFunction {
         switch (publicKey.getAlgorithm()) {
         case EC_SIGN_P256_SHA256:
             if (!DataIntegrityProof.TYPE_NAME.equals(proofType)) {
-                throw new IllegalArgumentException();
+                throw new IllegalStateException(
+                        """
+                        Unsupported PROOF_TYPE: %s for key algorithm: %s.
+                        """.formatted(proofType, publicKey.getAlgorithm()));
             }
-            ISSUER = RDFCIssuerService::issue;
+            ISSUER = RDFCIssuerService::issueDataIntegrityProof;
             DIGEST_NAME = Digestor.SHA_256;
             SIGNATURE_ALGORITHM = ECDSA2019.P256;
             SIGNER = KmsAsymmetricSigner.newP256Instance(KMS_RESOURCE, KMS)::sign;
@@ -178,9 +185,12 @@ public class RDFCIssuerService implements HttpFunction {
 
         case EC_SIGN_P384_SHA384:
             if (!DataIntegrityProof.TYPE_NAME.equals(proofType)) {
-                throw new IllegalArgumentException();
+                throw new IllegalStateException(
+                        """
+                        Unsupported PROOF_TYPE: %s for key algorithm: %s.
+                        """.formatted(proofType, publicKey.getAlgorithm()));
             }
-            ISSUER = RDFCIssuerService::issue;
+            ISSUER = RDFCIssuerService::issueDataIntegrityProof;
             DIGEST_NAME = Digestor.SHA_384;
             SIGNATURE_ALGORITHM = ECDSA2019.P384;
             SIGNER = KmsAsymmetricSigner.newP384Instance(KMS_RESOURCE, KMS)::sign;
@@ -195,11 +205,11 @@ public class RDFCIssuerService implements HttpFunction {
                 SIGNATURE_ALGORITHM = Ed25519Signature2020.SIGNATURE_ALGORITHM;
                 DIGEST_NAME = Ed25519Signature2020.HASH_ALGORITHM;
                 CRYPTOSUITE = null;
-                keyLength = EdDSA2022.PUBLIC_KEY_SIZE;
+                keyLength = Ed25519Signature2020.PUBLIC_KEY_SIZE;
                 MODEL = modelBuilder.Ed25519Signature2020().build();
 
             } else if (DataIntegrityProof.TYPE_NAME.equals(proofType)) {
-                ISSUER = RDFCIssuerService::issue;
+                ISSUER = RDFCIssuerService::issueDataIntegrityProof;
                 SIGNATURE_ALGORITHM = EdDSA2022.ALGORITHM;
                 CRYPTOSUITE = EdDSA2022.withRDFC();
                 DIGEST_NAME = Digestor.SHA_256;
@@ -207,7 +217,10 @@ public class RDFCIssuerService implements HttpFunction {
                 MODEL = modelBuilder.cryptosuite(CRYPTOSUITE).build();
 
             } else {
-                throw new IllegalArgumentException();
+                throw new IllegalStateException(
+                        """
+                        Unsupported PROOF_TYPE: %s. Expected %s or %s.
+                        """.formatted(proofType, DataIntegrityProof.TYPE_NAME, Ed25519Signature2020.TYPE_NAME));
             }
 
             SIGNER = KmsAsymmetricSigner.newEd25519Instance(KMS_RESOURCE, KMS)::sign;
@@ -215,9 +228,12 @@ public class RDFCIssuerService implements HttpFunction {
 
         case PQ_SIGN_ML_DSA_44:
             if (!DataIntegrityProof.TYPE_NAME.equals(proofType)) {
-                throw new IllegalArgumentException();
+                throw new IllegalStateException(
+                        """
+                        Unsupported PROOF_TYPE: %s for key algorithm: %s.
+                        """.formatted(proofType, publicKey.getAlgorithm()));
             }
-            ISSUER = RDFCIssuerService::issue;
+            ISSUER = RDFCIssuerService::issueDataIntegrityProof;
             DIGEST_NAME = Digestor.SHA_256;
             SIGNATURE_ALGORITHM = MLDSA2024.ALGORITHM_44;
             SIGNER = KmsAsymmetricSigner.newDSAInstance(KMS_RESOURCE, KMS)::sign;
@@ -228,9 +244,12 @@ public class RDFCIssuerService implements HttpFunction {
 
         case PQ_SIGN_SLH_DSA_SHA2_128S:
             if (!DataIntegrityProof.TYPE_NAME.equals(proofType)) {
-                throw new IllegalArgumentException();
+                throw new IllegalStateException(
+                        """
+                        Unsupported PROOF_TYPE: %s for key algorithm: %s.
+                        """.formatted(proofType, publicKey.getAlgorithm()));
             }
-            ISSUER = RDFCIssuerService::issue;
+            ISSUER = RDFCIssuerService::issueDataIntegrityProof;
             DIGEST_NAME = Digestor.SHA_256;
             SIGNATURE_ALGORITHM = SLHDSA2024.ALGORITHM_SHA2_128s;
             SIGNER = KmsAsymmetricSigner.newDSAInstance(KMS_RESOURCE, KMS)::sign;
@@ -324,7 +343,7 @@ public class RDFCIssuerService implements HttpFunction {
         }
     }
 
-    private static final Map<String, ?> issue(
+    private static final Map<String, ?> issueDataIntegrityProof(
             Map<String, Object> document,
             IssueRequest issueRequest,
             Digestor.Factory digestFactory) throws SignatureException {
@@ -396,7 +415,7 @@ public class RDFCIssuerService implements HttpFunction {
         if (proofDraft.created() == null) {
             proofDraft.created(Instant.now());
         }
-        
+
         if (proofDraft.hasRequired()) {
             throw new IllegalArgumentException();
         }

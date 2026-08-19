@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.SequencedCollection;
 import java.util.function.Consumer;
+import java.util.logging.Logger;
 
 import com.google.cloud.kms.v1.CryptoKey;
 import com.google.cloud.kms.v1.CryptoKeyVersion;
@@ -14,28 +15,32 @@ import com.google.cloud.kms.v1.KeyRingName;
 import com.google.cloud.kms.v1.PublicKey;
 
 public record IssueRequest(
-        SequencedCollection<String> context,
+        SequencedCollection<Object> context,
         Map<String, Object> document,
         Options options) {
 
-    static final String CREDENTIAL = "credential";
-    static final String PRESENTATION = "presentation";
-    static final String OPTIONS = "options";
+    private static final Logger LOG = Logger.getLogger(IssueRequest.class.getName());
+
+    private static final String CREDENTIAL = "credential";
+    private static final String PRESENTATION = "presentation";
+    private static final String OPTIONS = "options";
 
     public static IssueRequest from(final Map<String, Object> source) {
 
-        SequencedCollection<String> context = List.of();
+        SequencedCollection<Object> context = List.of();
         Map<String, Object> document = source;
         Options options = null;
 
         for (var entry : source.entrySet()) {
             switch (entry.getKey()) {
-            case "@context" -> context = MapEntryAdapter.stringCollection(entry);
-            case CREDENTIAL -> document = (Map<String, Object>) entry.getValue();
+            case "@context" -> context = MapEntryAdapter.toCollection(entry);
+            case CREDENTIAL, PRESENTATION -> document = (Map<String, Object>) entry.getValue();
             case OPTIONS -> options = Options.from((Map<String, ?>) entry.getValue());
 
-            default ->
-                throw new IllegalArgumentException("Unexpected option: " + entry.getKey() + "=" + entry.getValue());
+            default -> LOG.warning(
+                    () -> "Unexpected request property %s -> %s"
+                            .formatted(entry.getKey(), entry.getValue()));
+
             }
         }
 
@@ -77,7 +82,7 @@ public record IssueRequest(
                     proofDraft.put(entry.getKey(), entry.getValue());
 
                 default ->
-                    throw new IllegalArgumentException("Unexpected option: " + entry.getKey() + "=" + entry.getValue());
+                    LOG.warning(() -> "Unexpected request option %s -> %s".formatted(entry.getKey(), entry.getValue()));
                 }
             }
 
@@ -85,7 +90,6 @@ public record IssueRequest(
                     credentialId,
                     mandatoryPointers,
                     proofDraft);
-
         }
     }
 

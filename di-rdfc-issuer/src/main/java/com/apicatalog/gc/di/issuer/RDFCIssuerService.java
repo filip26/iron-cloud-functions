@@ -374,7 +374,7 @@ public class RDFCIssuerService implements HttpFunction {
             throw new IllegalArgumentException("Proof draft is missing required properties.");
         }
 
-        var updater = MODEL.createUpdater(issueRequest.document());
+        var updater = MODEL.createUpdater(documentContext, issueRequest.document());
 
         var payload = updater.createPayload();
 
@@ -421,7 +421,7 @@ public class RDFCIssuerService implements HttpFunction {
             throw new IllegalArgumentException("Proof draft is missing required properties.");
         }
 
-        var updater = MODEL.createUpdater(document);
+        var updater = MODEL.createUpdater(documentContext, document);
 
         var payload = updater.createPayload();
 
@@ -469,7 +469,7 @@ public class RDFCIssuerService implements HttpFunction {
         }
     }
 
-    private static final Collection<Object> expand(Map<String, Object> document) {
+    private static final Collection<Object> expand(Map<String, ?> document) {
         try {
             // TODO temporary, remove with Titanium v2.x.x
             var bos = new ByteArrayOutputStream();

@@ -27,7 +27,7 @@ class MapEntryAdapter {
             return Instant.parse(string(entry));
         } catch (DateTimeParseException e) {
             throw new IllegalArgumentException(
-                    "Property '" + entry.getKey() + "' must be an ISO-8601 instant.",
+                    "Property '" + entry.getKey() + "' must be an ISO-8601 datetime, but was " + entry.getValue(),
                     e);
         }
     }
@@ -92,7 +92,7 @@ class MapEntryAdapter {
                         + "' must be a string or collection of strings.");
     }
 
-    public static Collection<Object> toCollection(Map.Entry<String, Object> entry) {
+    public static SequencedCollection<Object> toCollection(Map.Entry<String, ?> entry) {
         if (entry.getValue() instanceof Collection<?> values) {
             return List.copyOf(values);
 

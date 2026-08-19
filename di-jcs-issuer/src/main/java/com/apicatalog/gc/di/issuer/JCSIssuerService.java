@@ -209,7 +209,7 @@ public class JCSIssuerService implements HttpFunction {
 
         proofDraft.verificationMethod(VERIFICATION_METHOD);
 
-        var updater = LEXICAL_MODEL.createUpdater(issueRequest.document());
+        var updater = LEXICAL_MODEL.createUpdater(documentContext, issueRequest.document());
 
         var payload = updater.createPayload();
 

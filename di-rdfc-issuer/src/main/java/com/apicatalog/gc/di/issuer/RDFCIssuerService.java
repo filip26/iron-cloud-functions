@@ -4,7 +4,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.net.HttpURLConnection;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.SignatureException;
@@ -49,6 +48,7 @@ import com.apicatalog.trust.semantic.SemanticModel;
 import com.apicatalog.trust.semantic.SemanticModel.GraphCanonizer;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.google.api.client.http.HttpMethods;
+import com.google.api.client.http.HttpStatusCodes;
 import com.google.cloud.ServiceOptions;
 import com.google.cloud.functions.HttpFunction;
 import com.google.cloud.functions.HttpRequest;
@@ -104,10 +104,10 @@ public class RDFCIssuerService implements HttpFunction {
 
         VERIFICATION_METHOD = env.get("VERIFICATION_METHOD");
 
-        if (proofType == null 
-                || location == null 
-                || keyRing == null 
-                || keyId == null 
+        if (proofType == null
+                || location == null
+                || keyRing == null
+                || keyId == null
                 || VERIFICATION_METHOD == null) {
             throw new IllegalStateException(
                     """
@@ -280,16 +280,16 @@ public class RDFCIssuerService implements HttpFunction {
     public void service(HttpRequest request, HttpResponse response) throws Exception {
         response.appendHeader("Access-Control-Allow-Origin", "*");
 
-        if ("OPTIONS".equals(request.getMethod())) {
+        if (HttpMethods.OPTIONS.equals(request.getMethod())) {
             response.appendHeader("Access-Control-Allow-Methods", "POST");
             response.appendHeader("Access-Control-Allow-Headers", "Content-Type");
             response.appendHeader("Access-Control-Max-Age", "3600");
-            response.setStatusCode(HttpURLConnection.HTTP_NO_CONTENT);
+            response.setStatusCode(HttpStatusCodes.STATUS_CODE_NO_CONTENT);
             return;
         }
 
         if (!HttpMethods.POST.equalsIgnoreCase(request.getMethod())) {
-            response.setStatusCode(HttpURLConnection.HTTP_BAD_METHOD);
+            response.setStatusCode(HttpStatusCodes.STATUS_CODE_METHOD_NOT_ALLOWED);
             return;
         }
 
@@ -305,7 +305,7 @@ public class RDFCIssuerService implements HttpFunction {
 
         } catch (Throwable e) {
             e.printStackTrace();
-            response.setStatusCode(HttpURLConnection.HTTP_BAD_REQUEST);
+            response.setStatusCode(HttpStatusCodes.STATUS_CODE_BAD_REQUEST);
         }
 
         Map<String, ?> signed = null;
@@ -317,11 +317,11 @@ public class RDFCIssuerService implements HttpFunction {
 
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
-            response.setStatusCode(HttpURLConnection.HTTP_BAD_REQUEST);
+            response.setStatusCode(HttpStatusCodes.STATUS_CODE_BAD_REQUEST);
 
         } catch (Throwable e) {
             LOG.log(Level.SEVERE, e, e::getMessage);
-            response.setStatusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
+            response.setStatusCode(HttpStatusCodes.STATUS_CODE_SERVER_ERROR);
         }
 
 //        //TODO
@@ -334,12 +334,13 @@ public class RDFCIssuerService implements HttpFunction {
 
         try (var writer = Jackson2Emitter.newEmitter(response.getOutputStream(), JSON_FACTORY)) {
             response.setStatusCode(HttpStatus.SC_OK);
+            response.setStatusCode(HttpStatusCodes.STATUS_CODE_OK);
             response.setContentType("application/json");
             Tree.write(signed, writer);
 
         } catch (Throwable e) {
             LOG.log(Level.SEVERE, e, e::getMessage);
-            response.setStatusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
+            response.setStatusCode(HttpStatusCodes.STATUS_CODE_SERVER_ERROR);
         }
     }
 
@@ -370,7 +371,7 @@ public class RDFCIssuerService implements HttpFunction {
         proofDraft.verificationMethod(VERIFICATION_METHOD);
 
         if (proofDraft.hasRequired()) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Proof draft is missing required properties.");
         }
 
         var updater = MODEL.createUpdater(issueRequest.document());
@@ -417,7 +418,7 @@ public class RDFCIssuerService implements HttpFunction {
         }
 
         if (proofDraft.hasRequired()) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Proof draft is missing required properties.");
         }
 
         var updater = MODEL.createUpdater(document);
